@@ -1,0 +1,41 @@
+{
+  "name": "use-resize-observer",
+  "version": "1.0.0",
+  "main": "dist/bundle.cjs.js",
+  "module": "dist/bundle.esm.js",
+  "repository": "git@github.com:ZeeCoder/use-resize-observer.git",
+  "description": "A React hook to use a Resize Observer",
+  "author": "Viktor Hubert <rpgmorpheus@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "prepublish": "yarn build"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "resize-observer": "^1.0.0-alpha.1"
+  },
+  "peerDependencies": {
+    "react": "^16.7.0-alpha.0",
+    "react-dom": "^16.7.0-alpha.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "husky": "^1.1.2",
+    "lint-staged": "^7.3.0",
+    "prettier": "^1.14.3",
+    "rollup": "^0.66.6",
+    "rollup-plugin-babel": "^4.0.3"
+  }
+}
