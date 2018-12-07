@@ -4,7 +4,7 @@ A React hook to use a Resize Observer.
 
 ## Usage
 
-```
+```js
 import React, { useRef } from "react";
 import useResizeObserver from "use-resize-observer";
 
@@ -19,3 +19,7 @@ const App = () => {
   );
 };
 ```
+
+## License
+
+MIT
