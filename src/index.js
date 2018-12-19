@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { install } from "resize-observer";
 
 if (!window.ResizeObserver) install();
 
-export default function(ref) {
+export default function() {
+  const ref = useRef();
   const [width, changeWidth] = useState(1);
   const [height, changeHeight] = useState(1);
 
@@ -31,5 +32,5 @@ export default function(ref) {
     return () => resizeObserver.unobserve(element);
   });
 
-  return { width, height };
+  return [ref, width, height];
 }
