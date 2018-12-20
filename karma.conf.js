@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
     basePath: ".",
     frameworks: ["jasmine"],
-    files: ["browser-tests/dist/index.js"],
+    files: ["tests/dist/index.js"],
     autoWatch: true,
 
     browsers,

@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rollup -c",
     "test": "karma start",
-    "test:build": "parcel build browser-tests/index.js --out-dir browser-tests/dist",
+    "test:build": "parcel build tests/index.js --out-dir tests/dist",
     "prepublish": "yarn build"
   },
   "husky": {
