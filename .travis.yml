@@ -3,6 +3,6 @@ node_js: [10]
 addons:
   chrome: stable
 script:
-  - yarn buid
-  - yarn test:buid
+  - yarn build
+  - yarn test:build
   - yarn test
