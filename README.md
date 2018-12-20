@@ -1,9 +1,17 @@
 # use-resize-observer
 
-A React hook to use a Resize Observer.
+A React hook that allows you to use a ResizeObserver to measure an element's size.
 
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
+
+## Install
+
+```
+yarn add use-resize-observer
+# or
+npm install --save use-resize-observer
+```
 
 ## Usage
 
@@ -21,6 +29,16 @@ const App = () => {
   );
 };
 ```
+
+## Notes
+
+- Uses [resize-observer-polyfill](https://github.com/que-etc/resize-observer-polyfill)
+  internally, which falls back to the native ResizeObserver, if available.
+
+## Related
+
+- [@zeecoder/react-resize-observer](https://github.com/ZeeCoder/react-resize-observer)
+- [@zeecoder/container-query](https://github.com/ZeeCoder/container-query)
 
 ## License
 
