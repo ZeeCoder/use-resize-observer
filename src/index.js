@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { install } from "resize-observer";
+import { useEffect, useState, useRef } from "react";
+import ResizeObserver from "resize-observer-polyfill";
 
-if (!window.ResizeObserver) install();
-
-export default function(ref) {
+export default function() {
+  const ref = useRef();
   const [width, changeWidth] = useState(1);
   const [height, changeHeight] = useState(1);
 
@@ -29,7 +28,7 @@ export default function(ref) {
     resizeObserver.observe(element);
 
     return () => resizeObserver.unobserve(element);
-  });
+  }, []);
 
-  return { width, height };
+  return [ref, width, height];
 }

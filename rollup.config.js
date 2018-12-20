@@ -13,5 +13,5 @@ export default {
     }
   ],
   plugins: [babel()],
-  external: ["react", "resize-observer"]
+  external: ["react", "resize-observer-polyfill"]
 };
