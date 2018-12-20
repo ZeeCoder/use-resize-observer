@@ -15,5 +15,5 @@ deploy:
   on:
     tags: true
     repo: ZeeCoder/use-resize-observer
+    branch: master
   skip_cleanup: true
-  branch: master

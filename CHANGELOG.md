@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.1
+
+- No real changes, testing travis deployment from master
+
 ## 2.0.0
 
 - [BREAKING] Returning a tuple and creating a ref object automatically
