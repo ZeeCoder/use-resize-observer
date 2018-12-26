@@ -13,6 +13,7 @@ deploy:
   api_key:
     secure: AVhIhFozrf45OjXuFjpL734kSr3Ar/VGqaBzmggF0VWFqOa3stMt6t4gYLRJKrXfr9alMPhB4IdQ7fTjO0EIZh51pT7uRkjAJ8ZUXyDB6fohAFw2Q2mowufOMt2Pu0peC0SDWROosXk0asRAgWhjsMNcNiwgctjr0Pw2DHswq13QBcdL0/sTtTMRnawrjZJBbXtdDb0Q6nfygQjDav6NzpK1uT3elsNKlyf+MiOqNguwc1lgoIqfp2Twvj9a7TmbMf8TFiQjsXZgFZxPYwXZyi62gbcvySEZvEQnYGzUCGsgF+aM3GYsluFmOjMUaUnm9++48gDmKF9+aigowhu5vvVl8XdoI5RIjg/5ibwh04SlHhUab/0JqQy9HmfCkFXDHnzwDyRZMjNlXMfbX+XXSrY3R+WXIfeepdressTHJr3DoPdpkJmic5LN+i8zPjJH/+TU/MMzSot7lTQLD5q5hmxpZi1fCPxAzdVwn7s3uKDtJiUU0i0s864wu7VzRLNBxTLi5uR4mToFNtfQAzuOqOvhK7mGNqSYTIAeCnf67VLHWRLZcqR3bbRCJVt3PT+LKg51nDor/jBnuZTrph1DNo7vGfxIydyQ4EbY3QqDt1gcZoB5imGUc2+4pSzXA0xX9ijwCrNPuh7Vtyg+rV2/R6e9ecdWE5CSz6FzvG5k5TQ=
   on:
-    tags: true
+    tags: false
     repo: ZeeCoder/use-resize-observer
+    branch: master
   skip_cleanup: true
