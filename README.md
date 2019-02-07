@@ -5,6 +5,10 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
 
+## In Action
+
+[CodeSandbox Demo](https://codesandbox.io/s/nrp0w2r5z0)
+
 ## Install
 
 ```
