@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.0.0
+
+- [BREAKING] Requires React 16.8.0 or above, which is the first non-alpha release
+  that includes hooks
+
 ## 2.0.1
 
 - No real changes, testing travis deployment from master
