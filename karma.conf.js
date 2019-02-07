@@ -1,5 +1,4 @@
 module.exports = function(config) {
-  const singleRun = process.env.KARMA_SINGLE_RUN !== "false";
   const browsers = (process.env.KARMA_BROWSERS || "Chrome").split(",");
 
   config.set({
@@ -11,7 +10,7 @@ module.exports = function(config) {
     browsers,
     reporters: ["spec"],
 
-    singleRun,
+    singleRun: true,
 
     // Max concurrency for SauceLabs OS plan
     concurrency: 5,

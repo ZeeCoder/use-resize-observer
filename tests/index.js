@@ -44,8 +44,6 @@ beforeAll(() => {
   global.observed = document.querySelector("#observed");
 });
 
-// todo make sure parcel transpiles down to IE10 (example: async and "Set" doesn't work properly)
-// todo run in sauce labs with multiple browsers
 it("should render with 1x1 initially, before the ResizeObserver is triggered", async () => {
   expect(observed.textContent).toBe("1x1");
 });

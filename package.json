@@ -1,6 +1,6 @@
 {
   "name": "use-resize-observer",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "repository": "git@github.com:ZeeCoder/use-resize-observer.git",
@@ -28,8 +28,8 @@
     "resize-observer-polyfill": "^1.5.0"
   },
   "peerDependencies": {
-    "react": "16.7.0-alpha.2",
-    "react-dom": "16.7.0-alpha.2"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
@@ -44,8 +44,8 @@
     "lint-staged": "^7.3.0",
     "parcel-bundler": "^1.10.3",
     "prettier": "^1.14.3",
-    "react": "16.7.0-alpha.2",
-    "react-dom": "16.7.0-alpha.2",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
     "rollup": "^0.66.6",
     "rollup-plugin-babel": "^4.0.3"
   }
