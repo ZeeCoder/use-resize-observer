@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.0
+
+- Added Typescript types
+
 ## 3.0.0
 
 - **[BREAKING]** Requires React 16.8.0 or above, which is the first non-alpha release
