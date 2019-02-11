@@ -48,5 +48,6 @@
     "react-dom": "^16.8.1",
     "rollup": "^0.66.6",
     "rollup-plugin-babel": "^4.0.3"
-  }
+  },
+  "types": "index.d.ts"
 }
