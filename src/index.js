@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 
-export default function() {
+export default function(defaultWidth = 1, defaultHeight = 1) {
   const ref = useRef();
-  const [width, changeWidth] = useState(1);
-  const [height, changeHeight] = useState(1);
+  const [width, changeWidth] = useState(defaultWidth);
+  const [height, changeHeight] = useState(defaultHeight);
 
   useEffect(() => {
     const element = ref.current;
