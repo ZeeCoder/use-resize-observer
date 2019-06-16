@@ -6,7 +6,7 @@ addons:
 script:
   - yarn build
   - yarn test:build
-  - yarn test
+  - yarn test --singleRun
 deploy:
   provider: npm
   email: rpgmorpheus@gmail.com

@@ -9,8 +9,10 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
+    "watch": "rollup -c -w",
     "test": "karma start",
     "test:build": "parcel build tests/index.js --out-dir tests/dist",
+    "test:watch": "parcel watch tests/index.js --out-dir tests/dist",
     "prepublish": "yarn build"
   },
   "husky": {
