@@ -2,16 +2,8 @@
 
 ## 3.2.0
 
-- Added option to pass default width and height. This is useful when using this plugin on the SSR side.
-
-Demo:
-
-```js
-const DEFAULT_WIDTH = 1024;
-const DEFAULT_HEIGHT = 600;
-
-const [ref, width, height] = useResizeObserver(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-```
+- Added option to pass default width and height. (Useful when using this plugin
+  on the SSR side.)
 
 ## 3.1.0
 

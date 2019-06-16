@@ -34,6 +34,19 @@ const App = () => {
 };
 ```
 
+## SSR, Default Size
+
+You can set the default custom size, which is useful for SSR.
+
+```js
+const [ref, width, height] = useResizeObserver({
+  defaultWidth: 100,
+  defaultHeight: 50
+});
+
+// width / height will be 100 and 50 respectively, until the ResizeObserver kicks in.
+```
+
 ## Notes
 
 - Uses [resize-observer-polyfill](https://github.com/que-etc/resize-observer-polyfill)
