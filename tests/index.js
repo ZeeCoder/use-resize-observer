@@ -8,13 +8,16 @@ import delay from "delay";
 // works while it might actually not, if you use the lib without babel-polyfill.
 import "babel-regenerator-runtime";
 
-const Observed = () => {
-  const [ref, width, height] = useResizeObserver();
+const Observed = ({ defaultWidth, defaultHeight, ...props }) => {
+  const [ref, width, height] = useResizeObserver({
+    defaultWidth: defaultWidth || 1,
+    defaultHeight: defaultHeight || 1
+  });
 
   return (
     <div
+      {...props}
       ref={ref}
-      id="observed"
       style={{
         position: "absolute",
         left: 0,
@@ -38,20 +41,35 @@ beforeAll(() => {
   app.style.height = "300px";
   document.body.appendChild(app);
 
-  ReactDOM.render(<Observed />, app);
+  ReactDOM.render(
+    <React.Fragment>
+      <Observed id="observed" />
+      <Observed
+        id="observed-with-defaults"
+        defaultWidth={24}
+        defaultHeight={42}
+      />
+    </React.Fragment>,
+    app
+  );
 
   global.app = app;
   global.observed = document.querySelector("#observed");
+  global.observedWithDefaults = document.querySelector(
+    "#observed-with-defaults"
+  );
 });
 
-it("should render with 1x1 initially, before the ResizeObserver is triggered", async () => {
+it("should render with the right defaults, before the ResizeObserver is triggered", async () => {
   expect(observed.textContent).toBe("1x1");
+  expect(observedWithDefaults.textContent).toBe("24x42");
 });
 
 it("should report the correct size after the size is reported by the ResizeObserver", async () => {
   await delay(100);
 
   expect(observed.textContent).toBe("200x300");
+  expect(observedWithDefaults.textContent).toBe("200x300");
 });
 
 it("should report following size changes", async () => {

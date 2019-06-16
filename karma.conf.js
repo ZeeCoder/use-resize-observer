@@ -10,8 +10,6 @@ module.exports = function(config) {
     browsers,
     reporters: ["spec"],
 
-    singleRun: true,
-
     // Max concurrency for SauceLabs OS plan
     concurrency: 5,
 
