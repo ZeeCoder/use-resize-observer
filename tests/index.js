@@ -25,14 +25,14 @@ const Observed = () => {
   const [width2, height2] = useResizeObserver(ref2);
 
   return (
-    <>
+    <div>
       <div ref={ref1} id="observed1" style={styles}>
         1 {width1}x{height1}
       </div>
       <div ref={ref2} id="observed2" style={styles}>
         2 {width2}x{height2}
       </div>
-    </>
+    </div>
   );
 };
 
