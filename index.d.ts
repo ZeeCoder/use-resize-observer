@@ -1,7 +1,8 @@
 // Type definitions for use-resize-observer
 // Project: use-resize-observer
 
-import { RefObject } from 'react';
+import { RefObject, MutableRefObject } from 'react';
 
-export default function useResizeObserver(): [RefObject<HTMLElement>, number, number];
-
+function useResizeObserver(): [RefObject<HTMLElement>, number, number];
+function useResizeObserver(ref: MutableRefObject<HTMLElement>): [number, number, RefObject<HTMLElement>];
+export default useResizeObserver;
