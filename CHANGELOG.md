@@ -3,7 +3,8 @@
 ## 4.0.0
 
 - Added option to pass default width and height. Useful when using the lib with
-  SSR.
+  SSR. (Thanks [Simon Boudrias](https://github.com/SBoudrias) and
+  [Fokke Zandbergen](https://github.com/FokkeZB))
 - Dep upgrades
 - **[BREAKING]** Removed TS types. See:
   - https://github.com/ZeeCoder/use-resize-observer/issues/12
