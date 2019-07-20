@@ -11,7 +11,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 ## Install
 
-```
+```sh
 yarn add use-resize-observer
 # or
 npm install --save use-resize-observer
@@ -36,7 +36,7 @@ const App = () => {
 
 ## SSR, Default Size
 
-You can set the default custom size, which is useful for SSR.
+You can set the default size, which is useful for SSR.
 
 ```js
 const [ref, width, height] = useResizeObserver({
@@ -44,7 +44,8 @@ const [ref, width, height] = useResizeObserver({
   defaultHeight: 50
 });
 
-// width / height will be 100 and 50 respectively, until the ResizeObserver kicks in.
+// width / height will be 100 and 50 respectively, until the ResizeObserver
+// kicks in and reports the actual size.
 ```
 
 ## Notes
