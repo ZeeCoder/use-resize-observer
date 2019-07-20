@@ -1,9 +1,14 @@
 # CHANGELOG
 
-## 3.2.0
+## 4.0.0
 
-- Added option to pass default width and height. (Useful when using this plugin
-  on the SSR side.)
+- Added option to pass default width and height. Useful when using the lib with
+  SSR.
+- Dep upgrades
+- **[BREAKING]** Removed TS types. See:
+  - https://github.com/ZeeCoder/use-resize-observer/issues/12
+  - https://github.com/ZeeCoder/use-resize-observer/pull/13
+  - https://github.com/ZeeCoder/use-resize-observer/pull/8
 
 ## 3.1.0
 
@@ -11,8 +16,8 @@
 
 ## 3.0.0
 
-- **[BREAKING]** Requires React 16.8.0 or above, which is the first non-alpha release
-  that includes hooks
+- **[BREAKING]** Requires React 16.8.0 or above, which is the first non-alpha
+  release that includes hooks
 
 ## 2.0.1
 
