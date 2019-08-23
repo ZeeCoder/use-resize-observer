@@ -5,6 +5,13 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
 
+## On Transpilation / Polyfilling
+
+This library is neither transpiled nor polyfilled by default.
+I recommend using Babel with its "env" preset to transpile your code to your
+target browsers, and adding a [ResizeObserver](https://github.com/que-etc/resize-observer-polyfill)
+poly- or [ponyfill](https://github.com/sindresorhus/ponyfill) when necessary.
+
 ## In Action
 
 [CodeSandbox Demo](https://codesandbox.io/s/nrp0w2r5z0)
@@ -12,9 +19,9 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Install
 
 ```sh
-yarn add use-resize-observer
+yarn add use-resize-observer --dev
 # or
-npm install --save use-resize-observer
+npm install use-resize-observer --save-dev
 ```
 
 ## Usage
@@ -47,11 +54,6 @@ const [ref, width, height] = useResizeObserver({
 // width / height will be 100 and 50 respectively, until the ResizeObserver
 // kicks in and reports the actual size.
 ```
-
-## Notes
-
-- Uses [resize-observer-polyfill](https://github.com/que-etc/resize-observer-polyfill)
-  internally, which falls back to the native ResizeObserver, if available.
 
 ## Related
 

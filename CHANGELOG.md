@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 5.0.0
+
+- **[BREAKING]** Removed Babel code transpiling and the ResizeObserver polyfill.
+
 ## 4.0.0
 
 - Added option to pass default width and height. Useful when using the lib with

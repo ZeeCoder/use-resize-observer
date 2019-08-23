@@ -1,5 +1,3 @@
-import babel from "rollup-plugin-babel";
-
 export default {
   input: "src/index.js",
   output: [
@@ -12,6 +10,5 @@ export default {
       format: "esm"
     }
   ],
-  plugins: [babel()],
-  external: ["react", "resize-observer-polyfill"]
+  external: ["react"]
 };
