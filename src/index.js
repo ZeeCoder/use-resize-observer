@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import ResizeObserver from "resize-observer-polyfill";
 
 export default function({ defaultWidth = 1, defaultHeight = 1 } = {}) {
   const ref = useRef(null);

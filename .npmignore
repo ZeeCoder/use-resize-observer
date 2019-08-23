@@ -3,11 +3,9 @@ src
 yarn.lock
 yarn-error.log
 .DS_Store
-.babelrc
 rollup.config.js
 karma.conf.js
 .editorconfig
-browserslist
 .cache
 .travis.yml
 tests
