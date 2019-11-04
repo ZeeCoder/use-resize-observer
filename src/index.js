@@ -20,9 +20,12 @@ export default function({ defaultWidth = 1, defaultHeight = 1 } = {}) {
       }
 
       const entry = entries[0];
-
-      changeWidth(entry.contentRect.width);
-      changeHeight(entry.contentRect.height);
+      if (entry.contentRect.width !== width) {
+        changeWidth(entry.contentRect.width);
+      }
+      if (entry.contentRect.height !== height) {
+        changeHeight(entry.contentRect.height);
+      }
     });
 
     resizeObserver.observe(element);
