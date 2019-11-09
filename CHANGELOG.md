@@ -6,6 +6,11 @@
 - **[BREAKING]** Returning an object instead of an array, so that the returned
   values could be omitted when not needed.
 - `#18` Added missing copyright notice in the MIT license.
+- Improved ref handling:
+  - You can now pass in your own ref
+  - Ref changes are handled
+  - The hook will no longer break if an invalid ref is passed in.
+    (Anything other than an object with a `.current` value of an `Element` )
 
 ## 4.0.0
 
