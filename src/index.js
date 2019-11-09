@@ -29,5 +29,5 @@ export default function({ defaultWidth = 1, defaultHeight = 1 } = {}) {
     return () => resizeObserver.unobserve(element);
   }, []);
 
-  return [ref, width, height];
+  return { ref, width, height };
 }

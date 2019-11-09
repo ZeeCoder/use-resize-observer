@@ -9,7 +9,7 @@ import delay from "delay";
 import "babel-regenerator-runtime";
 
 const Observed = ({ defaultWidth, defaultHeight, ...props }) => {
-  const [ref, width, height] = useResizeObserver({
+  const { ref, width, height } = useResizeObserver({
     defaultWidth: defaultWidth || 1,
     defaultHeight: defaultHeight || 1
   });

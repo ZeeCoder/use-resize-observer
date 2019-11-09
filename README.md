@@ -31,7 +31,7 @@ import React from "react";
 import useResizeObserver from "use-resize-observer";
 
 const App = () => {
-  const [ref, width, height] = useResizeObserver();
+  const { ref, width, height } = useResizeObserver();
 
   return (
     <div ref={ref}>
@@ -46,7 +46,7 @@ const App = () => {
 You can set the default size, which is useful for SSR.
 
 ```js
-const [ref, width, height] = useResizeObserver({
+const { ref, width, height } = useResizeObserver({
   defaultWidth: 100,
   defaultHeight: 50
 });
@@ -54,6 +54,8 @@ const [ref, width, height] = useResizeObserver({
 // width / height will be 100 and 50 respectively, until the ResizeObserver
 // kicks in and reports the actual size.
 ```
+
+## Contributing
 
 ## Related
 
