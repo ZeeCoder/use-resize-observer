@@ -3,6 +3,7 @@
 ## 5.0.0
 
 - **[BREAKING]** Removed Babel code transpiling and the ResizeObserver polyfill.
+- `#18` Added missing copyright notice in the MIT license.
 
 ## 4.0.0
 
