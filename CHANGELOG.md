@@ -3,6 +3,8 @@
 ## 5.0.0
 
 - **[BREAKING]** Removed Babel code transpiling and the ResizeObserver polyfill.
+- **[BREAKING]** Returning an object instead of an array, so that the returned
+  values could be omitted when not needed.
 - `#18` Added missing copyright notice in the MIT license.
 
 ## 4.0.0
