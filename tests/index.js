@@ -110,15 +110,22 @@ it("should render with custom defaults", async () => {
   assertSize({ width: 24, height: 42 });
 });
 
-it("should follow size changes correctly without subpixels as they're used in CSS", async () => {
-  const { setSize, assertSize } = await render(Observed);
+it("should follow size changes correctly with appropriate render count and without sub-pixels as they're used in CSS", async () => {
+  const { setSize, assertSize, assertRenderCount } = await render(Observed);
+
+  // Default render
+  assertRenderCount(1);
 
   setSize({ width: 100, height: 200 });
   await delay(50);
+  // One render for setting the CSS, and another for the hook to react
+  assertRenderCount(3);
   assertSize({ width: 100, height: 200 });
 
   setSize({ width: 321, height: 456 });
   await delay(50);
+  // One render for setting the CSS, and another for the hook to react
+  assertRenderCount(5);
   assertSize({ width: 321, height: 456 });
 });
 
