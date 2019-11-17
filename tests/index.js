@@ -259,3 +259,79 @@ it("should be able to render without mock defaults", async () => {
   await delay(50);
   assertSize({ width: 100, height: 100 });
 });
+
+it("should not trigger unnecessary renders with the same width or height", async () => {
+  const Test = ({ resolveHandler }) => {
+    return (
+      <div style={{ position: "relative" }} id="container">
+        <Observed resolveHandler={resolveHandler} />
+      </div>
+    );
+  };
+
+  // Setting the size like this won't trigger any unnecessary re-renders within
+  // the components, so we can accurately measure renders being triggered by the
+  // hook itself.
+  const setSize = ({ width, height }) => {
+    const container = document.querySelector("#container");
+    container.style.width = `${width}px`;
+    container.style.height = `${height}px`;
+  };
+  const { assertSize, assertRenderCount } = await render(Test);
+
+  assertSize({ width: 1, height: 1 });
+  assertRenderCount(1);
+
+  await delay(50);
+  assertRenderCount(2);
+
+  setSize({ width: 100, height: 102 });
+  await delay(50);
+  assertSize({ width: 100, height: 102 });
+  assertRenderCount(3);
+
+  // Shouldn't trigger on subpixel values that are rounded to be the same as the
+  // previous size
+  setSize({ width: 100.4, height: 102.4 });
+  await delay(50);
+  assertSize({ width: 100, height: 102 });
+  assertRenderCount(3);
+});
+
+it("should keep the same response instance between renders if nothing changed", async () => {
+  const Test = ({ resolveHandler }) => {
+    const previousResponseRef = useRef(null);
+    const response = useResizeObserver({ useDefaults: false });
+    const [state, setState] = useState(false);
+
+    const sameInstance = previousResponseRef.current === response;
+    previousResponseRef.current = response;
+
+    useEffect(() => {
+      if (response.width && response.height) {
+        // Triggering an extra render once the hook properly measured the element size once.
+        // This'll allow us to see if the hook keeps the same response object or not.
+        setState(true);
+      }
+    }, [response]);
+
+    useEffect(() => {
+      if (!state) {
+        return;
+      }
+
+      // Everything is set up, ready for assertions
+      resolveHandler({
+        assertSameInstance: () => {
+          expect(sameInstance).toBe(true);
+        }
+      });
+    }, [state]);
+
+    return <div ref={response.ref}>{String(sameInstance)}</div>;
+  };
+
+  const { assertSameInstance } = await render(Test);
+
+  assertSameInstance();
+});
