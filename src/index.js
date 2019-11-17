@@ -1,15 +1,29 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 
-export default function({ ref, defaultWidth = 1, defaultHeight = 1 } = {}) {
-  // Has to be non-conditionally declared here whether or not it'll be used
+export default function({
+  ref,
+  defaultWidth = 1,
+  defaultHeight = 1,
+  useDefaults = true
+} = {}) {
+  // `defaultRef` Has to be non-conditionally declared here whether or not it'll
+  // be used as that's how hooks work.
+  // @see https://reactjs.org/docs/hooks-rules.html#explanation
   const defaultRef = useRef(null);
   ref = ref || defaultRef;
-  const [width, changeWidth] = useState(defaultWidth);
-  const [height, changeHeight] = useState(defaultHeight);
-  // Using refs to track the previous width / height for comparison, without
-  // rerunning the effect
-  const widthRef = useRef(defaultWidth);
-  const heightRef = useRef(defaultHeight);
+  const [size, setSize] = useState(
+    useDefaults
+      ? {
+          width: defaultWidth,
+          height: defaultHeight
+        }
+      : null
+  );
+  // Using a ref to track the previous width / height to avoid unnecessary renders
+  const previous = useRef({
+    width: defaultWidth,
+    height: defaultHeight
+  });
 
   useEffect(() => {
     if (
@@ -34,15 +48,16 @@ export default function({ ref, defaultWidth = 1, defaultHeight = 1 } = {}) {
 
       const entry = entries[0];
 
-      const newWidth = Math.floor(entry.contentRect.width);
-      if (widthRef.current !== newWidth) {
-        widthRef.current = newWidth;
-        changeWidth(newWidth);
-      }
-      const newHeight = Math.floor(entry.contentRect.height);
-      if (heightRef.current !== newHeight) {
-        heightRef.current = newHeight;
-        changeHeight(newHeight);
+      // `Math.round` is in line with how CSS resolves sub-pixel values
+      const newWidth = Math.round(entry.contentRect.width);
+      const newHeight = Math.round(entry.contentRect.height);
+      if (
+        previous.current.width !== newWidth ||
+        previous.current.height !== newHeight
+      ) {
+        previous.current.width = newWidth;
+        previous.current.height = newHeight;
+        setSize({ width: newWidth, height: newHeight });
       }
     });
 
@@ -51,5 +66,9 @@ export default function({ ref, defaultWidth = 1, defaultHeight = 1 } = {}) {
     return () => resizeObserver.unobserve(element);
   }, [ref]);
 
-  return { ref, width, height };
+  return useMemo(() => ({ ref, ...size }), [
+    ref,
+    size ? size.width : null,
+    size ? size.height : null
+  ]);
 }

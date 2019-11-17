@@ -1,5 +1,5 @@
 module.exports = function(config) {
-  const browsers = (process.env.KARMA_BROWSERS || "Chrome").split(",");
+  const browsers = (process.env.KARMA_BROWSERS || "ChromeHeadless").split(",");
 
   config.set({
     basePath: ".",
