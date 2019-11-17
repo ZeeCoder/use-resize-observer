@@ -8,12 +8,20 @@
   "author": "Viktor Hubert <rpgmorpheus@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
-    "test": "karma start",
+    "build": "run-s src:build test:build",
+    "watch": "KARMA_BROWSERS=Chrome run-p src:watch test:watch karma:watch",
+    "src:build": "rollup -c",
+    "src:watch": "rollup -c -w",
+    "test": "run-s build karma:run",
     "test:build": "parcel build tests/index.js --out-dir tests/dist",
     "test:watch": "parcel watch tests/index.js --out-dir tests/dist",
-    "prepublish": "yarn build"
+    "test:chrome": "KARMA_BROWSERS=Chrome yarn test",
+    "test:chrome:headless": "KARMA_BROWSERS=ChromeHeadless yarn test",
+    "test:firefox": "KARMA_BROWSERS=Firefox yarn test",
+    "test:firefox:headless": "KARMA_BROWSERS=FirefoxHeadless yarn test",
+    "karma:run": "karma start --singleRun",
+    "karma:watch": "karma start",
+    "prepublish": "yarn src:build"
   },
   "husky": {
     "hooks": {
@@ -38,9 +46,11 @@
     "husky": "^3.0.4",
     "karma": "^4.2.0",
     "karma-chrome-launcher": "^3.0.0",
+    "karma-firefox-launcher": "^1.2.0",
     "karma-jasmine": "^2.0.1",
     "karma-spec-reporter": "^0.0.32",
     "lint-staged": "^9.2.3",
+    "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.10.3",
     "prettier": "^1.14.3",
     "react": "^16.9.0",

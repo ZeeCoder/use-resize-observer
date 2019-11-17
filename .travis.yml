@@ -1,12 +1,15 @@
 language: node_js
 node_js:
   - 10
+env:
+  global:
+    - MOZ_HEADLESS=1
 addons:
   chrome: stable
+  firefox: latest
 script:
-  - yarn build
-  - yarn test:build
-  - yarn test --singleRun
+  - yarn test:chrome:headless
+  - yarn test:firefox:headless
 deploy:
   provider: npm
   email: rpgmorpheus@gmail.com
