@@ -8,6 +8,7 @@ addons:
   chrome: stable
   firefox: latest
 script:
+  - yarn build
   - yarn test:chrome:headless
   - yarn test:firefox:headless
 deploy:

@@ -37,16 +37,14 @@ const App = () => {
 };
 ```
 
-## Passing in your own `ref`
+## Passing in Your Own `ref`
 
-You can pass in your own ref to measure, use now.
-This can be useful if you already have a ref from somewhere you want to measure.
+You can pass in your own ref instead of using the one provided.
+This can be useful if you already have a ref you want to measure.
 
 ```js
-const { ref, width, height } = useResizeObserver({
-  defaultWidth: 100,
-  defaultHeight: 50
-});
+const ref = useRef(null);
+const { width, height } = useResizeObserver({ ref });
 ```
 
 You can even reuse the same hook instance to measure different elements:
@@ -55,16 +53,21 @@ You can even reuse the same hook instance to measure different elements:
 
 ## Throttle / Debounce
 
-You might want values less frequently than actually reported.
+You might want to receive values less frequently than changes actually occur.
 
-While this hook does not come its own implementation of throttling / debouncing
-the reported values (Issue #19), you can use hook composition to achieve it:
+While this hook does not come with its own implementation of throttling / debouncing,
+you can use hook composition instead to achieve the same results:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
 
-## SSR, Default Size
+## Defaults (SSR)
 
-You can set the default size, which is useful for SSR.
+On initial mount the ResizeObserver will take a little time to report on the
+actual size.
+
+Until then the hook receives the first measurement, it returns with "1x1" by default.
+
+You can override this behaviour, which could be useful for SSR as well.
 
 ```js
 const { ref, width, height } = useResizeObserver({
@@ -76,10 +79,10 @@ const { ref, width, height } = useResizeObserver({
 Here "width" and "height" will be 100 and 50 respectively, until the
 ResizeObserver kicks in and reports the actual size.
 
-## Without Default Measurements
+## No Defaults
 
 If you only want real measurements (only values from the ResizeObserver without
-defaults), then you can use the following:
+any default values), then you can use the following:
 
 ```js
 const { ref, width, height } = useResizeObserver({
@@ -102,17 +105,15 @@ container/element queries:
 
 By default the library provides transpiled ES5 modules in CJS / ESM module formats.
 
-Polyfilling is recommended to be done in the host app, and not in the library, as
-that gives users more control over what exact polyfills they might want to use.
+Polyfilling is recommended to be done in the host app, and not within imported
+libraries, as that way consumers have control over the exact polyfills being used.
 
-However, there's a polyfilled CJS module (without affecting globals) that can be
-used for convenience:
+That said, there's a [polyfilled](https://github.com/que-etc/resize-observer-polyfill)
+CJS module that can be used for convenience (Not affecting globals):
 
 ```js
 import useResizeObserver from "use-resize-observer/polyfilled";
 ```
-
-[Bundled ResizeObserver implementation](<[ResizeObserver](https://github.com/que-etc/resize-observer-polyfill)>)
 
 ## Related
 
