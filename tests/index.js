@@ -335,3 +335,31 @@ it("should keep the same response instance between renders if nothing changed", 
 
   assertSameInstance();
 });
+
+it("should ignore invalid custom refs", async () => {
+  const Test = ({ resolveHandler }) => {
+    const ref = useRef(null);
+    const { width, height } = useResizeObserver({ ref: null }); // invalid custom ref
+
+    useEffect(() => {
+      resolveHandler({
+        assertSize: ({ width, height }) => {
+          expect(ref.current.textContent).toBe(`${width}x${height}`);
+        }
+      });
+    }, []);
+
+    return (
+      <div ref={ref}>
+        {width}x{height}
+      </div>
+    );
+  };
+
+  const { assertSize } = await render(Test);
+
+  // Since no refs were passed in with an element to be measured, the hook should
+  // stay on the defaults
+  await delay(50);
+  assertSize({ width: 1, height: 1 });
+});
