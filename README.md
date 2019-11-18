@@ -37,8 +37,6 @@ const App = () => {
 };
 ```
 
-[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-basic-usage-nrp0w2r5z0)
-
 ## Passing in Your Own `ref`
 
 You can pass in your own ref instead of using the one provided.
