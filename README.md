@@ -20,7 +20,7 @@ npm install use-resize-observer --save-dev
 ## Basic Usage
 
 Note that the default builds are not polyfilled! For instructions and alternatives,
-see the [Transpilation / Polyfilling](##transpilation-/-polyfilling) section.
+see the [Transpilation / Polyfilling](#transpilation--polyfilling) section.
 
 ```js
 import React from "react";
