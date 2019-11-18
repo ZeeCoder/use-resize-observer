@@ -1,0 +1,5 @@
+# Using IE to declare a fixed point.
+# "Last n versions" and such could potentially change the build as time goes on,
+# while this will transpile down to ES5 that'll run in most browsers you probably
+# care about.
+IE >= 11

@@ -1,6 +1,8 @@
 .cache
 node_modules
 .idea
+yarn.lock
 yarn-error.log*
 dist
+/polyfilled.js
 
