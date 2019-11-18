@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef, forwardRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import useResizeObserver from "../dist/bundle.esm";
+import useResizeObserverPolyfilled from "../polyfilled";
 import delay from "delay";
 // Using the following to support async/await in tests.
 // I'm intentionally not using babel/polyfill, as that would introduce polyfills
@@ -362,4 +363,29 @@ it("should ignore invalid custom refs", async () => {
   // stay on the defaults
   await delay(50);
   assertSize({ width: 1, height: 1 });
+});
+
+it("should work with the polyfilled version", async () => {
+  const Test = ({ resolveHandler }) => {
+    const { ref, width, height } = useResizeObserverPolyfilled();
+
+    useEffect(() => {
+      resolveHandler({
+        assertSize: ({ width, height }) => {
+          expect(ref.current.textContent).toBe(`${width}x${height}`);
+        }
+      });
+    }, []);
+
+    return (
+      <div style={{ width: 50, height: 40 }} ref={ref}>
+        {width}x{height}
+      </div>
+    );
+  };
+
+  const { assertSize } = await render(Test);
+
+  await delay(50);
+  assertSize({ width: 50, height: 40 });
 });

@@ -2,7 +2,8 @@
 
 ## 5.0.0
 
-- **[BREAKING]** `#14` Removed Babel code transpiling and the ResizeObserver polyfill.
+- **[BREAKING]** `#14` Removed the polyfill from the default builds, and shipping
+  it instead as as separate module.
 - **[BREAKING]** `#21` Returning an object instead of an array, so that values not
   needed could be omitted.
 - `#18` Added missing copyright notice in the MIT license.

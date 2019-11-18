@@ -5,13 +5,6 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
 
-## On Transpilation / Polyfilling
-
-This library is neither transpiled nor polyfilled by default.
-I recommend using Babel with its "env" preset to transpile your code to your
-target browsers, and adding a [ResizeObserver](https://github.com/que-etc/resize-observer-polyfill)
-poly- or [ponyfill](https://github.com/sindresorhus/ponyfill) when necessary.
-
 ## In Action
 
 [CodeSandbox Demo](https://codesandbox.io/s/nrp0w2r5z0)
@@ -25,6 +18,9 @@ npm install use-resize-observer --save-dev
 ```
 
 ## Basic Usage
+
+Note that the default builds are not polyfilled! For instructions and alternatives,
+see the [Transpilation / Polyfilling](##transpilation-/-polyfilling) section.
 
 ```js
 import React from "react";
@@ -101,6 +97,22 @@ element using a CSS-in-JS solution, which is the basic idea behind
 container/element queries:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-container-query-with-css-in-js-iitxl)
+
+## Transpilation / Polyfilling
+
+By default the library provides transpiled ES5 modules in CJS / ESM module formats.
+
+Polyfilling is recommended to be done in the host app, and not in the library, as
+that gives users more control over what exact polyfills they might want to use.
+
+However, there's a polyfilled CJS module (without affecting globals) that can be
+used for convenience:
+
+```js
+import useResizeObserver from "use-resize-observer/polyfilled";
+```
+
+[Bundled ResizeObserver implementation](<[ResizeObserver](https://github.com/que-etc/resize-observer-polyfill)>)
 
 ## Related
 
