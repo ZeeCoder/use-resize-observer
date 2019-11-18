@@ -24,7 +24,7 @@ yarn add use-resize-observer --dev
 npm install use-resize-observer --save-dev
 ```
 
-## Usage
+## Basic Usage
 
 ```js
 import React from "react";
@@ -43,7 +43,28 @@ const App = () => {
 
 ## Passing in your own `ref`
 
-TODO
+You can pass in your own ref to measure, use now.
+This can be useful if you already have a ref from somewhere you want to measure.
+
+```js
+const { ref, width, height } = useResizeObserver({
+  defaultWidth: 100,
+  defaultHeight: 50
+});
+```
+
+You can even reuse the same hook instance to measure different elements:
+
+[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-reusing-refs-buftd)
+
+## Throttle / Debounce
+
+You might want values less frequently than actually reported.
+
+While this hook does not come its own implementation of throttling / debouncing
+the reported values (Issue #19), you can use hook composition to achieve it:
+
+[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
 
 ## SSR, Default Size
 
@@ -54,17 +75,37 @@ const { ref, width, height } = useResizeObserver({
   defaultWidth: 100,
   defaultHeight: 50
 });
-
-// width / height will be 100 and 50 respectively, until the ResizeObserver
-// kicks in and reports the actual size.
 ```
 
-## Contributing
+Here "width" and "height" will be 100 and 50 respectively, until the
+ResizeObserver kicks in and reports the actual size.
+
+## Without Default Measurements
+
+If you only want real measurements (only values from the ResizeObserver without
+defaults), then you can use the following:
+
+```js
+const { ref, width, height } = useResizeObserver({
+  useDefaults: false
+});
+```
+
+Here "width" and "height" will be undefined until the ResizeObserver takes its
+first measurement.
+
+## Container/Element Query with CSS-in-JS
+
+It's possible to apply styles conditionally based on the width / height of an
+element using a CSS-in-JS solution, which is the basic idea behind
+container/element queries:
+
+[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-container-query-with-css-in-js-iitxl)
 
 ## Related
 
-- [@zeecoder/react-resize-observer](https://github.com/ZeeCoder/react-resize-observer)
 - [@zeecoder/container-query](https://github.com/ZeeCoder/container-query)
+- [@zeecoder/react-resize-observer](https://github.com/ZeeCoder/react-resize-observer)
 
 ## License
 

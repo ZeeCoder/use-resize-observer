@@ -2,18 +2,20 @@
 
 ## 5.0.0
 
-- **[BREAKING]** Removed Babel code transpiling and the ResizeObserver polyfill.
-- **[BREAKING]** Returning an object instead of an array, so that the returned
-  values could be omitted when not needed.
+- **[BREAKING]** `#14` Removed Babel code transpiling and the ResizeObserver polyfill.
+- **[BREAKING]** `#21` Returning an object instead of an array, so that values not
+  needed could be omitted.
 - `#18` Added missing copyright notice in the MIT license.
-- New `package.json` scripts to ease development
 - Improved ref handling:
-  - You can now pass in your own ref
-  - Ref changes are handled: TODO better explanation
-  - The hook will no longer break if an invalid ref is passed in.
-    (Anything other than an object with a `.current` value of an `Element` )
-- TODO: Document useDefaults
-- TODO: Document throttle / debounce solutions
+  - `#16` You can now pass in your own ref
+  - The same hook instance can now be reused with different refs
+  - The hook will no longer break if the ref is not immediately filled.
+    (Anything other than an object with a `.current` value of an `Element` will
+    be ignored.)
+- Made defaults optional with the `useDefaults` option.
+- New `package.json` scripts to ease development
+- Added throttle and debounce guides to the readme
+- More tests
 
 ## 4.0.0
 
