@@ -1,5 +1,19 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 
+const isResizable = element => typeof element.handleResize === "function";
+
+const resizeObserver = new ResizeObserver(entries => {
+  if (!Array.isArray(entries)) {
+    return;
+  }
+
+  for (const entry of entries) {
+    if (isResizable(entry.target)) {
+      entry.target.handleResize(entry.contentRect);
+    }
+  }
+});
+
 export default function({
   ref,
   defaultWidth = 1,
@@ -35,22 +49,11 @@ export default function({
     }
 
     const element = ref.current;
-    const resizeObserver = new ResizeObserver(entries => {
-      if (!Array.isArray(entries)) {
-        return;
-      }
 
-      // Since we only observe the one element, we don't need to loop over the
-      // array
-      if (!entries.length) {
-        return;
-      }
-
-      const entry = entries[0];
-
+    element.handleResize = contentRect => {
       // `Math.round` is in line with how CSS resolves sub-pixel values
-      const newWidth = Math.round(entry.contentRect.width);
-      const newHeight = Math.round(entry.contentRect.height);
+      const newWidth = Math.round(contentRect.width);
+      const newHeight = Math.round(contentRect.height);
       if (
         previous.current.width !== newWidth ||
         previous.current.height !== newHeight
@@ -59,7 +62,7 @@ export default function({
         previous.current.height = newHeight;
         setSize({ width: newWidth, height: newHeight });
       }
-    });
+    };
 
     resizeObserver.observe(element);
 
