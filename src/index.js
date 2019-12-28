@@ -1,28 +1,19 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 
-export default function({
-  ref,
-  defaultWidth = 1,
-  defaultHeight = 1,
-  useDefaults = true
-} = {}) {
+export default function({ ref } = {}) {
   // `defaultRef` Has to be non-conditionally declared here whether or not it'll
   // be used as that's how hooks work.
   // @see https://reactjs.org/docs/hooks-rules.html#explanation
   const defaultRef = useRef(null);
   ref = ref || defaultRef;
-  const [size, setSize] = useState(
-    useDefaults
-      ? {
-          width: defaultWidth,
-          height: defaultHeight
-        }
-      : null
-  );
+  const [size, setSize] = useState({
+    width: undefined,
+    height: undefined
+  });
   // Using a ref to track the previous width / height to avoid unnecessary renders
   const previous = useRef({
-    width: defaultWidth,
-    height: defaultHeight
+    width: undefined,
+    height: undefined
   });
 
   useEffect(() => {

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 6.0.0
+
+- **[BREAKING]** Default width and height can now be set by declaring defaults
+  for object destructuring, instead of having custom options for them.
+  This means the following options were removed: `defaultWidth`, `defaultHeight`,
+  `useDefaults`.
+- **[BREAKING]** Due to the above, the default width and height will be
+  `undefined` instead of `1`.
+- Docs were updated to reflect the above changes.
+
 ## 5.0.0
 
 - **[BREAKING]** `#14` Removed the polyfill from the default builds, and shipping

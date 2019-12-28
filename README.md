@@ -27,7 +27,7 @@ import React from "react";
 import useResizeObserver from "use-resize-observer";
 
 const App = () => {
-  const { ref, width, height } = useResizeObserver();
+  const { ref, width = 1, height = 1 } = useResizeObserver();
 
   return (
     <div ref={ref}>
@@ -67,15 +67,13 @@ you can use hook composition instead to achieve the same results:
 On initial mount the ResizeObserver will take a little time to report on the
 actual size.
 
-Until then the hook receives the first measurement, it returns with "1x1" by default.
+Until the hook receives the first measurement, it returns `undefined` for width
+and height by default.
 
 You can override this behaviour, which could be useful for SSR as well.
 
 ```js
-const { ref, width, height } = useResizeObserver({
-  defaultWidth: 100,
-  defaultHeight: 50
-});
+const { ref, width = 100, height = 50 } = useResizeObserver();
 ```
 
 Here "width" and "height" will be 100 and 50 respectively, until the
@@ -84,12 +82,10 @@ ResizeObserver kicks in and reports the actual size.
 ## No Defaults
 
 If you only want real measurements (only values from the ResizeObserver without
-any default values), then you can use the following:
+any default values), then you can just leave defaults off:
 
 ```js
-const { ref, width, height } = useResizeObserver({
-  useDefaults: false
-});
+const { ref, width, height } = useResizeObserver();
 ```
 
 Here "width" and "height" will be undefined until the ResizeObserver takes its
