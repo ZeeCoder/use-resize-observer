@@ -9,6 +9,9 @@
 - **[BREAKING]** Due to the above, the default width and height will be
   `undefined` instead of `1`.
 - Docs were updated to reflect the above changes.
+- Added an `onResize` handler that can report size changes instead of the default
+  object return. (This also helps implementing a more performant throttle /
+  debounce solution.)
 
 ## 5.0.0
 

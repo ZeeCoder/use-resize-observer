@@ -1,3 +1,7 @@
+// todo simplify setting the size and measuring renders
+//      Currently setting the size of the component to see if it gets measured
+//      results in a render of itself, which makes it hard to follow relevant
+//      render counts that are triggered by the hook.
 import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import useResizeObserver from "../dist/bundle.esm";
@@ -13,6 +17,7 @@ const Observed = ({
   resolveHandler,
   defaultWidth,
   defaultHeight,
+  onResize,
   ...props
 }) => {
   const textRef = useRef(null);
@@ -22,7 +27,7 @@ const Observed = ({
     ref,
     width = defaultWidth,
     height = defaultHeight
-  } = useResizeObserver();
+  } = useResizeObserver({ onResize });
   const [size, setSize] = useState({ width: "100%", height: "100%" });
 
   renderCountRef.current++;
@@ -116,19 +121,20 @@ it("should render with custom defaults", async () => {
 it("should follow size changes correctly with appropriate render count and without sub-pixels as they're used in CSS", async () => {
   const { setSize, assertSize, assertRenderCount } = await render(Observed);
 
-  // Default render
-  assertRenderCount(1);
+  // Default render + first measurement
+  await delay(50);
+  assertRenderCount(2);
 
   setSize({ width: 100, height: 200 });
   await delay(50);
   // One render for setting the CSS, and another for the hook to react
-  assertRenderCount(3);
+  assertRenderCount(4);
   assertSize({ width: 100, height: 200 });
 
   setSize({ width: 321, height: 456 });
   await delay(50);
   // One render for setting the CSS, and another for the hook to react
-  assertRenderCount(5);
+  assertRenderCount(6);
   assertSize({ width: 321, height: 456 });
 });
 
@@ -276,6 +282,7 @@ it("should not trigger unnecessary renders with the same width or height", async
   // the components, so we can accurately measure renders being triggered by the
   // hook itself.
   const setSize = ({ width, height }) => {
+    // todo this is roughly how other setSize functions should work as well
     const container = document.querySelector("#container");
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
@@ -285,8 +292,8 @@ it("should not trigger unnecessary renders with the same width or height", async
   );
 
   assertDefaultSize();
-  assertRenderCount(1);
 
+  // Default render + first measurement
   await delay(50);
   assertRenderCount(2);
 
@@ -392,4 +399,97 @@ it("should work with the polyfilled version", async () => {
 
   await delay(50);
   assertSize({ width: 50, height: 40 });
+});
+
+it("should be able to work with onResize instead of rendering the values", async () => {
+  const observations = [];
+  const { setSize, assertDefaultSize, assertRenderCount } = await render(
+    Observed,
+    {},
+    { onResize: size => observations.push(size) }
+  );
+
+  setSize({ width: 100, height: 200 });
+  await delay(50);
+  setSize({ width: 101, height: 201 });
+  await delay(50);
+
+  // Should render once on mount, and twice more for size changes, but the hooks
+  // should not trigger further renders.
+  assertRenderCount(3);
+
+  // Should stay at default as width/height is not passed to the hook response
+  // when an onResize callback is given
+  assertDefaultSize();
+
+  expect(observations.length).toBe(2);
+  expect(observations[0]).toEqual({ width: 100, height: 200 });
+  expect(observations[1]).toEqual({ width: 101, height: 201 });
+});
+
+it("should handle if the onResize handler changes properly with the correct render counts", async () => {
+  const Test = ({ resolveHandler, ...props }) => {
+    const [onResizeHandler, setOnResizeHandler] = useState(() => () => {});
+    const changeOnResizeHandler = handler => setOnResizeHandler(() => handler);
+
+    return (
+      <Observed
+        {...props}
+        onResize={onResizeHandler}
+        resolveHandler={handler => {
+          resolveHandler({
+            ...handler,
+            changeOnResizeHandler
+          });
+        }}
+      />
+    );
+  };
+
+  const { assertRenderCount, setSize, changeOnResizeHandler } = await render(
+    Test
+  );
+
+  await delay(50);
+
+  // Since `onResize` is used, no extra renders should've been triggered at this
+  // point. (As opposed to the defaults where the hook would trigger a render
+  // with the first measurement.)
+  assertRenderCount(1);
+
+  const observations1 = [];
+  const observations2 = [];
+
+  // Establishing a default, which'll be measured when the resize handler is set.
+  setSize({ width: 1, height: 1 });
+  await delay(50);
+
+  assertRenderCount(2);
+
+  changeOnResizeHandler(size => observations1.push(size));
+  await delay(50);
+  setSize({ width: 1, height: 2 });
+  await delay(50);
+  setSize({ width: 3, height: 4 });
+
+  assertRenderCount(5);
+
+  await delay(50);
+  changeOnResizeHandler(size => observations2.push(size));
+  await delay(50);
+  setSize({ width: 5, height: 6 });
+  await delay(50);
+  setSize({ width: 7, height: 8 });
+  await delay(50);
+
+  assertRenderCount(8);
+
+  expect(observations1.length).toBe(3);
+  expect(observations1[0]).toEqual({ width: 1, height: 1 });
+  expect(observations1[1]).toEqual({ width: 1, height: 2 });
+  expect(observations1[2]).toEqual({ width: 3, height: 4 });
+  expect(observations2.length).toBe(3);
+  expect(observations2[0]).toEqual({ width: 3, height: 4 });
+  expect(observations2[1]).toEqual({ width: 5, height: 6 });
+  expect(observations2[2]).toEqual({ width: 7, height: 8 });
 });
