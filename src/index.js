@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 
-export default function({ ref } = {}) {
+export default function({ ref, onResize } = {}) {
   // `defaultRef` Has to be non-conditionally declared here whether or not it'll
   // be used as that's how hooks work.
   // @see https://reactjs.org/docs/hooks-rules.html#explanation
@@ -10,6 +10,7 @@ export default function({ ref } = {}) {
     width: undefined,
     height: undefined
   });
+
   // Using a ref to track the previous width / height to avoid unnecessary renders
   const previous = useRef({
     width: undefined,
@@ -46,16 +47,21 @@ export default function({ ref } = {}) {
         previous.current.width !== newWidth ||
         previous.current.height !== newHeight
       ) {
-        previous.current.width = newWidth;
-        previous.current.height = newHeight;
-        setSize({ width: newWidth, height: newHeight });
+        const newSize = { width: newWidth, height: newHeight };
+        if (onResize) {
+          onResize(newSize);
+        } else {
+          previous.current.width = newWidth;
+          previous.current.height = newHeight;
+          setSize(newSize);
+        }
       }
     });
 
     resizeObserver.observe(element);
 
     return () => resizeObserver.unobserve(element);
-  }, [ref]);
+  }, [ref, onResize]);
 
   return useMemo(() => ({ ref, ...size }), [
     ref,
