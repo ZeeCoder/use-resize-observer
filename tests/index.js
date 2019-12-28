@@ -13,17 +13,16 @@ const Observed = ({
   resolveHandler,
   defaultWidth,
   defaultHeight,
-  useDefaults,
   ...props
 }) => {
   const textRef = useRef(null);
   const renderRef = useRef(null);
   const renderCountRef = useRef(0);
-  const { ref, width, height } = useResizeObserver({
-    defaultWidth: defaultWidth || 1,
-    defaultHeight: defaultHeight || 1,
-    useDefaults: useDefaults !== false
-  });
+  const {
+    ref,
+    width = defaultWidth,
+    height = defaultHeight
+  } = useResizeObserver();
   const [size, setSize] = useState({ width: "100%", height: "100%" });
 
   renderCountRef.current++;
@@ -34,6 +33,9 @@ const Observed = ({
     }
 
     resolveHandler({
+      assertDefaultSize: () => {
+        expect(textRef.current.textContent).toBe("x");
+      },
       assertSize: ({ width, height }) => {
         expect(textRef.current.textContent).toBe(`${width}x${height}`);
       },
@@ -93,9 +95,9 @@ const render = (TestComponent, { resolvesHandler = true } = {}, props) => {
   return controllerPromise;
 };
 
-it("should render with 1x1 by default", async () => {
-  const { assertSize } = await render(Observed);
-  assertSize({ width: 1, height: 1 });
+it("should render with undefined sizes at first", async () => {
+  const { assertDefaultSize } = await render(Observed);
+  assertDefaultSize();
 });
 
 it("should render with custom defaults", async () => {
@@ -173,6 +175,9 @@ it("should handle custom refs", async () => {
 
     useEffect(() => {
       resolveHandler({
+        assertDefaultSize: () => {
+          expect(ref.current.textContent).toBe("x");
+        },
         assertSize: ({ width, height }) => {
           expect(ref.current.textContent).toBe(`${width}x${height}`);
         }
@@ -186,10 +191,10 @@ it("should handle custom refs", async () => {
     );
   };
 
-  const { assertSize } = await render(Test);
+  const { assertDefaultSize, assertSize } = await render(Test);
 
   // Default
-  assertSize({ width: 1, height: 1 });
+  assertDefaultSize();
 
   // Actual measurement
   await delay(50);
@@ -211,6 +216,9 @@ it("should be able to reuse the same ref to measure different elements", async (
       resolveHandler({
         // Measures the second div on demand
         switchRefs: () => setStateRef(ref2),
+        assertDefaultSize: () => {
+          expect(sizeRef.current.textContent).toBe("x");
+        },
         assertSize: ({ width, height }) => {
           expect(sizeRef.current.textContent).toBe(`${width}x${height}`);
         }
@@ -228,10 +236,10 @@ it("should be able to reuse the same ref to measure different elements", async (
     );
   };
 
-  const { assertSize, switchRefs } = await render(Test);
+  const { switchRefs, assertDefaultSize, assertSize } = await render(Test);
 
   // Default
-  assertSize({ width: 1, height: 1 });
+  assertDefaultSize();
 
   // Div 1 measurement
   await delay(50);
@@ -244,13 +252,7 @@ it("should be able to reuse the same ref to measure different elements", async (
 });
 
 it("should be able to render without mock defaults", async () => {
-  const { setSize, assertSize } = await render(
-    Observed,
-    {},
-    {
-      useDefaults: false
-    }
-  );
+  const { setSize, assertSize } = await render(Observed);
 
   // Text should be "x" without the sizes, as they're simply undefined on the
   // returned object at this point.
@@ -278,9 +280,11 @@ it("should not trigger unnecessary renders with the same width or height", async
     container.style.width = `${width}px`;
     container.style.height = `${height}px`;
   };
-  const { assertSize, assertRenderCount } = await render(Test);
+  const { assertDefaultSize, assertSize, assertRenderCount } = await render(
+    Test
+  );
 
-  assertSize({ width: 1, height: 1 });
+  assertDefaultSize();
   assertRenderCount(1);
 
   await delay(50);
@@ -302,7 +306,7 @@ it("should not trigger unnecessary renders with the same width or height", async
 it("should keep the same response instance between renders if nothing changed", async () => {
   const Test = ({ resolveHandler }) => {
     const previousResponseRef = useRef(null);
-    const response = useResizeObserver({ useDefaults: false });
+    const response = useResizeObserver();
     const [state, setState] = useState(false);
 
     const sameInstance = previousResponseRef.current === response;
@@ -344,8 +348,8 @@ it("should ignore invalid custom refs", async () => {
 
     useEffect(() => {
       resolveHandler({
-        assertSize: ({ width, height }) => {
-          expect(ref.current.textContent).toBe(`${width}x${height}`);
+        assertDefaultSize: () => {
+          expect(ref.current.textContent).toBe("x");
         }
       });
     }, []);
@@ -357,12 +361,12 @@ it("should ignore invalid custom refs", async () => {
     );
   };
 
-  const { assertSize } = await render(Test);
+  const { assertDefaultSize } = await render(Test);
 
   // Since no refs were passed in with an element to be measured, the hook should
   // stay on the defaults
   await delay(50);
-  assertSize({ width: 1, height: 1 });
+  assertDefaultSize();
 });
 
 it("should work with the polyfilled version", async () => {
