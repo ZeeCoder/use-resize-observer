@@ -51,6 +51,37 @@ You can even reuse the same hook instance to measure different elements:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-reusing-refs-buftd)
 
+## The "onResize" callback
+
+By the default the hook will trigger a re-render on all changes to the target
+element's width and / or height.
+
+You can opt out of this behaviour, by providing an `onResize` callback function,
+which'll simply receive the width and height of the element when it changes, so
+that you can decide what to do with it:
+
+```js
+import React from "react";
+import useResizeObserver from "use-resize-observer";
+
+const App = () => {
+  // width / height will not be returned here when the onResize callback is present
+  const { ref } = useResizeObserver({
+    onResize: ({ width, height }) => {
+      // do something here.
+    }
+  });
+
+  return <div ref={ref} />;
+};
+```
+
+This callback also makes it possible to implement your own hooks that report only
+what you need, for example:
+
+- Reporting only width or height
+- Throttle / debounce
+
 ## Throttle / Debounce
 
 You might want to receive values less frequently than changes actually occur.
