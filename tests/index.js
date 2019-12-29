@@ -1,104 +1,13 @@
-// todo simplify setting the size and measuring renders
-//      Currently setting the size of the component to see if it gets measured
-//      results in a render of itself, which makes it hard to follow relevant
-//      render counts that are triggered by the hook.
 import React, { useEffect, useState, useRef } from "react";
-import ReactDOM from "react-dom";
 import useResizeObserver from "../dist/bundle.esm";
 import useResizeObserverPolyfilled from "../polyfilled";
 import delay from "delay";
+import { createComponentHandler, Observed, render } from "./utils";
 // Using the following to support async/await in tests.
 // I'm intentionally not using babel/polyfill, as that would introduce polyfills
 // the actual lib might not have, giving the false impression that something
 // works while it might actually not, if you use the lib without babel-polyfill.
 import "babel-regenerator-runtime";
-
-const Observed = ({
-  resolveHandler,
-  defaultWidth,
-  defaultHeight,
-  onResize,
-  ...props
-}) => {
-  const textRef = useRef(null);
-  const renderRef = useRef(null);
-  const renderCountRef = useRef(0);
-  const {
-    ref,
-    width = defaultWidth,
-    height = defaultHeight
-  } = useResizeObserver({ onResize });
-  const [size, setSize] = useState({ width: "100%", height: "100%" });
-
-  renderCountRef.current++;
-
-  useEffect(() => {
-    if (!resolveHandler) {
-      return;
-    }
-
-    resolveHandler({
-      assertDefaultSize: () => {
-        expect(textRef.current.textContent).toBe("x");
-      },
-      assertSize: ({ width, height }) => {
-        expect(textRef.current.textContent).toBe(`${width}x${height}`);
-      },
-      assertRenderCount: count => {
-        expect(renderRef.current.textContent).toBe(`${count}`);
-      },
-      setSize
-    });
-  }, []);
-
-  return (
-    <div
-      {...props}
-      ref={ref}
-      style={{
-        ...size,
-        position: "absolute",
-        left: 0,
-        top: 0,
-        background: "grey",
-        color: "white",
-        fontWeight: "bold"
-      }}
-    >
-      <span ref={textRef}>
-        {width}x{height}
-      </span>
-      <div>
-        Render Count: <span ref={renderRef}>{renderCountRef.current}</span>
-      </div>
-    </div>
-  );
-};
-
-let appRoot = null;
-const render = (TestComponent, { resolvesHandler = true } = {}, props) => {
-  let resolveHandler = null;
-  const controllerPromise = new Promise(resolve => (resolveHandler = resolve));
-
-  if (!appRoot) {
-    appRoot = document.createElement("div");
-    appRoot.id = "app";
-    document.body.appendChild(appRoot);
-  }
-
-  ReactDOM.render(null, appRoot);
-
-  ReactDOM.render(
-    <TestComponent {...props} resolveHandler={resolveHandler} />,
-    appRoot
-  );
-
-  if (!resolvesHandler) {
-    resolveHandler({});
-  }
-
-  return controllerPromise;
-};
 
 it("should render with undefined sizes at first", async () => {
   const { assertDefaultSize } = await render(Observed);
@@ -115,27 +24,29 @@ it("should render with custom defaults", async () => {
     }
   );
 
+  // By running this assertion immediately, it should check the default values
+  // instead ot the first on-mount measurement.
   assertSize({ width: 24, height: 42 });
 });
 
 it("should follow size changes correctly with appropriate render count and without sub-pixels as they're used in CSS", async () => {
-  const { setSize, assertSize, assertRenderCount } = await render(Observed);
+  const {
+    setAndAssertSize,
+    setSize,
+    assertSize,
+    assertRenderCount
+  } = await render(Observed, { waitForFirstMeasurement: true });
 
   // Default render + first measurement
-  await delay(50);
   assertRenderCount(2);
 
-  setSize({ width: 100, height: 200 });
-  await delay(50);
-  // One render for setting the CSS, and another for the hook to react
-  assertRenderCount(4);
-  assertSize({ width: 100, height: 200 });
+  await setAndAssertSize({ width: 100, height: 200 });
+  assertRenderCount(3);
 
   setSize({ width: 321, height: 456 });
   await delay(50);
-  // One render for setting the CSS, and another for the hook to react
-  assertRenderCount(6);
   assertSize({ width: 321, height: 456 });
+  assertRenderCount(4);
 });
 
 it("should handle multiple instances", async () => {
@@ -162,32 +73,33 @@ it("should handle multiple instances", async () => {
   };
   const { handler1, handler2 } = await render(Test);
 
-  handler1.setSize({ width: 100, height: 200 });
-  handler2.setSize({ width: 300, height: 400 });
-  await delay(50);
-  handler1.assertSize({ width: 100, height: 200 });
-  handler2.assertSize({ width: 300, height: 400 });
+  await Promise.all([
+    handler1.setAndAssertSize({ width: 100, height: 200 }),
+    handler2.setAndAssertSize({ width: 300, height: 400 })
+  ]);
 
-  handler2.setSize({ width: 321, height: 456 });
-  await delay(50);
+  handler1.assertRenderCount(2);
+  handler2.assertRenderCount(2);
+
+  await handler2.setAndAssertSize({ width: 321, height: 456 });
+
+  handler1.assertRenderCount(2);
+  handler2.assertRenderCount(3);
+
+  // Instance No. 1 should still be at the previous state.
   handler1.assertSize({ width: 100, height: 200 });
-  handler2.assertSize({ width: 321, height: 456 });
 });
 
 it("should handle custom refs", async () => {
   const Test = ({ resolveHandler }) => {
     const ref = useRef(null);
     const { width, height } = useResizeObserver({ ref });
+    const currentSizeRef = useRef({});
+    currentSizeRef.current.width = width;
+    currentSizeRef.current.height = height;
 
     useEffect(() => {
-      resolveHandler({
-        assertDefaultSize: () => {
-          expect(ref.current.textContent).toBe("x");
-        },
-        assertSize: ({ width, height }) => {
-          expect(ref.current.textContent).toBe(`${width}x${height}`);
-        }
-      });
+      resolveHandler(createComponentHandler({ currentSizeRef }));
     }, []);
 
     return (
@@ -214,20 +126,20 @@ it("should be able to reuse the same ref to measure different elements", async (
     const ref2 = useRef(null);
     const sizeRef = useRef(null);
     const { width, height } = useResizeObserver({ ref: stateRef });
+    const currentSizeRef = useRef({});
+    currentSizeRef.current.width = width;
+    currentSizeRef.current.height = height;
 
     useEffect(() => {
       // Measures the first div on mount
       setStateRef(ref1);
 
+      // Measures the second div on demand
+      const switchRefs = () => setStateRef(ref2);
+
       resolveHandler({
-        // Measures the second div on demand
-        switchRefs: () => setStateRef(ref2),
-        assertDefaultSize: () => {
-          expect(sizeRef.current.textContent).toBe("x");
-        },
-        assertSize: ({ width, height }) => {
-          expect(sizeRef.current.textContent).toBe(`${width}x${height}`);
-        }
+        ...createComponentHandler({ currentSizeRef }),
+        switchRefs
       });
     }, []);
 
@@ -258,11 +170,10 @@ it("should be able to reuse the same ref to measure different elements", async (
 });
 
 it("should be able to render without mock defaults", async () => {
-  const { setSize, assertSize } = await render(Observed);
+  const { setSize, assertSize, assertDefaultSize } = await render(Observed);
 
-  // Text should be "x" without the sizes, as they're simply undefined on the
-  // returned object at this point.
-  assertSize({ width: "", height: "" });
+  // Default values should be undefined
+  assertDefaultSize();
 
   setSize({ width: 100, height: 100 });
   await delay(50);
@@ -270,26 +181,12 @@ it("should be able to render without mock defaults", async () => {
 });
 
 it("should not trigger unnecessary renders with the same width or height", async () => {
-  const Test = ({ resolveHandler }) => {
-    return (
-      <div style={{ position: "relative" }} id="container">
-        <Observed resolveHandler={resolveHandler} />
-      </div>
-    );
-  };
-
-  // Setting the size like this won't trigger any unnecessary re-renders within
-  // the components, so we can accurately measure renders being triggered by the
-  // hook itself.
-  const setSize = ({ width, height }) => {
-    // todo this is roughly how other setSize functions should work as well
-    const container = document.querySelector("#container");
-    container.style.width = `${width}px`;
-    container.style.height = `${height}px`;
-  };
-  const { assertDefaultSize, assertSize, assertRenderCount } = await render(
-    Test
-  );
+  const {
+    setSize,
+    assertDefaultSize,
+    assertSize,
+    assertRenderCount
+  } = await render(Observed);
 
   assertDefaultSize();
 
@@ -352,13 +249,12 @@ it("should ignore invalid custom refs", async () => {
   const Test = ({ resolveHandler }) => {
     const ref = useRef(null);
     const { width, height } = useResizeObserver({ ref: null }); // invalid custom ref
+    const currentSizeRef = useRef({});
+    currentSizeRef.current.width = width;
+    currentSizeRef.current.height = height;
 
     useEffect(() => {
-      resolveHandler({
-        assertDefaultSize: () => {
-          expect(ref.current.textContent).toBe("x");
-        }
-      });
+      resolveHandler(createComponentHandler({ currentSizeRef }));
     }, []);
 
     return (
@@ -379,13 +275,12 @@ it("should ignore invalid custom refs", async () => {
 it("should work with the polyfilled version", async () => {
   const Test = ({ resolveHandler }) => {
     const { ref, width, height } = useResizeObserverPolyfilled();
+    const currentSizeRef = useRef({});
+    currentSizeRef.current.width = width;
+    currentSizeRef.current.height = height;
 
     useEffect(() => {
-      resolveHandler({
-        assertSize: ({ width, height }) => {
-          expect(ref.current.textContent).toBe(`${width}x${height}`);
-        }
-      });
+      resolveHandler(createComponentHandler({ currentSizeRef }));
     }, []);
 
     return (
@@ -414,10 +309,6 @@ it("should be able to work with onResize instead of rendering the values", async
   setSize({ width: 101, height: 201 });
   await delay(50);
 
-  // Should render once on mount, and twice more for size changes, but the hooks
-  // should not trigger further renders.
-  assertRenderCount(3);
-
   // Should stay at default as width/height is not passed to the hook response
   // when an onResize callback is given
   assertDefaultSize();
@@ -425,6 +316,9 @@ it("should be able to work with onResize instead of rendering the values", async
   expect(observations.length).toBe(2);
   expect(observations[0]).toEqual({ width: 100, height: 200 });
   expect(observations[1]).toEqual({ width: 101, height: 201 });
+
+  // Should render once on mount only
+  assertRenderCount(1);
 });
 
 it("should handle if the onResize handler changes properly with the correct render counts", async () => {
@@ -446,11 +340,11 @@ it("should handle if the onResize handler changes properly with the correct rend
     );
   };
 
-  const { assertRenderCount, setSize, changeOnResizeHandler } = await render(
-    Test
-  );
-
-  await delay(50);
+  const {
+    assertRenderCount,
+    setSize,
+    changeOnResizeHandler
+  } = await render(Test, { waitForFirstMeasurement: true });
 
   // Since `onResize` is used, no extra renders should've been triggered at this
   // point. (As opposed to the defaults where the hook would trigger a render
@@ -464,7 +358,7 @@ it("should handle if the onResize handler changes properly with the correct rend
   setSize({ width: 1, height: 1 });
   await delay(50);
 
-  assertRenderCount(2);
+  assertRenderCount(1);
 
   changeOnResizeHandler(size => observations1.push(size));
   await delay(50);
@@ -472,7 +366,7 @@ it("should handle if the onResize handler changes properly with the correct rend
   await delay(50);
   setSize({ width: 3, height: 4 });
 
-  assertRenderCount(5);
+  assertRenderCount(2);
 
   await delay(50);
   changeOnResizeHandler(size => observations2.push(size));
@@ -482,7 +376,7 @@ it("should handle if the onResize handler changes properly with the correct rend
   setSize({ width: 7, height: 8 });
   await delay(50);
 
-  assertRenderCount(8);
+  assertRenderCount(3);
 
   expect(observations1.length).toBe(3);
   expect(observations1[0]).toEqual({ width: 1, height: 1 });
