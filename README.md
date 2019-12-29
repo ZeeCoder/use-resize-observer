@@ -56,7 +56,7 @@ You can even reuse the same hook instance to measure different elements:
 You might want to receive values less frequently than changes actually occur.
 
 While this hook does not come with its own implementation of throttling / debouncing,
-you can use hook composition instead to achieve the same results:
+you can use the `onResize` callback to implement your own version:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
 
@@ -77,7 +77,7 @@ const { ref, width = 100, height = 50 } = useResizeObserver();
 Here "width" and "height" will be 100 and 50 respectively, until the
 ResizeObserver kicks in and reports the actual size.
 
-## No Defaults
+## Without Defaults
 
 If you only want real measurements (only values from the ResizeObserver without
 any default values), then you can just leave defaults off:
