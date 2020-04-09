@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "jsx": "react",
+    "noEmit": true
+  },
+  "include": ["."]
+}

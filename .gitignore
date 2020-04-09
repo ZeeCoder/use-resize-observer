@@ -1,8 +1,9 @@
 .cache
 node_modules
 .idea
+.vscode
 yarn.lock
 yarn-error.log*
 dist
 /polyfilled.js
-
+/polyfilled.d.ts

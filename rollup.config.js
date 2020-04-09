@@ -1,41 +1,41 @@
 import babel from "rollup-plugin-babel";
-import inject from "rollup-plugin-inject";
+import inject from "@rollup/plugin-inject";
 
-const getConfig = polyfill => {
+const getConfig = ({ polyfill = false } = {}) => {
   const config = {
-    input: "src/index.js",
+    input: "src/index.ts",
     output: [],
-    plugins: [babel()],
-    external: ["react"]
+    plugins: [babel({ extensions: ["ts"] })],
+    external: ["react"],
   };
 
   if (polyfill) {
     config.output = [
       {
         file: "polyfilled.js",
-        format: "cjs"
-      }
+        format: "cjs",
+      },
     ];
     config.external.push("resize-observer-polyfill");
     config.plugins.push(
       inject({
-        ResizeObserver: "resize-observer-polyfill"
+        ResizeObserver: "resize-observer-polyfill",
       })
     );
   } else {
     config.output = [
       {
         file: "dist/bundle.cjs.js",
-        format: "cjs"
+        format: "cjs",
       },
       {
         file: "dist/bundle.esm.js",
-        format: "esm"
-      }
+        format: "esm",
+      },
     ];
   }
 
   return config;
 };
 
-export default [getConfig(), getConfig(true)];
+export default [getConfig(), getConfig({ polyfill: true })];
