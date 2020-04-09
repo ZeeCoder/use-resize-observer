@@ -1,20 +1,53 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, RefObject } from "react";
 
-export default function({ ref, onResize } = {}) {
+type ObservedSize = {
+  width: number | undefined;
+  height: number | undefined;
+};
+
+type ResizeHandler = (size: ObservedSize) => void;
+
+// Type definition when the user wants the hook to provide the ref with the given type.
+function useResizeObserver<T extends HTMLElement>(opts?: {
+  onResize?: ResizeHandler;
+}): { ref: RefObject<T> } & ObservedSize;
+
+// Type definition when the hook just passes through the user provided ref.
+function useResizeObserver<T extends HTMLElement>(opts?: {
+  ref: RefObject<T>;
+  onResize?: ResizeHandler;
+}): { ref: RefObject<T> } & ObservedSize;
+
+function useResizeObserver<T>(
+  opts: {
+    ref?: RefObject<T>;
+    onResize?: ResizeHandler;
+  } = {}
+): { ref: RefObject<T> } & ObservedSize {
   // `defaultRef` Has to be non-conditionally declared here whether or not it'll
   // be used as that's how hooks work.
   // @see https://reactjs.org/docs/hooks-rules.html#explanation
-  const defaultRef = useRef(null);
-  ref = ref || defaultRef;
-  const [size, setSize] = useState({
+  const defaultRef = useRef<T>(null);
+
+  const ref = opts.ref || defaultRef;
+  const onResize = opts.onResize;
+  const [size, setSize] = useState<{
+    width?: number;
+    height?: number;
+  }>({
     width: undefined,
-    height: undefined
+    height: undefined,
   });
 
   // Using a ref to track the previous width / height to avoid unnecessary renders
-  const previous = useRef({
+  const previous: {
+    current: {
+      width?: number;
+      height?: number;
+    };
+  } = useRef({
     width: undefined,
-    height: undefined
+    height: undefined,
   });
 
   useEffect(() => {
@@ -27,7 +60,7 @@ export default function({ ref, onResize } = {}) {
     }
 
     const element = ref.current;
-    const resizeObserver = new ResizeObserver(entries => {
+    const resizeObserver = new ResizeObserver((entries) => {
       if (!Array.isArray(entries)) {
         return;
       }
@@ -63,9 +96,11 @@ export default function({ ref, onResize } = {}) {
     return () => resizeObserver.unobserve(element);
   }, [ref, onResize]);
 
-  return useMemo(() => ({ ref, ...size }), [
+  return useMemo(() => ({ ref, width: size.width, height: size.height }), [
     ref,
     size ? size.width : null,
-    size ? size.height : null
+    size ? size.height : null,
   ]);
 }
+
+export default useResizeObserver;

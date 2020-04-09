@@ -5,6 +5,17 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
 
+## Highlights
+
+- Written in **TypeScript**.
+- **Tiny**: 323 B (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
+- Exposes an **onResize callback** if you need more control.
+- [Throttle / Debounce](#throttle--debounce)
+- Works with **SSR**.
+- Works with **CSS-in-JS**.
+- **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
+- **Tested** in real browsers. (Headless Chrome and Firefox).
+
 ## In Action
 
 [CodeSandbox Demo](https://codesandbox.io/s/nrp0w2r5z0)
@@ -69,7 +80,7 @@ const App = () => {
   const { ref } = useResizeObserver({
     onResize: ({ width, height }) => {
       // do something here.
-    }
+    },
   });
 
   return <div ref={ref} />;

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 6.1.0-alpha1
+
+- Rewrote the source in TypeScript. (Feedback is welcome.)
+- Rewrote tests in TypeScript as well. (Ensures the types make sense.)
+- Added checks to ensure reasonable bundle size.
+
 ## 6.0.0
 
 - **[BREAKING]** Default width and height can now be set by declaring defaults

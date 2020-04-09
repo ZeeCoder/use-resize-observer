@@ -11,3 +11,4 @@ browserslist
 .cache
 .travis.yml
 tests
+tsconfig.json
