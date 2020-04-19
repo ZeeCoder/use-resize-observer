@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 6.1.0-alpha2
+
+- ResizeObserver instances are no longer created unnecessarily when the onResize
+  callback changes. (Fixes #32)
+- Written new tests in [react testing library](https://github.com/testing-library/react-testing-library).
+
 ## 6.1.0-alpha1
 
 - Rewrote the source in TypeScript. (Feedback is welcome.)

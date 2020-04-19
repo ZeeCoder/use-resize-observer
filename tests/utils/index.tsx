@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, RefObject, FunctionComponent } from "react";
 import ReactDOM from "react-dom";
-import useResizeObserver from "../";
+import useResizeObserver from "../..";
 import delay from "delay";
 
 export type Size = {
@@ -48,14 +48,14 @@ export function createComponentHandler(opts: {
 export function createComponentHandler({
   currentSizeRef,
   measuredElementRef,
-  renderCountRef
+  renderCountRef,
 }: {
   currentSizeRef: RefObject<ObservedSize>;
   measuredElementRef?: RefObject<HTMLElement>;
   renderCountRef?: RefObject<number>;
 }): BaseComponentHandler {
   let handler = {
-    assertSize: function({ width, height }: ObservedSize) {
+    assertSize: function ({ width, height }: ObservedSize) {
       if (currentSizeRef.current === null) {
         throw new Error(`currentSizeRef.current is not set.`);
       }
@@ -63,9 +63,9 @@ export function createComponentHandler({
       expect(currentSizeRef.current.width).toBe(width);
       expect(currentSizeRef.current.height).toBe(height);
     },
-    assertDefaultSize: function() {
+    assertDefaultSize: function () {
       return this.assertSize({ width: undefined, height: undefined });
-    }
+    },
   } as ComponentHandler;
 
   if (measuredElementRef) {
@@ -77,7 +77,7 @@ export function createComponentHandler({
       measuredElementRef.current.style.width = `${width}px`;
       measuredElementRef.current.style.height = `${height}px`;
     };
-    handler.setAndAssertSize = async size => {
+    handler.setAndAssertSize = async (size) => {
       handler.setSize(size);
       await delay(50);
       handler.assertSize(size);
@@ -85,7 +85,7 @@ export function createComponentHandler({
   }
 
   if (renderCountRef) {
-    handler.assertRenderCount = count => {
+    handler.assertRenderCount = (count) => {
       expect(renderCountRef.current).toBe(count);
     };
   }
@@ -101,20 +101,22 @@ export type MultiHandlerResolverComponentProps = {
   resolveHandler: MultiHandlerReceiver;
 };
 
-export const Observed: FunctionComponent<HandlerResolverComponentProps & {
-  defaultWidth?: number;
-  defaultHeight?: number;
-  onResize?: (size: ObservedSize) => void;
-}> = ({ resolveHandler, defaultWidth, defaultHeight, onResize, ...props }) => {
+export const Observed: FunctionComponent<
+  HandlerResolverComponentProps & {
+    defaultWidth?: number;
+    defaultHeight?: number;
+    onResize?: (size: ObservedSize) => void;
+  }
+> = ({ resolveHandler, defaultWidth, defaultHeight, onResize, ...props }) => {
   const renderCountRef = useRef(0);
   const {
     ref: measuredElementRef,
     width = defaultWidth,
-    height = defaultHeight
+    height = defaultHeight,
   } = useResizeObserver<HTMLDivElement>({ onResize });
   const currentSizeRef = useRef<ObservedSize>({
     width: undefined,
-    height: undefined
+    height: undefined,
   });
   currentSizeRef.current.width = width;
   currentSizeRef.current.height = height;
@@ -129,7 +131,7 @@ export const Observed: FunctionComponent<HandlerResolverComponentProps & {
       createComponentHandler({
         currentSizeRef,
         measuredElementRef,
-        renderCountRef
+        renderCountRef,
       })
     );
   }, []);
@@ -146,7 +148,7 @@ export const Observed: FunctionComponent<HandlerResolverComponentProps & {
         top: 0,
         background: "grey",
         color: "white",
-        fontWeight: "bold"
+        fontWeight: "bold",
       }}
     >
       <span>
@@ -183,11 +185,11 @@ export function render(
     | FunctionComponent<HandlerResolverComponentProps>
     | FunctionComponent<MultiHandlerResolverComponentProps>,
   {
-    waitForFirstMeasurement = false
+    waitForFirstMeasurement = false,
   }: { waitForFirstMeasurement?: boolean } = {},
   props?: {}
 ) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     async function resolveHandler<T extends Partial<ComponentHandler>>(
       handler: T | T[]
     ): Promise<void> {

@@ -9,5 +9,5 @@
     "jsx": "react",
     "noEmit": true
   },
-  "include": ["."]
+  "include": [".", "../src"]
 }
