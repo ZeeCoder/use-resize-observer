@@ -1,9 +1,10 @@
+// todo test for SSR
 import React, {
   useEffect,
   useState,
   useRef,
   RefObject,
-  FunctionComponent
+  FunctionComponent,
 } from "react";
 import useResizeObserver from "../";
 import useResizeObserverPolyfilled from "../polyfilled";
@@ -16,13 +17,8 @@ import {
   ObservedSize,
   MultiHandlerResolverComponentProps,
   ComponentHandler,
-  HandlerResolverComponentProps
+  HandlerResolverComponentProps,
 } from "./utils";
-// Using the following to support async/await in tests.
-// I'm intentionally not using babel/polyfill, as that would introduce polyfills
-// the actual lib might not have, giving the false impression that something
-// works while it might actually not, if you use the lib without babel-polyfill.
-import "babel-regenerator-runtime";
 
 it("should render with undefined sizes at first", async () => {
   const handler = await render(Observed);
@@ -35,7 +31,7 @@ it("should render with custom defaults", async () => {
     {},
     {
       defaultWidth: 24,
-      defaultHeight: 42
+      defaultHeight: 42,
     }
   );
 
@@ -49,7 +45,7 @@ it("should follow size changes correctly with appropriate render count and witho
     setAndAssertSize,
     setSize,
     assertSize,
-    assertRenderCount
+    assertRenderCount,
   } = await render(Observed, { waitForFirstMeasurement: true });
 
   // Default render + first measurement
@@ -66,18 +62,18 @@ it("should follow size changes correctly with appropriate render count and witho
 
 it("should handle multiple instances", async () => {
   const Test: FunctionComponent<MultiHandlerResolverComponentProps> = ({
-    resolveHandler
+    resolveHandler,
   }) => {
     let resolveHandler1: HandlerReceiver = () => {};
     let resolveHandler2: HandlerReceiver = () => {};
 
     const handlersPromise = Promise.all([
       new Promise<ComponentHandler>(
-        resolve => (resolveHandler1 = resolve as HandlerReceiver)
+        (resolve) => (resolveHandler1 = resolve as HandlerReceiver)
       ),
       new Promise<ComponentHandler>(
-        resolve => (resolveHandler2 = resolve as HandlerReceiver)
-      )
+        (resolve) => (resolveHandler2 = resolve as HandlerReceiver)
+      ),
     ]);
 
     useEffect(() => {
@@ -99,7 +95,7 @@ it("should handle multiple instances", async () => {
 
   await Promise.all([
     handler1.setAndAssertSize({ width: 100, height: 200 }),
-    handler2.setAndAssertSize({ width: 300, height: 400 })
+    handler2.setAndAssertSize({ width: 300, height: 400 }),
   ]);
 
   handler1.assertRenderCount(2);
@@ -116,7 +112,7 @@ it("should handle multiple instances", async () => {
 
 it("should handle custom refs", async () => {
   const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-    resolveHandler
+    resolveHandler,
   }) => {
     const ref = useRef(null);
     const { width, height } = useResizeObserver({ ref });
@@ -160,7 +156,7 @@ it("should be able to reuse the same ref to measure different elements", async (
     const { width, height } = useResizeObserver({ ref: stateRef });
     const currentSizeRef = useRef<ObservedSize>({
       width: undefined,
-      height: undefined
+      height: undefined,
     });
     currentSizeRef.current.width = width;
     currentSizeRef.current.height = height;
@@ -237,7 +233,7 @@ it("should keep the same response instance between renders if nothing changed", 
   };
 
   const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-    resolveHandler
+    resolveHandler,
   }) => {
     const previousResponseRef = useRef<
       | ({
@@ -282,12 +278,12 @@ it("should keep the same response instance between renders if nothing changed", 
 
 it("should ignore invalid custom refs", async () => {
   const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-    resolveHandler
+    resolveHandler,
   }) => {
     // Passing in an invalid custom ref.
     // Same should be work if "null" or something similar gets passed in.
     const { width, height } = useResizeObserver({
-      ref: {} as RefObject<HTMLDivElement>
+      ref: {} as RefObject<HTMLDivElement>,
     });
     const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
     currentSizeRef.current.width = width;
@@ -314,7 +310,7 @@ it("should ignore invalid custom refs", async () => {
 
 it("should work with the polyfilled version", async () => {
   const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-    resolveHandler
+    resolveHandler,
   }) => {
     const { ref, width, height } = useResizeObserverPolyfilled<
       HTMLDivElement
@@ -373,7 +369,7 @@ it("should handle if the onResize handler changes properly with the correct rend
   }) => {
     const [onResizeHandler, setOnResizeHandler] = useState(() => () => {});
 
-    changeOnResizeHandler = handler => setOnResizeHandler(() => handler);
+    changeOnResizeHandler = (handler) => setOnResizeHandler(() => handler);
 
     return (
       <Observed
@@ -385,7 +381,7 @@ it("should handle if the onResize handler changes properly with the correct rend
   };
 
   const { assertRenderCount, setSize } = await render(Test, {
-    waitForFirstMeasurement: true
+    waitForFirstMeasurement: true,
   });
 
   // Since `onResize` is used, no extra renders should've been triggered at this
@@ -420,12 +416,11 @@ it("should handle if the onResize handler changes properly with the correct rend
 
   assertRenderCount(3);
 
-  expect(observations1.length).toBe(3);
-  expect(observations1[0]).toEqual({ width: 1, height: 1 });
-  expect(observations1[1]).toEqual({ width: 1, height: 2 });
-  expect(observations1[2]).toEqual({ width: 3, height: 4 });
-  expect(observations2.length).toBe(3);
-  expect(observations2[0]).toEqual({ width: 3, height: 4 });
-  expect(observations2[1]).toEqual({ width: 5, height: 6 });
-  expect(observations2[2]).toEqual({ width: 7, height: 8 });
+  expect(observations1.length).toBe(2);
+  expect(observations1[0]).toEqual({ width: 1, height: 2 });
+  expect(observations1[1]).toEqual({ width: 3, height: 4 });
+
+  expect(observations2.length).toBe(2);
+  expect(observations2[0]).toEqual({ width: 5, height: 6 });
+  expect(observations2[1]).toEqual({ width: 7, height: 8 });
 });

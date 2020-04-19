@@ -1,4 +1,11 @@
-import { useEffect, useState, useRef, useMemo, RefObject } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  RefObject,
+  MutableRefObject,
+} from "react";
 
 type ObservedSize = {
   width: number | undefined;
@@ -29,8 +36,51 @@ function useResizeObserver<T>(
   // @see https://reactjs.org/docs/hooks-rules.html#explanation
   const defaultRef = useRef<T>(null);
 
-  const ref = opts.ref || defaultRef;
+  // Saving the callback as a ref. With this, I don't need to put onResize in the
+  // effect dep array, and just passing in an anonymous function without memoising
+  // will not reinstantiate the hook's ResizeObserver
   const onResize = opts.onResize;
+  const onResizeRef = useRef<ResizeHandler | undefined>(undefined);
+  onResizeRef.current = onResize;
+
+  // Using a single instance throughought the hook's lifetime
+  const resizeObserverRef = useRef<ResizeObserver>() as MutableRefObject<
+    ResizeObserver
+  >;
+  if (!resizeObserverRef.current) {
+    resizeObserverRef.current = new ResizeObserver((entries) => {
+      if (!Array.isArray(entries)) {
+        return;
+      }
+
+      // Since we only observe the one element, we don't need to loop over the
+      // array
+      if (!entries.length) {
+        return;
+      }
+
+      const entry = entries[0];
+
+      // `Math.round` is in line with how CSS resolves sub-pixel values
+      const newWidth = Math.round(entry.contentRect.width);
+      const newHeight = Math.round(entry.contentRect.height);
+      if (
+        previous.current.width !== newWidth ||
+        previous.current.height !== newHeight
+      ) {
+        const newSize = { width: newWidth, height: newHeight };
+        if (onResizeRef.current) {
+          onResizeRef.current(newSize);
+        } else {
+          previous.current.width = newWidth;
+          previous.current.height = newHeight;
+          setSize(newSize);
+        }
+      }
+    });
+  }
+
+  const ref = opts.ref || defaultRef;
   const [size, setSize] = useState<{
     width?: number;
     height?: number;
@@ -60,41 +110,11 @@ function useResizeObserver<T>(
     }
 
     const element = ref.current;
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (!Array.isArray(entries)) {
-        return;
-      }
 
-      // Since we only observe the one element, we don't need to loop over the
-      // array
-      if (!entries.length) {
-        return;
-      }
+    resizeObserverRef.current.observe(element);
 
-      const entry = entries[0];
-
-      // `Math.round` is in line with how CSS resolves sub-pixel values
-      const newWidth = Math.round(entry.contentRect.width);
-      const newHeight = Math.round(entry.contentRect.height);
-      if (
-        previous.current.width !== newWidth ||
-        previous.current.height !== newHeight
-      ) {
-        const newSize = { width: newWidth, height: newHeight };
-        if (onResize) {
-          onResize(newSize);
-        } else {
-          previous.current.width = newWidth;
-          previous.current.height = newHeight;
-          setSize(newSize);
-        }
-      }
-    });
-
-    resizeObserver.observe(element);
-
-    return () => resizeObserver.unobserve(element);
-  }, [ref, onResize]);
+    return () => resizeObserverRef.current.unobserve(element);
+  }, [ref]);
 
   return useMemo(() => ({ ref, width: size.width, height: size.height }), [
     ref,
