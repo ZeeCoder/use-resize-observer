@@ -2,9 +2,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 // opting out from ts checks
 const Test = require("./ssr/Test");
-
-const waitForNextFrame = () =>
-  new Promise((resolve) => setTimeout(resolve, 1000 / 60));
+import delay from "delay";
 
 // This is replaced with the "server-generated" string before the tests are run.
 const html = `<div style="width:100px;height:200px" data-reactroot="">1x2</div>`;
@@ -25,7 +23,8 @@ describe("SSR", () => {
 
     expect(app.textContent).toBe(`1x2`);
 
-    await waitForNextFrame();
+    // For some reason headless Firefox takes a bit long here sometimes.
+    await delay(100);
 
     expect(app.textContent).toBe(`100x200`);
   });
