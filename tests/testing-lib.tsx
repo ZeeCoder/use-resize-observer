@@ -79,23 +79,25 @@ const renderTest = (
     );
   });
 
-it("should measure the right sizes", async () => {
-  const [controller] = await renderTest();
+describe("Testing Lib: Basics", () => {
+  it("should measure the right sizes", async () => {
+    const [controller] = await renderTest();
 
-  // Default response on the first render before an actual measurement took place
-  expect(controller.getWidth()).toBe(0);
-  expect(controller.getHeight()).toBe(0);
-  expect(controller.getRenderCount()).toBe(1);
+    // Default response on the first render before an actual measurement took place
+    expect(controller.getWidth()).toBe(0);
+    expect(controller.getHeight()).toBe(0);
+    expect(controller.getRenderCount()).toBe(1);
 
-  // Should react to component size changes.
-  controller.setSize(100, 200);
-  await awaitNextFrame();
-  expect(controller.getWidth()).toBe(100);
-  expect(controller.getHeight()).toBe(200);
-  expect(controller.getRenderCount()).toBe(2);
+    // Should react to component size changes.
+    controller.setSize(100, 200);
+    await awaitNextFrame();
+    expect(controller.getWidth()).toBe(100);
+    expect(controller.getHeight()).toBe(200);
+    expect(controller.getRenderCount()).toBe(2);
+  });
 });
 
-describe("Resize Observer Instance Counting Block", () => {
+describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   let resizeObserverInstanceCount = 0;
   let resizeObserverObserveCount = 0;
   let resizeObserverUnobserveCount = 0;

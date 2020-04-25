@@ -47,7 +47,32 @@ function useResizeObserver<T>(
   const resizeObserverRef = useRef<ResizeObserver>() as MutableRefObject<
     ResizeObserver
   >;
-  if (!resizeObserverRef.current) {
+
+  const ref = opts.ref || defaultRef;
+  const [size, setSize] = useState<{
+    width?: number;
+    height?: number;
+  }>({
+    width: undefined,
+    height: undefined,
+  });
+
+  // Using a ref to track the previous width / height to avoid unnecessary renders
+  const previous: {
+    current: {
+      width?: number;
+      height?: number;
+    };
+  } = useRef({
+    width: undefined,
+    height: undefined,
+  });
+
+  useEffect(() => {
+    if (resizeObserverRef.current) {
+      return;
+    }
+
     resizeObserverRef.current = new ResizeObserver((entries) => {
       if (!Array.isArray(entries)) {
         return;
@@ -78,27 +103,7 @@ function useResizeObserver<T>(
         }
       }
     });
-  }
-
-  const ref = opts.ref || defaultRef;
-  const [size, setSize] = useState<{
-    width?: number;
-    height?: number;
-  }>({
-    width: undefined,
-    height: undefined,
-  });
-
-  // Using a ref to track the previous width / height to avoid unnecessary renders
-  const previous: {
-    current: {
-      width?: number;
-      height?: number;
-    };
-  } = useRef({
-    width: undefined,
-    height: undefined,
-  });
+  }, []);
 
   useEffect(() => {
     if (
