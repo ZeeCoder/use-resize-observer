@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.1.0-alpha3
+
+- Fixed SSR rendering, and added a test to cover it.
+
 ## 6.1.0-alpha2
 
 - ResizeObserver instances are no longer created unnecessarily when the onResize
