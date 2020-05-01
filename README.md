@@ -23,9 +23,9 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Install
 
 ```sh
-yarn add use-resize-observer --dev
+yarn add use-resize-observer
 # or
-npm install use-resize-observer --save-dev
+npm install use-resize-observer --save
 ```
 
 ## Basic Usage
