@@ -4,7 +4,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 <h1 align="center">
 	<br>
-	<img width="250" src="https://rawgit.com/ZeeCoder/use-resize-observer/master/media/Logo.png" alt="useResizeObserver">
+	<img width="250" src="https://raw.githubusercontent.com/ZeeCoder/use-resize-observer/master/media/Logo.png" alt="useResizeObserver">
 	<br>
     <br>
 </h1>
