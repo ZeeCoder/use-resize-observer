@@ -12,3 +12,4 @@ browserslist
 .travis.yml
 tests
 tsconfig.json
+media

@@ -2,6 +2,13 @@
 
 A React hook that allows you to use a ResizeObserver to measure an element's size.
 
+<h1 align="center">
+	<br>
+	<img width="250" src="https://rawgit.com/ZeeCoder/use-resize-observer/master/media/Logo.png" alt="useResizeObserver">
+	<br>
+    <br>
+</h1>
+
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
 
