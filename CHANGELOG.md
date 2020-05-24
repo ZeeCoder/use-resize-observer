@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.1.0
+
+- No changes, only publishing the next minor.
+
 ## 6.1.0-alpha3
 
 - Fixed SSR rendering, and added a test to cover it.
