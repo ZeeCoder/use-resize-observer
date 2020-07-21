@@ -145,6 +145,36 @@ describe("Vanilla tests", () => {
     handler.assertSize({ width: 100, height: 200 });
   });
 
+  it("should not initialize a ResizeObserver if no ref is passed", async () => {
+    spyOn(window, "ResizeObserver");
+    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
+      resolveHandler,
+    }) => {
+      const { width, height } = useResizeObserver({ ref: null });
+      const currentSizeRef = useRef<{
+        width: number | undefined;
+        height: number | undefined;
+      }>({ width: undefined, height: undefined });
+      currentSizeRef.current.height = height;
+      currentSizeRef.current.width = width;
+
+      useEffect(() => {
+        resolveHandler(createComponentHandler({ currentSizeRef }));
+      }, []);
+
+      return (
+        <div style={{ width: 100, height: 200 }}>
+          {width}x{height}
+        </div>
+      );
+    };
+
+    await render(Test);
+
+    await delay(50);
+    expect(window.ResizeObserver).not.toHaveBeenCalled();
+  });
+
   it("should be able to reuse the same ref to measure different elements", async () => {
     let switchRefs = (): void => {
       throw new Error(`"switchRefs" should've been implemented by now.`);

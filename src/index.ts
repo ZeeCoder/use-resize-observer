@@ -21,13 +21,13 @@ function useResizeObserver<T extends HTMLElement>(opts?: {
 
 // Type definition when the hook just passes through the user provided ref.
 function useResizeObserver<T extends HTMLElement>(opts?: {
-  ref: RefObject<T>;
+  ref: RefObject<T> | null;
   onResize?: ResizeHandler;
 }): { ref: RefObject<T> } & ObservedSize;
 
 function useResizeObserver<T>(
   opts: {
-    ref?: RefObject<T>;
+    ref?: RefObject<T> | null;
     onResize?: ResizeHandler;
   } = {}
 ): { ref: RefObject<T> } & ObservedSize {
@@ -69,7 +69,7 @@ function useResizeObserver<T>(
   });
 
   useEffect(() => {
-    if (resizeObserverRef.current) {
+    if (!(ref?.current instanceof Element) || resizeObserverRef.current) {
       return;
     }
 
@@ -103,14 +103,10 @@ function useResizeObserver<T>(
         }
       }
     });
-  }, []);
+  });
 
   useEffect(() => {
-    if (
-      typeof ref !== "object" ||
-      ref === null ||
-      !(ref.current instanceof Element)
-    ) {
+    if (!(ref?.current instanceof Element)) {
       return;
     }
 
