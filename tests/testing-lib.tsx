@@ -1,102 +1,46 @@
 // Tests written with react testing library
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import useResizeObserver from "../";
-import { render, cleanup, RenderResult } from "@testing-library/react";
-import { ObservedSize } from "./utils";
-import delay from "delay";
+import { render, cleanup } from "@testing-library/react";
+import useRenderTrigger from "./utils/useRenderTrigger";
+import awaitNextFrame from "./utils/awaitNextFrame";
+import createController from "./utils/createController";
 
 afterEach(() => {
   cleanup();
 });
 
-type ComponentController = {
-  setSize: (width: number, height: number) => void;
-  getRenderCount: () => number;
-  getWidth: () => number | undefined;
-  getHeight: () => number | undefined;
-  triggerRender: () => void;
-  switchToExplicitRef: () => void;
-};
-
-type TestProps = {
-  onResize?: (size: ObservedSize) => void;
-  resolveController: (controller: ComponentController) => void;
-};
-
-const Test = ({ onResize, resolveController }: TestProps) => {
-  const [, setRenderTrigger] = useState(false);
-  const [useExplicitRef, setUseExplicitRef] = useState(false);
-  const explicitRef = useRef<HTMLDivElement>(null);
-  const { ref, width = 0, height = 0 } = useResizeObserver<HTMLDivElement>({
-    // We intentionally create a new function instance here if onResize is given.
-    // The hook is supposed to handle it and not recreate ResizeObserver instances on each render for example.
-    onResize: onResize ? (size: ObservedSize) => onResize(size) : undefined,
-    ...(useExplicitRef ? { ref: explicitRef } : {}),
-  });
-  const controllerStateRef = useRef<{ renderCount: number } & ObservedSize>({
-    renderCount: 0,
-    width: undefined,
-    height: undefined,
-  });
-
-  controllerStateRef.current.renderCount++;
-  controllerStateRef.current.width = width;
-  controllerStateRef.current.height = height;
-
-  useEffect(() => {
-    resolveController({
-      setSize: (width: number, height: number) => {
-        if (!ref.current) {
-          throw new Error(`Expected "ref.current" to be set.`);
-        }
-
-        ref.current.style.width = `${width}px`;
-        ref.current.style.height = `${height}px`;
-      },
-      getRenderCount: () => controllerStateRef.current.renderCount,
-      getWidth: () => controllerStateRef.current.width,
-      getHeight: () => controllerStateRef.current.height,
-      triggerRender: () => setRenderTrigger((value) => !value),
-      switchToExplicitRef: () => setUseExplicitRef(true),
-    });
-  }, []);
-
-  return <div ref={useExplicitRef ? explicitRef : ref}></div>;
-};
-
-const awaitNextFrame = () =>
-  new Promise((resolve) => setTimeout(resolve, 1000 / 60));
-
-const renderTest = (
-  props: Omit<TestProps, "resolveController"> = {}
-): Promise<[ComponentController, RenderResult]> =>
-  new Promise((resolve) => {
-    const tools = render(
-      <Test
-        {...props}
-        resolveController={(controller) => resolve([controller, tools])}
-      ></Test>
-    );
-  });
-
 describe("Testing Lib: Basics", () => {
+  // TODO also make sure this error doesn't happen in the console: "Warning: Can't perform a React state update on an unmounted component..."
   it("should measure the right sizes", async () => {
-    const [controller] = await renderTest();
+    const controller = createController();
+
+    const Test = () => {
+      const { ref, width = 0, height = 0 } = useResizeObserver<
+        HTMLDivElement
+      >();
+
+      controller.incrementRenderCount();
+      controller.reportMeasuredSize({ width, height });
+      controller.provideSetSizeFunction(ref);
+
+      return <div ref={ref} />;
+    };
+
+    render(<Test />);
 
     // Default response on the first render before an actual measurement took place
-    expect(controller.getWidth()).toBe(0);
-    expect(controller.getHeight()).toBe(0);
-    expect(controller.getRenderCount()).toBe(1);
+    controller.assertMeasuredSize({ width: 0, height: 0 });
+    controller.assertRenderCount(1);
 
     // Should react to component size changes.
-    controller.setSize(100, 200);
-    await awaitNextFrame();
-    expect(controller.getWidth()).toBe(100);
-    expect(controller.getHeight()).toBe(200);
-    expect(controller.getRenderCount()).toBe(2);
+    await controller.setSize({ width: 100, height: 200 });
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+    controller.assertRenderCount(2);
   });
 });
 
+// todo instead of this being a separate block, just add it globally. Then each test has the option to utilise it.
 describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   let resizeObserverInstanceCount = 0;
   let resizeObserverObserveCount = 0;
@@ -111,7 +55,8 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
 
       const ro = new NativeResizeObserver(cb) as ResizeObserver;
 
-      const mock = {
+      // mock
+      return {
         observe: (element: Element) => {
           resizeObserverObserveCount++;
           return ro.observe(element);
@@ -121,8 +66,6 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
           return ro.unobserve(element);
         },
       };
-
-      return mock;
     };
   });
 
@@ -143,46 +86,227 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   });
 
   it("should use a single ResizeObserver instance even if the onResize callback is not memoised", async () => {
-    const [controller] = await renderTest({
-      // This is only here so that each render passes a different callback
-      // instance through to the hook.
-      onResize: (size) => {},
-    });
+    const controller = createController();
+    const Test = () => {
+      const { ref } = useResizeObserver<HTMLDivElement>({
+        // This is only here so that each render passes a different callback
+        // instance through to the hook.
+        onResize: () => {},
+      });
+
+      controller.triggerRender = useRenderTrigger();
+      controller.provideSetSizeFunction(ref);
+
+      return <div ref={ref} />;
+    };
+
+    render(<Test />);
 
     await awaitNextFrame();
-
-    controller.triggerRender();
-
-    await awaitNextFrame();
+    await controller.triggerRender();
 
     // Different onResize instances used to trigger the hook's internal useEffect,
     // resulting in the hook using a new ResizeObserver instance on each render
     // regardless of what triggered it.
+    // Now it should handle such cases and keep the previous RO instance.
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(1);
     expect(resizeObserverUnobserveCount).toBe(0);
   });
 
-  it("should not reinstantiate if the hook is the same but the observed element changes", async () => {
-    const [controller] = await renderTest();
+  it("should not create a new RO instance if the hook is the same and the observed element changes", async () => {
+    const Test = ({ observeNewElement = false }) => {
+      const customRef = useRef<HTMLDivElement>(null);
+      const { ref } = useResizeObserver<HTMLDivElement>({
+        ref: observeNewElement ? customRef : null,
+      });
 
-    // Default behaviour on initial mount with the explicit ref
+      // This is a span, so that when we switch over, React actually renders a
+      // new element used with the custom ref, which is the main point of this
+      // test. If this were a div, then React would recycle the old element,
+      // which is not what we want.
+      if (observeNewElement) {
+        return <span ref={customRef} />;
+      }
+
+      return <div ref={ref} />;
+    };
+
+    const { rerender } = render(<Test />);
+    await awaitNextFrame();
+
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(1);
     expect(resizeObserverUnobserveCount).toBe(0);
 
-    // Switching to a different ref / element causes the hook to unobserve the
-    // previous element, and observe the new one, but it should not recreate the
-    // ResizeObserver instance.
-
-    // The waits here are added to replicate, and address an issue with travis
-    // running Firefox in headless mode:
-    // https://travis-ci.org/github/ZeeCoder/use-resize-observer/builds/677375509
+    rerender(<Test observeNewElement={true} />);
     await awaitNextFrame();
-    controller.switchToExplicitRef();
-    await delay(1000);
+
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(2);
     expect(resizeObserverUnobserveCount).toBe(1);
+  });
+
+  it("should not create a ResizeObserver instance until there's an actual element present to be measured", async () => {
+    let renderCount = 0;
+    let measuredWidth: number | undefined;
+    let measuredHeight: number | undefined;
+    const Test = ({ doMeasure }: { doMeasure: boolean }) => {
+      const ref = useRef<HTMLDivElement>(null);
+      const { width, height } = useResizeObserver({
+        ref: doMeasure ? ref : null,
+      });
+
+      renderCount++;
+      measuredWidth = width;
+      measuredHeight = height;
+
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
+    };
+
+    const { rerender } = render(<Test doMeasure={false} />);
+
+    // Default behaviour on initial mount with a null ref passed to the hook
+    expect(resizeObserverInstanceCount).toBe(0);
+    expect(renderCount).toBe(1);
+    expect(measuredWidth).toBe(undefined);
+    expect(measuredHeight).toBe(undefined);
+
+    // Actually kickstarting the hook by switching from null to a real ref.
+    rerender(<Test doMeasure={true} />);
+    await awaitNextFrame();
+    expect(resizeObserverInstanceCount).toBe(1);
+    expect(renderCount).toBe(3);
+    expect(measuredWidth).toBe(100);
+    expect(measuredHeight).toBe(200);
+  });
+
+  // Note that even thought this sort of "works", callback refs are the preferred
+  // method to use in such cases. Relying in this behaviour will certainly cause
+  // issues down the line.
+  it("should work with refs even if the ref value is filled by react later, with a delayed mount", async () => {
+    const controller = createController();
+
+    // Mounting later. Previously this wouldn't have been picked up
+    // automatically, and users would've had to wait for the mount, and only
+    // then set the ref from null, to its actual object value.
+    // @see https://github.com/ZeeCoder/use-resize-observer/issues/43#issuecomment-674719609
+    const Test = ({ mount = false }) => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+
+      controller.triggerRender = useRenderTrigger();
+      controller.reportMeasuredSize({ width, height });
+
+      if (!mount) {
+        return null;
+      }
+
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
+    };
+
+    // Reported size should be undefined before the hook kicks in
+    const { rerender } = render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Once the hook supposedly kicked in, it should still be undefined, as the ref is not in use yet.
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Once mounted, the ref *will* be filled in the next render. However, the
+    // hook has no way of knowing about this, until there's another render call,
+    // where it gets to compare the current values between the previous and
+    // current render.
+    await awaitNextFrame();
+    rerender(<Test mount={true} />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Once that render happened, the hook finally gets a chance to measure the element.
+    await awaitNextFrame();
+    await controller.triggerRender();
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  // This is the proper way of handling refs where the component mounts with a delay
+  it("should pick up on delayed mounts when using a callbackRef", async () => {
+    const controller = createController();
+
+    // Mounting later. Previously this wouldn't have been picked up
+    // automatically, and users would've had to wait for the mount, and only
+    // then set the ref from null, to its actual object value.
+    // @see https://github.com/ZeeCoder/use-resize-observer/issues/43#issuecomment-674719609
+    const Test = ({ mount = false }) => {
+      const { callbackRef, width, height } = useResizeObserver<
+        HTMLDivElement
+      >();
+
+      controller.reportMeasuredSize({ width, height });
+
+      if (!mount) {
+        return null;
+      }
+
+      return <div ref={callbackRef} style={{ width: 100, height: 200 }} />;
+    };
+
+    // Reported size should be undefined before the hook kicks in
+    const { rerender } = render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Once the hook supposedly kicked in, it should still be undefined, as the ref is not in use yet.
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Once mounted, the hook should automatically pick the new element up with
+    // the callback ref.
+    rerender(<Test mount={true} />);
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  it("should work with a callback ref on delayed mount", async () => {
+    const controller = createController();
+    const Test = () => {
+      const { callbackRef, width, height } = useResizeObserver<
+        HTMLDivElement
+      >();
+
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={callbackRef} style={{ width: 100, height: 200 }} />;
+    };
+
+    render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  it("should work with a regular element as the 'custom ref' too", async () => {
+    const controller = createController();
+    const Test = () => {
+      // This is a bit of a roundabout way of simulating the case where we have
+      // an Element from somewhere, when we can't simply use a callback ref.
+      const [element, setElement] = useState<HTMLDivElement | null>(null);
+      const { width, height } = useResizeObserver<HTMLDivElement>({
+        ref: element,
+      });
+
+      // Interestingly, if this callback is not memoised, then on each render,
+      // the callback is called with "null", then again with the element.
+      const receiveElement = useCallback((element: HTMLDivElement) => {
+        setElement(element);
+      }, []);
+
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={receiveElement} style={{ width: 100, height: 200 }} />;
+    };
+
+    render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 });

@@ -1,4 +1,3 @@
-// todo test for SSR
 import React, {
   useEffect,
   useState,
@@ -117,10 +116,7 @@ describe("Vanilla tests", () => {
     }) => {
       const ref = useRef(null);
       const { width, height } = useResizeObserver({ ref });
-      const currentSizeRef = useRef<{
-        width: number | undefined;
-        height: number | undefined;
-      }>({ width: undefined, height: undefined });
+      const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
       currentSizeRef.current.height = height;
       currentSizeRef.current.width = width;
 

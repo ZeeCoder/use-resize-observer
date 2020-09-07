@@ -4,8 +4,84 @@ import {
   useRef,
   useMemo,
   RefObject,
-  MutableRefObject,
+  RefCallback,
+  useCallback,
 } from "react";
+
+type SubscriberCleanup = () => void;
+type SubscriberResponse = SubscriberCleanup | void;
+
+// This of course could've been more streamlined with internal state instead of
+// refs, but then host hooks / components could not opt out of renders.
+// This could've been exported to its own module, but the current build doesn't
+// seem to work with module imports and I had no more time to spend on this...
+function useResolvedElement<T extends HTMLElement>(
+  subscriber: (element: T) => SubscriberResponse,
+  refOrElement?: T | RefObject<T> | null
+): {
+  ref: RefObject<T>;
+  callbackRef: RefCallback<T>;
+} {
+  // The default ref has to be non-conditionally declared here whether or not
+  // it'll be used as that's how hooks work.
+  // @see https://reactjs.org/docs/hooks-rules.html#explanation
+  let ref = useRef<T>(null); // Default ref
+  const refElement = useRef<T | null>(null);
+  const callbackRefElement = useRef<T | null>(null);
+  const callbackRef = useCallback((element: T) => {
+    callbackRefElement.current = element;
+    callSubscriber();
+  }, []);
+  const lastReportedElementRef = useRef<T | null>(null);
+  const cleanupRef = useRef<SubscriberResponse | null>();
+
+  const callSubscriber = () => {
+    let element = null;
+    if (callbackRefElement.current) {
+      element = callbackRefElement.current;
+    } else if (refElement.current) {
+      element = refElement.current;
+    } else if (refOrElement instanceof HTMLElement) {
+      element = refOrElement;
+    }
+
+    if (lastReportedElementRef.current === element) {
+      return;
+    }
+
+    if (cleanupRef.current) {
+      cleanupRef.current();
+    }
+    lastReportedElementRef.current = element;
+
+    // Only calling the subscriber, if there's an actual element to report.
+    if (element) {
+      cleanupRef.current = subscriber(element);
+    }
+  };
+
+  if (refOrElement && !(refOrElement instanceof HTMLElement)) {
+    // Overriding the default ref with the given one
+    ref = refOrElement;
+  }
+
+  // On each render, we check whether a ref changed, or if we got a new raw
+  // element.
+  useEffect(() => {
+    // Note that this does not mean that "element" will necessarily be whatever
+    // the ref currently holds. It'll simply "update" `element` each render to
+    // the current ref value, but there's no guarantee that the ref value will
+    // not change later without a render.
+    // This may or may not be a problem depending on the specific use case.
+    refElement.current = ref.current;
+    callSubscriber();
+  }, [ref, ref.current, refOrElement]);
+
+  return {
+    ref,
+    callbackRef,
+  };
+}
 
 type ObservedSize = {
   width: number | undefined;
@@ -14,28 +90,33 @@ type ObservedSize = {
 
 type ResizeHandler = (size: ObservedSize) => void;
 
+type HookResponse<T extends HTMLElement> = {
+  ref: RefObject<T>;
+  callbackRef: RefCallback<T>;
+} & ObservedSize;
+
 // Type definition when the user wants the hook to provide the ref with the given type.
 function useResizeObserver<T extends HTMLElement>(opts?: {
   onResize?: ResizeHandler;
-}): { ref: RefObject<T> } & ObservedSize;
+}): HookResponse<T>;
 
 // Type definition when the hook just passes through the user provided ref.
 function useResizeObserver<T extends HTMLElement>(opts?: {
   ref: RefObject<T>;
   onResize?: ResizeHandler;
-}): { ref: RefObject<T> } & ObservedSize;
+}): HookResponse<T>;
 
-function useResizeObserver<T>(
+function useResizeObserver<T extends HTMLElement>(opts?: {
+  ref: RefObject<T> | T | null | undefined;
+  onResize?: ResizeHandler;
+}): HookResponse<T>;
+
+function useResizeObserver<T extends HTMLElement>(
   opts: {
-    ref?: RefObject<T>;
+    ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
   } = {}
-): { ref: RefObject<T> } & ObservedSize {
-  // `defaultRef` Has to be non-conditionally declared here whether or not it'll
-  // be used as that's how hooks work.
-  // @see https://reactjs.org/docs/hooks-rules.html#explanation
-  const defaultRef = useRef<T>(null);
-
+): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
   // effect dep array, and just passing in an anonymous function without memoising
   // will not reinstantiate the hook's ResizeObserver
@@ -43,12 +124,9 @@ function useResizeObserver<T>(
   const onResizeRef = useRef<ResizeHandler | undefined>(undefined);
   onResizeRef.current = onResize;
 
-  // Using a single instance throughought the hook's lifetime
-  const resizeObserverRef = useRef<ResizeObserver>() as MutableRefObject<
-    ResizeObserver
-  >;
+  // Using a single instance throughout the hook's lifetime
+  const resizeObserverRef = useRef<ResizeObserver>();
 
-  const ref = opts.ref || defaultRef;
   const [size, setSize] = useState<{
     width?: number;
     height?: number;
@@ -56,6 +134,15 @@ function useResizeObserver<T>(
     width: undefined,
     height: undefined,
   });
+
+  // In certain edge cases the RO might want to report a size change just after
+  // the component unmounted.
+  const didUnmount = useRef(false);
+  useEffect(() => {
+    return () => {
+      didUnmount.current = true;
+    };
+  }, []);
 
   // Using a ref to track the previous width / height to avoid unnecessary renders
   const previous: {
@@ -68,64 +155,60 @@ function useResizeObserver<T>(
     height: undefined,
   });
 
-  useEffect(() => {
-    if (resizeObserverRef.current) {
-      return;
-    }
-
-    resizeObserverRef.current = new ResizeObserver((entries) => {
-      if (!Array.isArray(entries)) {
-        return;
-      }
-
-      // Since we only observe the one element, we don't need to loop over the
-      // array
-      if (!entries.length) {
-        return;
-      }
-
-      const entry = entries[0];
-
-      // `Math.round` is in line with how CSS resolves sub-pixel values
-      const newWidth = Math.round(entry.contentRect.width);
-      const newHeight = Math.round(entry.contentRect.height);
-      if (
-        previous.current.width !== newWidth ||
-        previous.current.height !== newHeight
-      ) {
-        const newSize = { width: newWidth, height: newHeight };
-        if (onResizeRef.current) {
-          onResizeRef.current(newSize);
-        } else {
-          previous.current.width = newWidth;
-          previous.current.height = newHeight;
-          setSize(newSize);
+  // This block is kinda like a useEffect, only it's called whenever a new
+  // element could be resolved based on the ref option. It also has a cleanup
+  // function.
+  const { ref, callbackRef } = useResolvedElement<T>((element) => {
+    // Initialising the RO instance
+    if (!resizeObserverRef.current) {
+      // Saving a single instance, used by the hook from this point on.
+      resizeObserverRef.current = new ResizeObserver((entries) => {
+        if (!Array.isArray(entries)) {
+          return;
         }
-      }
-    });
-  }, []);
 
-  useEffect(() => {
-    if (
-      typeof ref !== "object" ||
-      ref === null ||
-      !(ref.current instanceof Element)
-    ) {
-      return;
+        // Since we only observe the one element, we don't need to loop over the
+        // array
+        if (!entries.length) {
+          return;
+        }
+
+        const entry = entries[0];
+
+        // `Math.round` is in line with how CSS resolves sub-pixel values
+        const newWidth = Math.round(entry.contentRect.width);
+        const newHeight = Math.round(entry.contentRect.height);
+        if (
+          previous.current.width !== newWidth ||
+          previous.current.height !== newHeight
+        ) {
+          const newSize = { width: newWidth, height: newHeight };
+          if (onResizeRef.current) {
+            onResizeRef.current(newSize);
+          } else {
+            previous.current.width = newWidth;
+            previous.current.height = newHeight;
+            if (!didUnmount.current) {
+              setSize(newSize);
+            }
+          }
+        }
+      });
     }
-
-    const element = ref.current;
 
     resizeObserverRef.current.observe(element);
 
-    return () => resizeObserverRef.current.unobserve(element);
-  }, [ref]);
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.unobserve(element);
+      }
+    };
+  }, opts.ref);
 
-  return useMemo(() => ({ ref, width: size.width, height: size.height }), [
-    ref,
-    size ? size.width : null,
-    size ? size.height : null,
-  ]);
+  return useMemo(
+    () => ({ ref, callbackRef, width: size.width, height: size.height }),
+    [ref, callbackRef, size ? size.width : null, size ? size.height : null]
+  );
 }
 
 export default useResizeObserver;

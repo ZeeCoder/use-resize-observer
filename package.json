@@ -1,6 +1,6 @@
 {
   "name": "use-resize-observer",
-  "version": "6.1.0",
+  "version": "6.2.0-alpha1",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "types": "dist/index.d.ts",
@@ -45,9 +45,10 @@
     "@babel/preset-env": "^7.7.7",
     "@babel/preset-react": "^7.9.4",
     "@babel/preset-typescript": "^7.9.0",
+    "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-inject": "^4.0.1",
     "@size-limit/preset-small-lib": "^4.4.5",
-    "@testing-library/react": "^10.0.2",
+    "@testing-library/react": "^11.0.4",
     "@types/karma": "^5.0.0",
     "@types/karma-jasmine": "^3.1.0",
     "@types/react": "^16.9.34",
@@ -58,7 +59,7 @@
     "karma": "^5.0.1",
     "karma-chrome-launcher": "^3.0.0",
     "karma-firefox-launcher": "^1.3.0",
-    "karma-jasmine": "^3.1.1",
+    "karma-jasmine": "^4.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
@@ -68,9 +69,8 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "rollup": "^2.6.1",
-    "rollup-plugin-babel": "^4.4.0",
     "size-limit": "^4.4.5",
-    "typescript": "^3.8.3"
+    "typescript": "^4.0.3"
   },
   "dependencies": {
     "resize-observer-polyfill": "^1.5.1"

@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 6.2.0-alpha1
+
+- Only instantiating a ResizeObserver instance if there's actually something to
+  observe. This for example means that if you pass in `null` or undefined as the
+  ref, or if neither the default ref or callback ref returned from the hook are
+  in use, then no ResizeObserver instance will get created until there's an
+  actual element to observe. Resolves: #42
+- The hook now returns `callbackRef`, which can be used in place of the usual
+  `ref`. Use this instead of a normal ref, when the observed component is
+  mounted with a delay. Resolves: #43, #45
+- The `ref` option now accepts raw elements as well.
+- Handling custom refs (through options), the default ref and the callback ref
+  has been greatly refactored internally (into the `useResolvedElement`
+  hook), to handle more edge cases with the way refs are handled.
+- Tests based on react testing library were refactored to make them much simpler
+  and more approachable.
+- Fixed an error where in certain edge cases the hook tried to set state when
+  its host component already unmounted.
+- Added [contributing guidelines](./CONTRIBUTING.md)
+- Overall bundle size increased a bit, due to the new features added.
+  (With about ~150B or so.)
+
 ## 6.1.0
 
 - No changes, only publishing the next minor.
