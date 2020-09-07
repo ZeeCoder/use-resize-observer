@@ -2,6 +2,7 @@ module.exports = function (config) {
   const browsers = (process.env.KARMA_BROWSERS || "ChromeHeadless").split(",");
 
   const testFilePattern = "tests/*.tsx";
+  // const testFilePattern = "tests/testing-lib.tsx";
 
   config.set({
     basePath: ".",

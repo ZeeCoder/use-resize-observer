@@ -15,12 +15,14 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Highlights
 
 - Written in **TypeScript**.
-- **Tiny**: 353 B (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
+- **Tiny**: 500B (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
 - Exposes an **onResize callback** if you need more control.
-- [Throttle / Debounce](#throttle--debounce)
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
+- Handles many edge cases you might not even think of.
+  (See this documentation and the test cases.)
+- [Throttle / Debounce](#throttle--debounce)
 - **Tested** in real browsers. (Headless Chrome and Firefox).
 
 ## In Action
@@ -40,12 +42,12 @@ npm install use-resize-observer --save-dev
 Note that the default builds are not polyfilled! For instructions and alternatives,
 see the [Transpilation / Polyfilling](#transpilation--polyfilling) section.
 
-```js
+```tsx
 import React from "react";
 import useResizeObserver from "use-resize-observer";
 
 const App = () => {
-  const { ref, width = 1, height = 1 } = useResizeObserver();
+  const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
   return (
     <div ref={ref}>
@@ -60,14 +62,91 @@ const App = () => {
 You can pass in your own ref instead of using the one provided.
 This can be useful if you already have a ref you want to measure.
 
-```js
-const ref = useRef(null);
-const { width, height } = useResizeObserver({ ref });
+```ts
+const ref = useRef<HTMLDivElement>(null);
+const { width, height } = useResizeObserver<HTMLDivElement>({ ref });
 ```
 
 You can even reuse the same hook instance to measure different elements:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-reusing-refs-buftd)
+
+## Measuring a raw element
+
+There might be situations where you have an element already that you need to measure.
+`ref` now accepts elements as well, not just refs, which means that you can do this:
+
+```ts
+const { width, height } = useResizeObserver<HTMLDivElement>({
+  ref: divElement,
+});
+```
+
+## Observing components mounted with a delay
+
+Often times you might have to wait before you can mount a component.
+Unfortunately if you use a ref, the hook will not be able to pick up its "current"
+value being changed afterwards. (Which is by design by React.)
+
+To handle this case, you can do one of these three:
+
+- Use the provided callback ref
+- Refactor to a component which you can mount after a "loading" concluded with
+  the hook within it. This means that the hook will be mounted with the measured
+  element, which means that a regular ref will work fine.
+- Use local state to store the custom ref the hook needs to observe, with "null"
+  as its starting value. Then once loading concluded, set this state to the ref.
+  This'll make the hook notice a change from null to the ref, where this time the
+  ref actually has its current value set properly as well.
+  ([See example here](https://codesandbox.io/s/damp-cookies-6bdrg?file=/src/App.js))
+
+Using a callback ref is recommended, and might look like this:
+
+```tsx
+const { callbackRef, width, height } = useResizeObserver<HTMLDivElement>();
+const [loaded, setLoaded] = useState(false);
+
+// Simulating a loading state.
+useEffect(() => {
+  setTimeout(() => {
+    setLoaded(true);
+  }, 2000);
+}, []);
+
+if (!loaded) {
+  return <div>Loading...</div>;
+}
+
+return <div ref={callbackRef}></div>;
+```
+
+## Using a single hook to measure multiple refs
+
+The hook reacts to ref changes, as it resolves it to an element to observe.
+This means that you can freely change the custom `ref` option from one ref to
+another and back, and the hook will start observing whatever is set in its options.
+
+## Opting Out of (or Delaying) ResizeObserver instantiation
+
+In certain cases you might want to delay creating a ResizeObserver instance.
+
+You might provide a library, that only optionally provides observation features
+based on props, which means that while you have the hook within your component,
+you might not want to actually initialise it.
+
+Another example is that you might want to entirely opt out of initialising, when
+you run some tests, where the environment does not provide the `ResizeObserver`.
+
+([See discussions](https://github.com/ZeeCoder/use-resize-observer/issues/40))
+
+You can do one of the following depending on your needs:
+
+- Use a callback ref, or provide a custom ref conditionally, only when needed.
+  The hook will not create a ResizeObserver instance up until there's something
+  there to actually observe.
+- Patch the test environment, and make a polyfill available as the ResizeObserver.
+  (This assumes you don't already use the polyfilled version, which would switch
+  to the polyfill when no native implementation was available.)
 
 ## The "onResize" callback
 
@@ -78,13 +157,13 @@ You can opt out of this behaviour, by providing an `onResize` callback function,
 which'll simply receive the width and height of the element when it changes, so
 that you can decide what to do with it:
 
-```js
+```tsx
 import React from "react";
 import useResizeObserver from "use-resize-observer";
 
 const App = () => {
   // width / height will not be returned here when the onResize callback is present
-  const { ref } = useResizeObserver({
+  const { ref } = useResizeObserver<HTMLDivElement>({
     onResize: ({ width, height }) => {
       // do something here.
     },
@@ -119,8 +198,8 @@ and height by default.
 
 You can override this behaviour, which could be useful for SSR as well.
 
-```js
-const { ref, width = 100, height = 50 } = useResizeObserver();
+```ts
+const { ref, width = 100, height = 50 } = useResizeObserver<HTMLDivElement>();
 ```
 
 Here "width" and "height" will be 100 and 50 respectively, until the
@@ -131,8 +210,8 @@ ResizeObserver kicks in and reports the actual size.
 If you only want real measurements (only values from the ResizeObserver without
 any default values), then you can just leave defaults off:
 
-```js
-const { ref, width, height } = useResizeObserver();
+```ts
+const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 ```
 
 Here "width" and "height" will be undefined until the ResizeObserver takes its

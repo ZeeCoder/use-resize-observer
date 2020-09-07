@@ -1,32 +1,32 @@
 [
   {
     "path": "dist/bundle.esm.js",
-    "limit": "357 B",
+    "limit": "499 B",
     "gzip": true
   },
   {
     "path": "dist/bundle.esm.js",
-    "limit": "281 B",
+    "limit": "404 B",
     "brotli": true
   },
   {
     "path": "dist/bundle.cjs.js",
-    "limit": "346 B",
+    "limit": "485 B",
     "gzip": true
   },
   {
     "path": "dist/bundle.cjs.js",
-    "limit": "261 B",
+    "limit": "387 B",
     "brotli": true
   },
   {
     "path": "polyfilled.js",
-    "limit": "2678 B",
+    "limit": "2809 B",
     "gzip": true
   },
   {
     "path": "polyfilled.js",
-    "limit": "2381 B",
+    "limit": "2512 B",
     "brotli": true
   }
 ]
