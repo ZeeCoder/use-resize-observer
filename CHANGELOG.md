@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 6.2.0-alpha1
+## 6.2.0-alpha.1
 
 - Only instantiating a ResizeObserver instance if there's actually something to
   observe. This for example means that if you pass in `null` or undefined as the
@@ -26,17 +26,17 @@
 
 - No changes, only publishing the next minor.
 
-## 6.1.0-alpha3
+## 6.1.0-alpha.3
 
 - Fixed SSR rendering, and added a test to cover it.
 
-## 6.1.0-alpha2
+## 6.1.0-alpha.2
 
 - ResizeObserver instances are no longer created unnecessarily when the onResize
   callback changes. (Fixes #32)
 - Written new tests in [react testing library](https://github.com/testing-library/react-testing-library).
 
-## 6.1.0-alpha1
+## 6.1.0-alpha.1
 
 - Rewrote the source in TypeScript. (Feedback is welcome.)
 - Rewrote tests in TypeScript as well. (Ensures the types make sense.)
