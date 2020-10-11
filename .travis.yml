@@ -9,6 +9,9 @@ addons:
   firefox: latest
 script:
   - yarn test
+before_deploy:
+  - export DIST_TAG=$(node travis/getNpmDistTag.js)
+  - "echo NPM DIST TAG: $DIST_TAG"
 deploy:
   provider: npm
   email: contact@hubertviktor.com
@@ -19,3 +22,4 @@ deploy:
     repo: ZeeCoder/use-resize-observer
     branch: master
   skip_cleanup: true
+  tag: ${DIST_TAG}
