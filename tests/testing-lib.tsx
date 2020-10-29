@@ -5,6 +5,7 @@ import { render, cleanup } from "@testing-library/react";
 import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
+import useMergedCallbackRef from "./utils/useMergedCallbackRef";
 
 afterEach(() => {
   cleanup();
@@ -20,11 +21,17 @@ describe("Testing Lib: Basics", () => {
         HTMLDivElement
       >();
 
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
+
       controller.incrementRenderCount();
       controller.reportMeasuredSize({ width, height });
-      controller.provideSetSizeFunction(ref);
 
-      return <div ref={ref} />;
+      return <div ref={mergedCallbackRef} />;
     };
 
     render(<Test />);
@@ -95,9 +102,14 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       });
 
       controller.triggerRender = useRenderTrigger();
-      controller.provideSetSizeFunction(ref);
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
 
-      return <div ref={ref} />;
+      return <div ref={mergedCallbackRef} />;
     };
 
     render(<Test />);
@@ -144,6 +156,9 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
 
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(2);
+    // The following unobserve count assertion actually caught the cleanup
+    // functions being called more than one times, so it's especially important
+    // to keep this in place in order to cover that.
     expect(resizeObserverUnobserveCount).toBe(1);
   });
 
@@ -227,7 +242,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   });
 
   // This is the proper way of handling refs where the component mounts with a delay
-  it("should pick up on delayed mounts when using a callbackRef", async () => {
+  it("should pick up on delayed mounts", async () => {
     const controller = createController();
 
     // Mounting later. Previously this wouldn't have been picked up
@@ -235,9 +250,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     // then set the ref from null, to its actual object value.
     // @see https://github.com/ZeeCoder/use-resize-observer/issues/43#issuecomment-674719609
     const Test = ({ mount = false }) => {
-      const { callbackRef, width, height } = useResizeObserver<
-        HTMLDivElement
-      >();
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 
       controller.reportMeasuredSize({ width, height });
 
@@ -245,7 +258,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
         return null;
       }
 
-      return <div ref={callbackRef} style={{ width: 100, height: 200 }} />;
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
     };
 
     // Reported size should be undefined before the hook kicks in
@@ -263,16 +276,14 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
-  it("should work with a callback ref on delayed mount", async () => {
+  it("should work on a normal mount", async () => {
     const controller = createController();
     const Test = () => {
-      const { callbackRef, width, height } = useResizeObserver<
-        HTMLDivElement
-      >();
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 
       controller.reportMeasuredSize({ width, height });
 
-      return <div ref={callbackRef} style={{ width: 100, height: 200 }} />;
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
     };
 
     render(<Test />);

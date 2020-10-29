@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, RefObject, FunctionComponent } from "react";
+import React, { useRef, RefObject, FunctionComponent } from "react";
 import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
 import delay from "delay";
+import useMergedCallbackRef from "./useMergedCallbackRef";
 
 export type Size = {
   width: number;
@@ -34,7 +35,7 @@ export function createComponentHandler(opts: {
 }): BaseComponentHandler;
 export function createComponentHandler(opts: {
   currentSizeRef: RefObject<ObservedSize>;
-  measuredElementRef: RefObject<HTMLElement>;
+  element: HTMLElement;
 }): BaseComponentHandler & SizingComponentHandler;
 export function createComponentHandler(opts: {
   currentSizeRef: RefObject<ObservedSize>;
@@ -42,16 +43,16 @@ export function createComponentHandler(opts: {
 }): BaseComponentHandler & CountingComponentHandler;
 export function createComponentHandler(opts: {
   currentSizeRef: RefObject<ObservedSize>;
-  measuredElementRef: RefObject<HTMLElement>;
+  element: HTMLElement;
   renderCountRef: RefObject<number>;
 }): ComponentHandler;
 export function createComponentHandler({
   currentSizeRef,
-  measuredElementRef,
+  element,
   renderCountRef,
 }: {
   currentSizeRef: RefObject<ObservedSize>;
-  measuredElementRef?: RefObject<HTMLElement>;
+  element?: HTMLElement;
   renderCountRef?: RefObject<number>;
 }): BaseComponentHandler {
   let handler = {
@@ -68,14 +69,14 @@ export function createComponentHandler({
     },
   } as ComponentHandler;
 
-  if (measuredElementRef) {
+  if (element) {
     handler.setSize = ({ width, height }) => {
-      if (measuredElementRef.current === null) {
-        throw new Error(`measuredElementRef.current is not set.`);
+      if (element === null) {
+        throw new Error(`element is not set.`);
       }
 
-      measuredElementRef.current.style.width = `${width}px`;
-      measuredElementRef.current.style.height = `${height}px`;
+      element.style.width = `${width}px`;
+      element.style.height = `${height}px`;
     };
     handler.setAndAssertSize = async (size) => {
       handler.setSize(size);
@@ -110,7 +111,7 @@ export const Observed: FunctionComponent<
 > = ({ resolveHandler, defaultWidth, defaultHeight, onResize, ...props }) => {
   const renderCountRef = useRef(0);
   const {
-    ref: measuredElementRef,
+    ref,
     width = defaultWidth,
     height = defaultHeight,
   } = useResizeObserver<HTMLDivElement>({ onResize });
@@ -122,24 +123,27 @@ export const Observed: FunctionComponent<
   currentSizeRef.current.height = height;
   renderCountRef.current++;
 
-  useEffect(() => {
-    if (!resolveHandler) {
-      return;
-    }
+  const mergedCallbackRef = useMergedCallbackRef(
+    ref,
+    (element: HTMLElement) => {
+      if (!resolveHandler) {
+        return;
+      }
 
-    resolveHandler(
-      createComponentHandler({
-        currentSizeRef,
-        measuredElementRef,
-        renderCountRef,
-      })
-    );
-  }, []);
+      resolveHandler(
+        createComponentHandler({
+          currentSizeRef,
+          renderCountRef,
+          element,
+        })
+      );
+    }
+  );
 
   return (
     <div
       {...props}
-      ref={measuredElementRef}
+      ref={mergedCallbackRef}
       style={{
         position: "absolute",
         width: "100%",
