@@ -1,7 +1,6 @@
 // Creates a shared object which can be used in the test function, as well as
 // within the test component.
 // Provides some often used functions as well.
-import { RefObject } from "react";
 import awaitNextFrame from "./awaitNextFrame";
 
 const setSizePlaceholder: SetSizeFunction = async (params: SizeParams) => {};
@@ -11,19 +10,16 @@ type SizeParams = {
   height?: number;
 };
 type SetSizeFunction = (params: SizeParams) => Promise<void>;
-const doSetSize = async (
-  ref: RefObject<HTMLElement | null>,
-  params: SizeParams
-) => {
-  if (!ref.current) {
+const doSetSize = async (element: HTMLElement | null, params: SizeParams) => {
+  if (!element) {
     return;
   }
 
   if (params.width) {
-    ref.current.style.width = `${params.width}px`;
+    element.style.width = `${params.width}px`;
   }
   if (params.height) {
-    ref.current.style.height = `${params.height}px`;
+    element.style.height = `${params.height}px`;
   }
 
   // Returning a promise here to wait for the next "tick".
@@ -57,13 +53,13 @@ export default function createController() {
     reportMeasuredSize,
     assertMeasuredSize,
     setSize: setSizePlaceholder,
-    provideSetSizeFunction: (ref: RefObject<HTMLElement | null>) => {}, // Placeholder to make TS happy
+    provideSetSizeFunction: (ref: HTMLElement | null) => {}, // Placeholder to make TS happy
     triggerRender: async () => {},
   };
 
   // surely there's a better way to do this?
-  controller.provideSetSizeFunction = (ref: RefObject<HTMLElement | null>) => {
-    controller.setSize = (params: SizeParams) => doSetSize(ref, params);
+  controller.provideSetSizeFunction = (element: HTMLElement | null) => {
+    controller.setSize = (params: SizeParams) => doSetSize(element, params);
   };
 
   return controller;

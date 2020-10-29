@@ -19,7 +19,7 @@ function useResolvedElement<T extends HTMLElement>(
   subscriber: (element: T) => SubscriberResponse,
   refOrElement?: T | RefObject<T> | null
 ): {
-  ref: RefObject<T>;
+  ref: RefCallback<T>;
   callbackRef: RefCallback<T>;
 } {
   // The default ref has to be non-conditionally declared here whether or not
@@ -51,6 +51,8 @@ function useResolvedElement<T extends HTMLElement>(
 
     if (cleanupRef.current) {
       cleanupRef.current();
+      // Making sure the cleanup is not called accidentally multiple times.
+      cleanupRef.current = null;
     }
     lastReportedElementRef.current = element;
 
@@ -91,7 +93,7 @@ type ObservedSize = {
 type ResizeHandler = (size: ObservedSize) => void;
 
 type HookResponse<T extends HTMLElement> = {
-  ref: RefObject<T>;
+  ref: RefCallback<T>;
   callbackRef: RefCallback<T>;
 } & ObservedSize;
 
@@ -102,12 +104,12 @@ function useResizeObserver<T extends HTMLElement>(opts?: {
 
 // Type definition when the hook just passes through the user provided ref.
 function useResizeObserver<T extends HTMLElement>(opts?: {
-  ref: RefObject<T>;
+  ref: RefCallback<T>;
   onResize?: ResizeHandler;
 }): HookResponse<T>;
 
 function useResizeObserver<T extends HTMLElement>(opts?: {
-  ref: RefObject<T> | T | null | undefined;
+  ref: RefCallback<T> | T | null | undefined;
   onResize?: ResizeHandler;
 }): HookResponse<T>;
 
@@ -206,8 +208,13 @@ function useResizeObserver<T extends HTMLElement>(
   }, opts.ref);
 
   return useMemo(
-    () => ({ ref, callbackRef, width: size.width, height: size.height }),
-    [ref, callbackRef, size ? size.width : null, size ? size.height : null]
+    () => ({
+      ref: callbackRef,
+      callbackRef,
+      width: size.width,
+      height: size.height,
+    }),
+    [callbackRef, size ? size.width : null, size ? size.height : null]
   );
 }
 
