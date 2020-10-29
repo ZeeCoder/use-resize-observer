@@ -94,7 +94,6 @@ type ResizeHandler = (size: ObservedSize) => void;
 
 type HookResponse<T extends HTMLElement> = {
   ref: RefCallback<T>;
-  callbackRef: RefCallback<T>;
 } & ObservedSize;
 
 // Type definition when the user wants the hook to provide the ref with the given type.
@@ -160,7 +159,7 @@ function useResizeObserver<T extends HTMLElement>(
   // This block is kinda like a useEffect, only it's called whenever a new
   // element could be resolved based on the ref option. It also has a cleanup
   // function.
-  const { ref, callbackRef } = useResolvedElement<T>((element) => {
+  const { callbackRef } = useResolvedElement<T>((element) => {
     // Initialising the RO instance
     if (!resizeObserverRef.current) {
       // Saving a single instance, used by the hook from this point on.
@@ -210,7 +209,6 @@ function useResizeObserver<T extends HTMLElement>(
   return useMemo(
     () => ({
       ref: callbackRef,
-      callbackRef,
       width: size.width,
       height: size.height,
     }),
