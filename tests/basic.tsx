@@ -4,6 +4,7 @@ import React, {
   useRef,
   RefObject,
   FunctionComponent,
+  RefCallback,
 } from "react";
 import useResizeObserver from "../";
 import useResizeObserverPolyfilled from "../polyfilled";
@@ -236,7 +237,7 @@ describe("Vanilla tests", () => {
     }) => {
       const previousResponseRef = useRef<
         | ({
-            ref: RefObject<HTMLElement>;
+            ref: RefCallback<HTMLElement>;
           } & ObservedSize)
         | null
       >(null);

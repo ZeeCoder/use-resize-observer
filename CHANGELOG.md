@@ -1,5 +1,19 @@
 # CHANGELOG
 
+TODO
+
+- document how to get the raw element, now that we return a callback ref. (merge callback refs)
+- update the size in the docs
+
+## 7.0.0-alpha.1
+
+- **[BREAKING]** The returned ref is now a callback ref, not a ref object
+- **[BREAKING]** The returned ref will always be the same callback ref.
+  Previously when a custom ref object was passed, it was returned as well from
+  the hook as "ref".
+- **[BREAKING]** Compared to 6.2.0-alpha.1 There's no `callbackRef` return value
+  anymore.
+
 ## 6.2.0-alpha.1
 
 - Only instantiating a ResizeObserver instance if there's actually something to

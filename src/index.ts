@@ -92,22 +92,6 @@ type HookResponse<T extends HTMLElement> = {
   ref: RefCallback<T>;
 } & ObservedSize;
 
-// Type definition when the user wants the hook to provide the ref with the given type.
-function useResizeObserver<T extends HTMLElement>(opts?: {
-  onResize?: ResizeHandler;
-}): HookResponse<T>;
-
-// Type definition when the hook just passes through the user provided ref.
-function useResizeObserver<T extends HTMLElement>(opts?: {
-  ref: RefCallback<T>;
-  onResize?: ResizeHandler;
-}): HookResponse<T>;
-
-function useResizeObserver<T extends HTMLElement>(opts?: {
-  ref: RefCallback<T> | T | null | undefined;
-  onResize?: ResizeHandler;
-}): HookResponse<T>;
-
 function useResizeObserver<T extends HTMLElement>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
