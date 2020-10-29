@@ -18,14 +18,11 @@ type SubscriberResponse = SubscriberCleanup | void;
 function useResolvedElement<T extends HTMLElement>(
   subscriber: (element: T) => SubscriberResponse,
   refOrElement?: T | RefObject<T> | null
-): {
-  ref: RefCallback<T>;
-  callbackRef: RefCallback<T>;
-} {
+): RefCallback<T> {
   // The default ref has to be non-conditionally declared here whether or not
   // it'll be used as that's how hooks work.
   // @see https://reactjs.org/docs/hooks-rules.html#explanation
-  let ref = useRef<T>(null); // Default ref
+  let ref: RefObject<T> | null = null; // Default ref
   const refElement = useRef<T | null>(null);
   const callbackRefElement = useRef<T | null>(null);
   const callbackRef = useCallback((element: T) => {
@@ -75,14 +72,13 @@ function useResolvedElement<T extends HTMLElement>(
     // the current ref value, but there's no guarantee that the ref value will
     // not change later without a render.
     // This may or may not be a problem depending on the specific use case.
-    refElement.current = ref.current;
+    if (ref) {
+      refElement.current = ref.current;
+    }
     callSubscriber();
-  }, [ref, ref.current, refOrElement]);
+  }, [ref, ref?.current, refOrElement]);
 
-  return {
-    ref,
-    callbackRef,
-  };
+  return callbackRef;
 }
 
 type ObservedSize = {
@@ -159,7 +155,7 @@ function useResizeObserver<T extends HTMLElement>(
   // This block is kinda like a useEffect, only it's called whenever a new
   // element could be resolved based on the ref option. It also has a cleanup
   // function.
-  const { callbackRef } = useResolvedElement<T>((element) => {
+  const callbackRef = useResolvedElement<T>((element) => {
     // Initialising the RO instance
     if (!resizeObserverRef.current) {
       // Saving a single instance, used by the hook from this point on.
