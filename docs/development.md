@@ -1,3 +1,0 @@
-# Development
-
-Various development notes.
