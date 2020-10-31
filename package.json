@@ -24,7 +24,7 @@
     "karma:run": "karma start --singleRun",
     "karma:watch": "karma start",
     "prepublish": "yarn build",
-    "test:bs": "yarn karma:run --useBrowserStack",
+    "test:bs:all": "yarn karma:run --useBrowserStack",
     "test:bs:ie": "yarn karma:run --useBrowserStack --runIeTests"
   },
   "husky": {
