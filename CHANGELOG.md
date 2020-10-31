@@ -2,8 +2,8 @@
 
 ## 7.0.0-alpha.1
 
-- **[BREAKING]** The returned ref is now a callback ref, not a ref object
-- **[BREAKING]** The returned ref will always be the same callback ref.
+- **[BREAKING]** The returned ref is now a RefCallback, not a ref object
+- **[BREAKING]** The returned ref will always be the same RefCallback.
   Previously when a custom ref object was passed, it was returned as well from
   the hook as "ref".
 - **[BREAKING]** Compared to 6.2.0-alpha.1 There's no `callbackRef` return value
@@ -13,14 +13,14 @@
 
 - Only instantiating a ResizeObserver instance if there's actually something to
   observe. This for example means that if you pass in `null` or undefined as the
-  ref, or if neither the default ref or callback ref returned from the hook are
+  ref, or if neither the default ref or RefCallback returned from the hook are
   in use, then no ResizeObserver instance will get created until there's an
   actual element to observe. Resolves: #42
 - The hook now returns `callbackRef`, which can be used in place of the usual
   `ref`. Use this instead of a normal ref, when the observed component is
   mounted with a delay. Resolves: #43, #45
 - The `ref` option now accepts raw elements as well.
-- Handling custom refs (through options), the default ref and the callback ref
+- Handling custom refs (through options), the default ref and the RefCallback
   has been greatly refactored internally (into the `useResolvedElement`
   hook), to handle more edge cases with the way refs are handled.
 - Tests based on react testing library were refactored to make them much simpler

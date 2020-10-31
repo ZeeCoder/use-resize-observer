@@ -270,7 +270,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     controller.assertMeasuredSize({ width: undefined, height: undefined });
 
     // Once mounted, the hook should automatically pick the new element up with
-    // the callback ref.
+    // the RefCallback.
     rerender(<Test mount={true} />);
     await awaitNextFrame();
     controller.assertMeasuredSize({ width: 100, height: 200 });
@@ -297,7 +297,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     const controller = createController();
     const Test = () => {
       // This is a bit of a roundabout way of simulating the case where we have
-      // an Element from somewhere, when we can't simply use a callback ref.
+      // an Element from somewhere, when we can't simply use a RefCallback.
       const [element, setElement] = useState<HTMLDivElement | null>(null);
       const { width, height } = useResizeObserver<HTMLDivElement>({
         ref: element,
