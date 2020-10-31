@@ -1,5 +1,6 @@
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
+// @ts-ignore
 import ROP from "resize-observer-polyfill";
 if (!window.ResizeObserver) {
   // @ts-ignore

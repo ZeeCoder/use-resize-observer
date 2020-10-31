@@ -8,6 +8,7 @@ import {
 } from "../utils";
 import useResizeObserver from "../../polyfilled";
 import delay from "../utils/delay";
+// @ts-ignore
 import ROP from "resize-observer-polyfill";
 
 /**
