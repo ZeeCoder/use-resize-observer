@@ -11,6 +11,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://travis-ci.org/ZeeCoder/use-resize-observer.svg?branch=master)](https://travis-ci.org/ZeeCoder/use-resize-observer)
+[![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=bTAyOUVpa3hENUgwMkJBTVhXcytCQjREangwcTJqT0czUGhRSEZta3ZwYz0tLVRSZ1NhVkdPZ01FMithOEh5ZGxoWHc9PQ==--49d9d8ad43d557894fb270c80fd1c24107a82f51)](https://automate.browserstack.com/public-build/bTAyOUVpa3hENUgwMkJBTVhXcytCQjREangwcTJqT0czUGhRSEZta3ZwYz0tLVRSZ1NhVkdPZ01FMithOEh5ZGxoWHc9PQ==--49d9d8ad43d557894fb270c80fd1c24107a82f51)
 
 ## Highlights
 
@@ -25,7 +26,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
 - [Throttle / Debounce](#throttle--debounce)
-- **Tested** in real browsers. (Headless Chrome and Firefox).
+- **Tested in real browsers** (Currently latest Chrome, Safari, Firefox and IE 11, sponsored by BrowserStack)
 
 ## In Action
 

@@ -42,6 +42,7 @@ describe("Testing Lib: Basics", () => {
 
     // Should react to component size changes.
     await controller.setSize({ width: 100, height: 200 });
+
     controller.assertMeasuredSize({ width: 100, height: 200 });
     controller.assertRenderCount(2);
   });
