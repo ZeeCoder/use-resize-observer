@@ -8,9 +8,6 @@ addons:
   chrome: stable
   firefox: latest
 script:
-  # Not sure if there's a better way to do this, `tsc` conflicts with the
-  # ResizeObserver type definition the polyfill ships with when I run `tsc -p test`...
-  - rm node_modules/resize-observer-polyfill/src/index.d.ts
   - yarn test
 before_deploy:
   - export DIST_TAG=$(node travis/getNpmDistTag.js)
