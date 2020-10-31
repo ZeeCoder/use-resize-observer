@@ -76,7 +76,7 @@ module.exports = function (karmaConfig) {
         accessKey: BS_ACCESS_KEY,
         project: "use-resize-observer",
       },
-      browsers: ["bs_chrome", "bs_safari"],
+      browsers: ["bs_chrome", "bs_firefox", "bs_safari"],
       // @see https://www.browserstack.com/automate/capabilities
       customLaunchers: {
         bs_chrome: {
@@ -84,6 +84,13 @@ module.exports = function (karmaConfig) {
           os: "Windows",
           os_version: "10",
           browser: "Chrome",
+          browser_version: "latest",
+        },
+        bs_firefox: {
+          base: "BrowserStack",
+          os: "Windows",
+          os_version: "10",
+          browser: "Firefox",
           browser_version: "latest",
         },
         bs_safari: {
