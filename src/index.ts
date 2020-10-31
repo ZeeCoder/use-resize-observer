@@ -25,7 +25,7 @@ function useResolvedElement<T extends HTMLElement>(
   let ref: RefObject<T> | null = null; // Default ref
   const refElement = useRef<T | null>(null);
   const callbackRefElement = useRef<T | null>(null);
-  const callbackRef = useCallback((element: T) => {
+  const refCallback = useCallback((element: T) => {
     callbackRefElement.current = element;
     callSubscriber();
   }, []);
@@ -78,7 +78,7 @@ function useResolvedElement<T extends HTMLElement>(
     callSubscriber();
   }, [ref, ref?.current, refOrElement]);
 
-  return callbackRef;
+  return refCallback;
 }
 
 type ObservedSize = {
@@ -139,7 +139,7 @@ function useResizeObserver<T extends HTMLElement>(
   // This block is kinda like a useEffect, only it's called whenever a new
   // element could be resolved based on the ref option. It also has a cleanup
   // function.
-  const callbackRef = useResolvedElement<T>((element) => {
+  const refCallback = useResolvedElement<T>((element) => {
     // Initialising the RO instance
     if (!resizeObserverRef.current) {
       // Saving a single instance, used by the hook from this point on.
@@ -188,11 +188,11 @@ function useResizeObserver<T extends HTMLElement>(
 
   return useMemo(
     () => ({
-      ref: callbackRef,
+      ref: refCallback,
       width: size.width,
       height: size.height,
     }),
-    [callbackRef, size ? size.width : null, size ? size.height : null]
+    [refCallback, size ? size.width : null, size ? size.height : null]
   );
 }
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
 /**
- * This hook allows you to intercept a callback ref and receive the element in
+ * This hook allows you to intercept a RefCallback and receive the element in
  * another function as well.
  */
 const useMergedCallbackRef = (...callbacks: Function[]) => {

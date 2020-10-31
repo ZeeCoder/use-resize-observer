@@ -57,6 +57,49 @@ const App = () => {
 };
 ```
 
+Note that "ref" here is a `RefCallback`, not a `RefObject`, meaning you won't be
+able to access "ref.current" if you need the element itself.
+To get the raw element, either you use your own RefObject (see later in this doc)
+or you hook in the returned ref callback, like so:
+
+### Getting the raw element from the default `RefCallback`
+
+```tsx
+import React, { useCallback, useEffect, useRef } from "react";
+import useResizeObserver from "use-resize-observer";
+
+const useMergedCallbackRef = (...callbacks: Function[]) => {
+  // Storing callbacks in a ref, so that we don't need to memoise them in
+  // renders when using this hook.
+  const callbacksRegistry = useRef<Function[]>(callbacks);
+
+  useEffect(() => {
+    callbacksRegistry.current = callbacks;
+  }, [...callbacks]);
+
+  return useCallback((element) => {
+    callbacksRegistry.current.forEach((callback) => callback(element));
+  }, []);
+};
+
+const App = () => {
+  const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
+
+  const mergedCallbackRef = useMergedCallbackRef(
+    ref,
+    (element: HTMLDivElement) => {
+      // Do whatever you want with the `element`.
+    }
+  );
+
+  return (
+    <div ref={mergedCallbackRef}>
+      Size: {width}x{height}
+    </div>
+  );
+};
+```
+
 ## Passing in Your Own `ref`
 
 You can pass in your own ref instead of using the one provided.
@@ -82,44 +125,6 @@ const { width, height } = useResizeObserver<HTMLDivElement>({
 });
 ```
 
-## Observing components mounted with a delay
-
-Often times you might have to wait before you can mount a component.
-Unfortunately if you use a ref, the hook will not be able to pick up its "current"
-value being changed afterwards. (Which is by design by React.)
-
-To handle this case, you can do one of these three:
-
-- Use the provided callback ref
-- Refactor to a component which you can mount after a "loading" concluded with
-  the hook within it. This means that the hook will be mounted with the measured
-  element, which means that a regular ref will work fine.
-- Use local state to store the custom ref the hook needs to observe, with "null"
-  as its starting value. Then once loading concluded, set this state to the ref.
-  This'll make the hook notice a change from null to the ref, where this time the
-  ref actually has its current value set properly as well.
-  ([See example here](https://codesandbox.io/s/damp-cookies-6bdrg?file=/src/App.js))
-
-Using a callback ref is recommended, and might look like this:
-
-```tsx
-const { callbackRef, width, height } = useResizeObserver<HTMLDivElement>();
-const [loaded, setLoaded] = useState(false);
-
-// Simulating a loading state.
-useEffect(() => {
-  setTimeout(() => {
-    setLoaded(true);
-  }, 2000);
-}, []);
-
-if (!loaded) {
-  return <div>Loading...</div>;
-}
-
-return <div ref={callbackRef}></div>;
-```
-
 ## Using a single hook to measure multiple refs
 
 The hook reacts to ref changes, as it resolves it to an element to observe.
@@ -141,9 +146,9 @@ you run some tests, where the environment does not provide the `ResizeObserver`.
 
 You can do one of the following depending on your needs:
 
-- Use a callback ref, or provide a custom ref conditionally, only when needed.
-  The hook will not create a ResizeObserver instance up until there's something
-  there to actually observe.
+- Use the default `ref` RefCallback, or provide a custom ref conditionally,
+  only when needed. The hook will not create a ResizeObserver instance up until
+  there's something there to actually observe.
 - Patch the test environment, and make a polyfill available as the ResizeObserver.
   (This assumes you don't already use the polyfilled version, which would switch
   to the polyfill when no native implementation was available.)
@@ -178,6 +183,7 @@ what you need, for example:
 
 - Reporting only width or height
 - Throttle / debounce
+- Wrap in `requestAnimationFrame`
 
 ## Throttle / Debounce
 
