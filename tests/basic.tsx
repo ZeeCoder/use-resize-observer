@@ -92,20 +92,26 @@ describe("Vanilla tests", () => {
         </>
       );
     };
-    const [handler1, handler2] = await render(Test);
+    const [handler1, handler2] = await render(Test, {
+      waitForFirstMeasurement: true,
+    });
 
     await Promise.all([
       handler1.setAndAssertSize({ width: 100, height: 200 }),
       handler2.setAndAssertSize({ width: 300, height: 400 }),
     ]);
 
-    handler1.assertRenderCount(2);
-    handler2.assertRenderCount(2);
+    // By the first measurement the component would've rendered three times:
+    // - First natural render with "undefined" values
+    // - Second with whatever size the window is
+    // - Third render with the values set above
+    handler1.assertRenderCount(3);
+    handler2.assertRenderCount(3);
 
     await handler2.setAndAssertSize({ width: 321, height: 456 });
 
-    handler1.assertRenderCount(2);
-    handler2.assertRenderCount(3);
+    handler1.assertRenderCount(3);
+    handler2.assertRenderCount(4);
 
     // Instance No. 1 should still be at the previous state.
     handler1.assertSize({ width: 100, height: 200 });
