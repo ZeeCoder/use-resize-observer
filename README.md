@@ -20,6 +20,8 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
+- **Uses RefCallback by default** To address delayed mounts and changing ref elements.
+- **Ships a polyfilled version**
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
 - [Throttle / Debounce](#throttle--debounce)
