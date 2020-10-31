@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import React from "react";
-import delay from "../utils/delay";
+import delay from "delay";
 // opting out from ts checks
 const Test = require("./ssr/Test");
 
