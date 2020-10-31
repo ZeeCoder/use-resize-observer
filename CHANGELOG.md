@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## NEXT
+
+- Added tests in real browsers with Browserstack, so that we ensure the lib
+  works all the way back to IE11.
+
 ## 7.0.0-alpha.1
 
 - **[BREAKING]** The returned ref is now a RefCallback, not a ref object

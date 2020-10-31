@@ -1,35 +1,36 @@
-module.exports = function (config) {
-  const browsers = (process.env.KARMA_BROWSERS || "ChromeHeadless").split(",");
+module.exports = function (karmaConfig) {
+  const { useBrowserStack, runIeTests } = karmaConfig;
+  const { BS_USERNAME, BS_ACCESS_KEY } = process.env;
 
-  const testFilePattern = "tests/*.tsx";
+  let testFilePattern = "tests/*.tsx";
   // const testFilePattern = "tests/basic.tsx";
   // const testFilePattern = "tests/testing-lib.tsx";
 
-  config.set({
+  let transpileExcludePattern = /node_modules/;
+  let presetEndModules = false;
+  let transformRuntimeUseESModules = true;
+  if (useBrowserStack && runIeTests) {
+    // IE runs a special set of (polyfilled) tests
+    testFilePattern = "tests/ie/*.tsx";
+    // Processing everything (including node_modules) for IE11 to make sure 3rd
+    // party deps can run during the tests.
+    transpileExcludePattern = /^$/;
+    presetEndModules = "commonjs";
+    transformRuntimeUseESModules = false;
+  }
+
+  const config = {
     basePath: ".",
     frameworks: ["jasmine"],
     files: [
       {
         pattern: testFilePattern,
-        watched: true,
+        watched: !useBrowserStack,
       },
     ],
-    autoWatch: true,
-
-    browsers,
     reporters: ["spec"],
     preprocessors: {
       [testFilePattern]: ["webpack", "sourcemap"],
-    },
-
-    // Max concurrency for SauceLabs OS plan
-    concurrency: 5,
-
-    client: {
-      jasmine: {
-        // Order of the tests matter, so don't randomise it
-        random: false,
-      },
     },
 
     webpack: {
@@ -39,16 +40,24 @@ module.exports = function (config) {
         rules: [
           {
             test: /\.(ts|tsx|js|jsx)$/,
-            exclude: /node_modules/,
+            exclude: transpileExcludePattern,
             use: {
               loader: "babel-loader",
               options: {
                 presets: [
-                  ["@babel/preset-env", { loose: true, modules: false }],
+                  [
+                    "@babel/preset-env",
+                    { loose: true, modules: presetEndModules },
+                  ],
                   "@babel/preset-react",
                   "@babel/preset-typescript",
                 ],
-                plugins: [["@babel/transform-runtime", { useESModules: true }]],
+                plugins: [
+                  [
+                    "@babel/transform-runtime",
+                    { useESModules: transformRuntimeUseESModules },
+                  ],
+                ],
               },
             },
           },
@@ -58,5 +67,56 @@ module.exports = function (config) {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
       },
     },
-  });
+  };
+
+  if (useBrowserStack) {
+    Object.assign(config, {
+      browserStack: {
+        username: BS_USERNAME,
+        accessKey: BS_ACCESS_KEY,
+        project: "use-resize-observer",
+      },
+      browsers: ["bs_chrome", "bs_safari"],
+      // @see https://www.browserstack.com/automate/capabilities
+      customLaunchers: {
+        bs_chrome: {
+          base: "BrowserStack",
+          os: "Windows",
+          os_version: "10",
+          browser: "Chrome",
+          browser_version: "latest",
+        },
+        bs_safari: {
+          base: "BrowserStack",
+          os: "OS X",
+          os_version: "Catalina",
+          browser: "Safari",
+          browser_version: "13.0",
+        },
+      },
+    });
+
+    if (runIeTests) {
+      Object.assign(config, {
+        browsers: ["bs_ie"],
+        customLaunchers: {
+          bs_ie: {
+            base: "BrowserStack",
+            os: "Windows",
+            os_version: "10",
+            browser: "IE",
+            browser_version: "11.0",
+          },
+        },
+      });
+    }
+  } else {
+    Object.assign(config, {
+      browsers: (process.env.KARMA_BROWSERS || "ChromeHeadless").split(","),
+      // @see https://karma-runner.github.io/5.2/config/files.html
+      autoWatch: true,
+    });
+  }
+
+  karmaConfig.set(config);
 };

@@ -7,8 +7,6 @@ import React, {
   RefCallback,
 } from "react";
 import useResizeObserver from "../";
-import useResizeObserverPolyfilled from "../polyfilled";
-import delay from "delay";
 import {
   createComponentHandler,
   Observed,
@@ -19,6 +17,7 @@ import {
   ComponentHandler,
   HandlerResolverComponentProps,
 } from "./utils";
+import delay from "./utils/delay";
 
 describe("Vanilla tests", () => {
   it("should render with undefined sizes at first", async () => {
@@ -312,34 +311,6 @@ describe("Vanilla tests", () => {
     // stay on the defaults
     await delay(50);
     handler.assertDefaultSize();
-  });
-
-  it("should work with the polyfilled version", async () => {
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-    }) => {
-      const { ref, width, height } = useResizeObserverPolyfilled<
-        HTMLDivElement
-      >();
-      const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
-      currentSizeRef.current.width = width;
-      currentSizeRef.current.height = height;
-
-      useEffect(() => {
-        resolveHandler(createComponentHandler({ currentSizeRef }));
-      }, []);
-
-      return (
-        <div style={{ width: 50, height: 40 }} ref={ref}>
-          {width}x{height}
-        </div>
-      );
-    };
-
-    const { assertSize } = await render(Test);
-
-    await delay(50);
-    assertSize({ width: 50, height: 40 });
   });
 
   it("should be able to work with onResize instead of rendering the values", async () => {

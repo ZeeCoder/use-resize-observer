@@ -1,8 +1,8 @@
 import ReactDOM from "react-dom";
 import React from "react";
+import delay from "./utils/delay";
 // opting out from ts checks
 const Test = require("./ssr/Test");
-import delay from "delay";
 
 // This is replaced with the "server-generated" string before the tests are run.
 const html = `<div style="width:100px;height:200px" data-reactroot="">1x2</div>`;

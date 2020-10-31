@@ -1,8 +1,8 @@
 import React, { useRef, RefObject, FunctionComponent } from "react";
 import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
-import delay from "delay";
 import useMergedCallbackRef from "./useMergedCallbackRef";
+import delay from "./delay";
 
 export type Size = {
   width: number;

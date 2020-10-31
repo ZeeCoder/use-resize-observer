@@ -7,3 +7,4 @@ yarn-error.log*
 dist
 /polyfilled.js
 /polyfilled.d.ts
+local.log
