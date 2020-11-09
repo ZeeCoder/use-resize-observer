@@ -1,0 +1,36 @@
+name: Testing
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+jobs:
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    env:
+      BS_ACCESS_KEY: ${{ secrets.BS_ACCESS_KEY }}
+      BS_USERNAME: ${{ secrets.BS_USERNAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          always-auth: true
+          node-version: '12.x'
+      - name: Installing Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Removing Conflicting TypeScript ResizeObserver definition
+        # Without this, running `tsc -p tests` fails, not sure how else to fix it.
+        run: rm node_modules/resize-observer-polyfill/src/index.d.ts
+      - name: Checking File Size
+        run: yarn check:size
+      - name: Checking Types
+        run: yarn check:types
+      - name: Testing SSR
+        run: yarn test:create:ssr
+      - name: Testing in Modern Browsers (BrowserStack)
+        run: yarn test:bs:modern
+      - name: Testing in IE11 (BrowserStack)
+        run: yarn test:bs:ie
