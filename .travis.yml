@@ -12,6 +12,8 @@ script:
 before_deploy:
   - export DIST_TAG=$(node travis/getNpmDistTag.js)
   - "echo NPM DIST TAG: $DIST_TAG"
+# @see https://blog.travis-ci.com/2016-11-21-travis-ci-now-supports-yarn
+cache: yarn
 deploy:
   provider: npm
   email: contact@hubertviktor.com
