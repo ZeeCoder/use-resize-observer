@@ -2,7 +2,7 @@ os: linux
 dist: xenial
 language: node_js
 node_js:
-  - 11.7.0
+  - 14.0.0
 env:
   global:
     - MOZ_HEADLESS=1
