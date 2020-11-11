@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## NEXT
+## 7.0.0-alpha.2
 
 - Added tests in real browsers with Browserstack, so that we ensure the lib
   works all the way back to IE11.
+- Switched to GitHub Actions
 
 ## 7.0.0-alpha.1
 

@@ -9,8 +9,7 @@ karma.conf.js
 .editorconfig
 browserslist
 .cache
-travis
-.travis.yml
+ci
 tests
 tsconfig.json
 media
