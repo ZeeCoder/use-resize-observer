@@ -5,6 +5,12 @@
     ["@semantic-release/changelog", {
       "changelogFile": "CHANGELOG.md"
     }],
+    ["@semantic-release/npm", {
+      "tarballDir": "release"
+    }],
+    ["@semantic-release/github", {
+      "assets": "release/*.tgz"
+    }],
     ["@semantic-release/git", {
       "assets": ["CHANGELOG.md", "package.json"]
     }],
