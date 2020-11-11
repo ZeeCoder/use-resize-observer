@@ -37,6 +37,15 @@
       "prettier --write"
     ]
   },
+  "files": [
+    "dist/*",
+    "polyfilled*",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG*",
+    "CONTRIBUTING.md",
+    "package.json"
+  ],
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
