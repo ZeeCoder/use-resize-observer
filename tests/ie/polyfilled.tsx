@@ -10,6 +10,7 @@ import useResizeObserver from "../../polyfilled";
 import delay from "../utils/delay";
 // @ts-ignore
 import ROP from "resize-observer-polyfill";
+import awaitNextFrame from "../utils/awaitNextFrame";
 
 /**
  * This test ensures that the shipped polyfilled version actually works.
@@ -51,7 +52,7 @@ describe("Polyfilled lib testing", () => {
 
     const { assertSize } = await render(Test);
 
-    await delay(50);
+    await awaitNextFrame();
     assertSize({ width: 50, height: 40 });
   });
 });

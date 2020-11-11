@@ -18,6 +18,7 @@ import {
   HandlerResolverComponentProps,
 } from "./utils";
 import awaitNextFrame from "./utils/awaitNextFrame";
+import delay from "./utils/delay";
 
 describe("Vanilla tests", () => {
   it("should render with undefined sizes at first", async () => {
@@ -95,10 +96,8 @@ describe("Vanilla tests", () => {
       waitForFirstMeasurement: true,
     });
 
-    await Promise.all([
-      handler1.setAndAssertSize({ width: 100, height: 200 }),
-      handler2.setAndAssertSize({ width: 300, height: 400 }),
-    ]);
+    await handler1.setAndAssertSize({ width: 100, height: 200 });
+    await handler2.setAndAssertSize({ width: 300, height: 400 });
 
     // By the first measurement the component would've rendered three times:
     // - First natural render with "undefined" values
