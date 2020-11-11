@@ -1,0 +1,22 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+      - alpha
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Installing Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Releasing
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
