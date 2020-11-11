@@ -17,7 +17,7 @@ import {
   ComponentHandler,
   HandlerResolverComponentProps,
 } from "./utils";
-import delay from "./utils/delay";
+import awaitNextFrame from "./utils/awaitNextFrame";
 
 describe("Vanilla tests", () => {
   it("should render with undefined sizes at first", async () => {
@@ -55,7 +55,7 @@ describe("Vanilla tests", () => {
     assertRenderCount(3);
 
     setSize({ width: 321, height: 456 });
-    await delay(50);
+    await awaitNextFrame();
     assertSize({ width: 321, height: 456 });
     assertRenderCount(4);
   });
@@ -143,7 +143,7 @@ describe("Vanilla tests", () => {
     handler.assertDefaultSize();
 
     // Actual measurement
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 100, height: 200 });
   });
 
@@ -188,12 +188,12 @@ describe("Vanilla tests", () => {
     handler.assertDefaultSize();
 
     // Div 1 measurement
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 100, height: 200 });
 
     // Div 2 measurement
     switchRefs();
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 150, height: 250 });
   });
 
@@ -204,7 +204,7 @@ describe("Vanilla tests", () => {
     handler.assertDefaultSize();
 
     handler.setSize({ width: 100, height: 100 });
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 100, height: 100 });
   });
 
@@ -214,18 +214,18 @@ describe("Vanilla tests", () => {
     handler.assertDefaultSize();
 
     // Default render + first measurement
-    await delay(50);
+    await awaitNextFrame();
     handler.assertRenderCount(2);
 
     handler.setSize({ width: 100, height: 102 });
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 100, height: 102 });
     handler.assertRenderCount(3);
 
     // Shouldn't trigger on subpixel values that are rounded to be the same as the
     // previous size
     handler.setSize({ width: 100.4, height: 102.4 });
-    await delay(50);
+    await awaitNextFrame();
     handler.assertSize({ width: 100, height: 102 });
     handler.assertRenderCount(3);
   });
@@ -309,7 +309,7 @@ describe("Vanilla tests", () => {
 
     // Since no refs were passed in with an element to be measured, the hook should
     // stay on the defaults
-    await delay(50);
+    await awaitNextFrame();
     handler.assertDefaultSize();
   });
 
@@ -322,9 +322,9 @@ describe("Vanilla tests", () => {
     );
 
     handler.setSize({ width: 100, height: 200 });
-    await delay(50);
+    await awaitNextFrame();
     handler.setSize({ width: 101, height: 201 });
-    await delay(50);
+    await awaitNextFrame();
 
     // Should stay at default as width/height is not passed to the hook response
     // when an onResize callback is given
@@ -371,25 +371,25 @@ describe("Vanilla tests", () => {
 
     // Establishing a default, which'll be measured when the resize handler is set.
     setSize({ width: 1, height: 1 });
-    await delay(50);
+    await awaitNextFrame();
 
     assertRenderCount(1);
 
     changeOnResizeHandler((size: ObservedSize) => observations1.push(size));
-    await delay(50);
+    await awaitNextFrame();
     setSize({ width: 1, height: 2 });
-    await delay(50);
+    await awaitNextFrame();
     setSize({ width: 3, height: 4 });
 
     assertRenderCount(2);
 
-    await delay(50);
+    await awaitNextFrame();
     changeOnResizeHandler((size: ObservedSize) => observations2.push(size));
-    await delay(50);
+    await awaitNextFrame();
     setSize({ width: 5, height: 6 });
-    await delay(50);
+    await awaitNextFrame();
     setSize({ width: 7, height: 8 });
-    await delay(50);
+    await awaitNextFrame();
 
     assertRenderCount(3);
 
