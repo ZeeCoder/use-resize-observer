@@ -2,7 +2,7 @@ import React, { useRef, RefObject, FunctionComponent } from "react";
 import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
 import useMergedCallbackRef from "./useMergedCallbackRef";
-import delay from "./delay";
+import awaitNextFrame from "./awaitNextFrame";
 
 export type Size = {
   width: number;
@@ -80,7 +80,7 @@ export function createComponentHandler({
     };
     handler.setAndAssertSize = async (size) => {
       handler.setSize(size);
-      await delay(50);
+      await awaitNextFrame();
       handler.assertSize(size);
     };
   }
@@ -198,7 +198,7 @@ export function render(
       handler: T | T[]
     ): Promise<void> {
       if (waitForFirstMeasurement) {
-        await delay(50);
+        await awaitNextFrame();
       }
 
       resolve(handler);
