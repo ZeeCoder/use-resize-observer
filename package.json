@@ -9,6 +9,23 @@
   "description": "A React hook that allows you to use a ResizeObserver to measure an element's size.",
   "author": "Viktor Hubert <contact@hubertviktor.com>",
   "license": "MIT",
+  "keywords": [
+    "react",
+    "hook",
+    "react hook",
+    "resize observer",
+    "resize observer hook",
+    "resize observer react hook",
+    "use-resize-observer",
+    "useresizeobserver",
+    "resize hook",
+    "size hook",
+    "container query",
+    "css in js",
+    "measure",
+    "size",
+    "resize"
+  ],
   "scripts": {
     "build": "rollup -c && tsc && cp dist/index.d.ts polyfilled.d.ts",
     "watch": "KARMA_BROWSERS=Chrome run-p 'src:watch' 'karma:watch'",
