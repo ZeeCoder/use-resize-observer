@@ -92,9 +92,15 @@ type HookResponse<T extends HTMLElement> = {
   ref: RefCallback<T>;
 } & ObservedSize;
 
+export type RoundingFunction = (
+  width: number,
+  height: number
+) => [number, number];
+
 function useResizeObserver<T extends HTMLElement>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
+    round?: RoundingFunction;
     onResize?: ResizeHandler;
   } = {}
 ): HookResponse<T> {
@@ -156,9 +162,15 @@ function useResizeObserver<T extends HTMLElement>(
 
         const entry = entries[0];
 
-        // `Math.round` is in line with how CSS resolves sub-pixel values
-        const newWidth = Math.round(entry.contentRect.width);
-        const newHeight = Math.round(entry.contentRect.height);
+        // Rounding defaults to Math.round but can be customized using opts
+        const round =
+          opts.round ??
+          ((width, height) => [Math.round(width), Math.round(height)]);
+        const [newWidth, newHeight] = round(
+          entry.contentRect.width,
+          entry.contentRect.height
+        );
+
         if (
           previous.current.width !== newWidth ||
           previous.current.height !== newHeight
