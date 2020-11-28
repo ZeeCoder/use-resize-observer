@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
 import useMergedCallbackRef from "./useMergedCallbackRef";
 import awaitNextFrame from "./awaitNextFrame";
+import { RoundingFunction } from '../../src';
 
 export type Size = {
   width: number;
@@ -107,14 +108,15 @@ export const Observed: FunctionComponent<
     defaultWidth?: number;
     defaultHeight?: number;
     onResize?: (size: ObservedSize) => void;
+    round?: RoundingFunction;
   }
-> = ({ resolveHandler, defaultWidth, defaultHeight, onResize, ...props }) => {
+> = ({ resolveHandler, defaultWidth, defaultHeight, onResize, round, ...props }) => {
   const renderCountRef = useRef(0);
   const {
     ref,
     width = defaultWidth,
     height = defaultHeight,
-  } = useResizeObserver<HTMLDivElement>({ onResize });
+  } = useResizeObserver<HTMLDivElement>({ onResize, round });
   const currentSizeRef = useRef<ObservedSize>({
     width: undefined,
     height: undefined,

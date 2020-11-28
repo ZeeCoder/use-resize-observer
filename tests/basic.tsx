@@ -229,6 +229,28 @@ describe("Vanilla tests", () => {
     handler.assertRenderCount(3);
   });
 
+  it("should trigger renders on subpixel changes if a custom rounding function is provided", async () => {
+    const handler = await render(Observed, {}, { round: (meassurements: [number, number]) => meassurements });
+
+    handler.assertDefaultSize();
+
+    // Default render + first measurement
+    await awaitNextFrame();
+    handler.assertRenderCount(2);
+
+    handler.setSize({ width: 100, height: 102 });
+    await awaitNextFrame();
+    handler.assertSize({ width: 100, height: 102 });
+    handler.assertRenderCount(3);
+
+    // Shouldn't trigger on subpixel values that are rounded to be the same as the
+    // previous size
+    handler.setSize({ width: 100.4, height: 102.4 });
+    await awaitNextFrame();
+    handler.assertSize({ width: 100.4, height: 102.4 });
+    handler.assertRenderCount(4);
+  });
+
   it("should keep the same response instance between renders if nothing changed", async () => {
     let assertSameInstance = (): void => {
       throw new Error(
