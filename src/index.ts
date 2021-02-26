@@ -38,7 +38,7 @@ function useResolvedElement<T extends HTMLElement>(
       element = callbackRefElement.current;
     } else if (refElement.current) {
       element = refElement.current;
-    } else if (refOrElement instanceof HTMLElement) {
+    } else if (typeof HTMLElement !== "undefined" && refOrElement instanceof HTMLElement) {
       element = refOrElement;
     }
 
@@ -59,7 +59,7 @@ function useResolvedElement<T extends HTMLElement>(
     }
   };
 
-  if (refOrElement && !(refOrElement instanceof HTMLElement)) {
+  if (refOrElement && typeof HTMLElement !== "undefined" && !(refOrElement instanceof HTMLElement)) {
     // Overriding the default ref with the given one
     ref = refOrElement;
   }
