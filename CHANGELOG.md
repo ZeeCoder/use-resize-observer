@@ -1,3 +1,9 @@
+# Unreleased
+
+### Misc
+
+- Added guard against undefined `HTMLElement` in `callSubscriber` for SSR
+
 # [7.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v6.1.0...v7.0.0) (2020-11-11)
 
 ### Bug Fixes
