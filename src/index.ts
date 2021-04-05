@@ -96,7 +96,7 @@ function useResizeObserver<T extends HTMLElement>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
-    customResizeObserver?: ResizeObserver;
+    customResizeObserver?: typeof ResizeObserver;
   } = {}
 ): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
@@ -179,7 +179,7 @@ function useResizeObserver<T extends HTMLElement>(
       });
     }
 
-    resizeObserverRef.current.observe(element);
+    resizeObserverRef.current!.observe(element);
 
     return () => {
       if (resizeObserverRef.current) {
