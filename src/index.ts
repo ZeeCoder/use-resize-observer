@@ -96,6 +96,7 @@ function useResizeObserver<T extends HTMLElement>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
+    customResizeObserver?: typeof ResizeObserver;
   } = {}
 ): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
@@ -143,7 +144,8 @@ function useResizeObserver<T extends HTMLElement>(
     // Initialising the RO instance
     if (!resizeObserverRef.current) {
       // Saving a single instance, used by the hook from this point on.
-      resizeObserverRef.current = new ResizeObserver((entries) => {
+      const ResizeObserverClass = opts.customResizeObserver || ResizeObserver;
+      resizeObserverRef.current = new ResizeObserverClass((entries) => {
         if (!Array.isArray(entries)) {
           return;
         }
@@ -177,7 +179,7 @@ function useResizeObserver<T extends HTMLElement>(
       });
     }
 
-    resizeObserverRef.current.observe(element);
+    resizeObserverRef.current!.observe(element);
 
     return () => {
       if (resizeObserverRef.current) {
