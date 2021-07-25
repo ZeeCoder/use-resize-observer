@@ -19,13 +19,8 @@ function useResolvedElement<T extends HTMLElement>(
   subscriber: (element: T) => SubscriberResponse,
   refOrElement?: T | RefObject<T> | null
 ): RefCallback<T> {
-  // The default ref has to be non-conditionally declared here whether or not
-  // it'll be used as that's how hooks work.
-  // @see https://reactjs.org/docs/hooks-rules.html#explanation
-  let ref: RefObject<T> | null = null; // Default ref
-  const refElement = useRef<T | null>(null);
   const callbackRefElement = useRef<T | null>(null);
-  const refCallback = useCallback((element: T) => {
+  const refCallback = useCallback<RefCallback<T>>((element) => {
     callbackRefElement.current = element;
     callSubscriber();
   }, []);
@@ -36,10 +31,12 @@ function useResolvedElement<T extends HTMLElement>(
     let element = null;
     if (callbackRefElement.current) {
       element = callbackRefElement.current;
-    } else if (refElement.current) {
-      element = refElement.current;
-    } else if (refOrElement instanceof HTMLElement) {
-      element = refOrElement;
+    } else if (refOrElement) {
+      if (refOrElement instanceof HTMLElement) {
+        element = refOrElement;
+      } else {
+        element = refOrElement.current;
+      }
     }
 
     if (lastReportedElementRef.current === element) {
@@ -59,11 +56,6 @@ function useResolvedElement<T extends HTMLElement>(
     }
   };
 
-  if (refOrElement && !(refOrElement instanceof HTMLElement)) {
-    // Overriding the default ref with the given one
-    ref = refOrElement;
-  }
-
   // On each render, we check whether a ref changed, or if we got a new raw
   // element.
   useEffect(() => {
@@ -72,11 +64,8 @@ function useResolvedElement<T extends HTMLElement>(
     // the current ref value, but there's no guarantee that the ref value will
     // not change later without a render.
     // This may or may not be a problem depending on the specific use case.
-    if (ref) {
-      refElement.current = ref.current;
-    }
     callSubscriber();
-  }, [ref, ref?.current, refOrElement]);
+  }, [refOrElement]);
 
   return refCallback;
 }
