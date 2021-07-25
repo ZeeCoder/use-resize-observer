@@ -137,12 +137,6 @@ function useResizeObserver<T extends HTMLElement>(
           return;
         }
 
-        // Since we only observe the one element, we don't need to loop over the
-        // array
-        if (!entries.length) {
-          return;
-        }
-
         const entry = entries[0];
 
         // `Math.round` is in line with how CSS resolves sub-pixel values
