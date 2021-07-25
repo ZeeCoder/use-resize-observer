@@ -7,7 +7,10 @@ const useResizeObserver =
   baseUseResizeObserver.default || baseUseResizeObserver;
 
 module.exports = function Test() {
-  const { ref, width = 1, height = 2 } = useResizeObserver();
+  // Pasting in our own ref here, as this used to cause issues with SSR:
+  // @see https://github.com/ZeeCoder/use-resize-observer/issues/74
+  const ref = React.useRef(null);
+  const { width = 1, height = 2 } = useResizeObserver({ ref });
 
   return React.createElement(
     "div",
