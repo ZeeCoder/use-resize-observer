@@ -1,3 +1,11 @@
+## [7.0.1](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.0...v7.0.1) (2021-07-27)
+
+
+### Bug Fixes
+
+* Removed unnecessary entries.length check ([3211d33](https://github.com/ZeeCoder/use-resize-observer/commit/3211d338117b0d2a97ccb229683eb8458de81d01))
+* Undefined HTMLElement is no longer an issue in certain SSR edge cases. ([599cace](https://github.com/ZeeCoder/use-resize-observer/commit/599cace5c33ecd4276a0fe2848e0ed920f81e2fe)), closes [#74](https://github.com/ZeeCoder/use-resize-observer/issues/74) [#62](https://github.com/ZeeCoder/use-resize-observer/issues/62)
+
 # [7.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v6.1.0...v7.0.0) (2020-11-11)
 
 ### Bug Fixes
