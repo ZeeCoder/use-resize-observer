@@ -21,7 +21,7 @@ module.exports = function (karmaConfig) {
 
   const config = {
     basePath: ".",
-    frameworks: ["jasmine"],
+    frameworks: ["jasmine", "webpack"],
     files: [
       {
         pattern: testFilePattern,

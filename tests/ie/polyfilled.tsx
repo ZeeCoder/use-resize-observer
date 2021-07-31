@@ -7,9 +7,7 @@ import {
   render,
 } from "../utils";
 import useResizeObserver from "../../polyfilled";
-import delay from "../utils/delay";
-// @ts-ignore
-import ROP from "resize-observer-polyfill";
+import { ResizeObserver as ROP } from "@juggle/resize-observer";
 import awaitNextFrame from "../utils/awaitNextFrame";
 
 /**
