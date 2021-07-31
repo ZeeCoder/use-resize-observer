@@ -25,10 +25,10 @@ const getConfig = ({ polyfill = false } = {}) => {
         exports: "default",
       },
     ];
-    config.external.push("resize-observer-polyfill");
+    config.external.push("@juggle/resize-observer");
     config.plugins.push(
       inject({
-        ResizeObserver: "resize-observer-polyfill",
+        ResizeObserver: ["@juggle/resize-observer", "ResizeObserver"],
       })
     );
   } else {

@@ -42,12 +42,8 @@
     "karma:watch": "karma start",
     "prepublish": "yarn build",
     "test:bs:modern": "yarn karma:run --useBrowserStack",
-    "test:bs:ie": "yarn karma:run --useBrowserStack --runIeTests"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "test:bs:ie": "yarn karma:run --useBrowserStack --runIeTests",
+    "prepare": "husky install"
   },
   "lint-staged": {
     "*.{js,ts,md}": [
@@ -81,35 +77,35 @@
     "@semantic-release/github": "^7.1.1",
     "@semantic-release/npm": "^7.0.6",
     "@semantic-release/release-notes-generator": "^9.0.1",
-    "@size-limit/preset-small-lib": "^4.4.5",
-    "@testing-library/react": "^11.0.4",
-    "@types/karma": "^5.0.0",
-    "@types/karma-jasmine": "^3.1.0",
-    "@types/react": "^16.9.34",
-    "@types/react-dom": "^16.9.6",
+    "@size-limit/preset-small-lib": "^5.0.1",
+    "@testing-library/react": "^12.0.0",
+    "@types/karma": "^6.3.1",
+    "@types/karma-jasmine": "^4.0.1",
+    "@types/react": "^17.0.15",
+    "@types/react-dom": "^17.0.9",
     "babel-loader": "^8.1.0",
-    "delay": "^4.1.0",
-    "husky": "^4.2.5",
-    "karma": "^5.0.1",
+    "delay": "^5.0.0",
+    "husky": "^7.0.0",
+    "karma": "^6.3.4",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chrome-launcher": "^3.0.0",
-    "karma-firefox-launcher": "^1.3.0",
+    "karma-firefox-launcher": "^2.1.1",
     "karma-jasmine": "^4.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.32",
-    "karma-webpack": "^4.0.2",
-    "lint-staged": "^10.1.3",
+    "karma-webpack": "^5.0.0",
+    "lint-staged": "^11.1.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.4",
-    "react": "^16.9.0",
+    "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
-    "react-dom": "^16.9.0",
+    "react-dom": "^17.0.2",
     "rollup": "^2.6.1",
     "semantic-release": "^17.2.2",
-    "size-limit": "^4.4.5",
+    "size-limit": "^5.0.1",
     "typescript": "^4.0.3"
   },
   "dependencies": {
-    "resize-observer-polyfill": "^1.5.1"
+    "@juggle/resize-observer": "^3.3.1"
   }
 }
