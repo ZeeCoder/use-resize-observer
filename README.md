@@ -241,12 +241,31 @@ By default the library provides transpiled ES5 modules in CJS / ESM module forma
 Polyfilling is recommended to be done in the host app, and not within imported
 libraries, as that way consumers have control over the exact polyfills being used.
 
-That said, there's a [polyfilled](https://github.com/que-etc/resize-observer-polyfill)
-CJS module that can be used for convenience (Not affecting globals):
+That said, there's a [polyfilled](https://github.com/juggle/resize-observer)
+CJS module that can be used for convenience:
 
-```js
+```ts
 import useResizeObserver from "use-resize-observer/polyfilled";
 ```
+
+Note that using the above will use the polyfill, [even if the native ResizeObserver is available](https://github.com/juggle/resize-observer#basic-usage).
+
+To use the polyfill as a fallback instead only when the native RO is unavailable, you can polyfill yourself instead,
+either in your app's entry file, or you could create a local useResizeObserver module, like so:
+
+```ts
+// useResizeObserver.ts
+import { ResizeObserver } from "@juggle/resize-observer";
+import useResizeObserver from "use-resize-observer";
+
+if (!window.ResizeObserver) {
+  window.ResizeObserver = ResizeObserver;
+}
+
+export default useResizeObserver;
+```
+
+The same technique can also be used to provide any of your preferred ResizeObserver polyfills out there.
 
 ## Related
 

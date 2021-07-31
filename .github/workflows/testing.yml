@@ -20,9 +20,6 @@ jobs:
           node-version: '12.x'
       - name: Installing Dependencies
         run: yarn install --frozen-lockfile
-      - name: Removing Conflicting TypeScript ResizeObserver definition
-        # Without this, running `tsc -p tests` fails, not sure how else to fix it.
-        run: rm node_modules/resize-observer-polyfill/src/index.d.ts
       - name: Checking File Size
         run: yarn check:size
       - name: Checking Types
