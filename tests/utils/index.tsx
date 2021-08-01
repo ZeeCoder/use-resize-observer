@@ -3,6 +3,15 @@ import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
 import useMergedCallbackRef from "./useMergedCallbackRef";
 import awaitNextFrame from "./awaitNextFrame";
+import { detect } from "detect-browser";
+
+const rawBrowser = detect();
+export const browser = {
+  ...rawBrowser,
+  ...(rawBrowser && rawBrowser.version
+    ? { version: parseInt(rawBrowser.version) }
+    : null),
+};
 
 export type Size = {
   width: number;

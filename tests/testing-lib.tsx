@@ -6,6 +6,7 @@ import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
+import { browser } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -17,9 +18,11 @@ describe("Testing Lib: Basics", () => {
     const controller = createController();
 
     const Test = () => {
-      const { ref, width = 0, height = 0 } = useResizeObserver<
-        HTMLDivElement
-      >();
+      const {
+        ref,
+        width = 0,
+        height = 0,
+      } = useResizeObserver<HTMLDivElement>();
 
       const mergedCallbackRef = useMergedCallbackRef(
         ref,
@@ -103,14 +106,8 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       });
 
       controller.triggerRender = useRenderTrigger();
-      const mergedCallbackRef = useMergedCallbackRef(
-        ref,
-        (element: HTMLElement) => {
-          controller.provideSetSizeFunction(element);
-        }
-      );
 
-      return <div ref={mergedCallbackRef} />;
+      return <div ref={ref} />;
     };
 
     render(<Test />);
@@ -321,4 +318,67 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     await awaitNextFrame();
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
+
+  // This test will also make sure that firefox works, where the reported sizes are not returned in an array.
+  it("should be able to observer the border-box and switch to observing the content-box", async () => {
+    const controller = createController();
+    type Controller = {
+      setBox: (box: ResizeObserverBoxOptions) => void;
+    };
+    const c2 = {} as Controller;
+
+    const Test = () => {
+      const [box, setBox] = useState<ResizeObserverBoxOptions>("border-box");
+      c2.setBox = setBox;
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({ box });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
+
+      controller.incrementRenderCount();
+      controller.reportMeasuredSize({ width, height });
+
+      return (
+        <div
+          ref={mergedCallbackRef}
+          style={{ padding: "10px 20px", border: "1px solid" }}
+        />
+      );
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+    controller.assertRenderCount(1);
+
+    // Should react to component size changes.
+    await controller.setSize({ width: 100, height: 200 });
+
+    // Should report border-size
+    controller.assertMeasuredSize({ width: 142, height: 222 });
+    controller.assertRenderCount(2);
+
+    // Should be able to switch to observing content-box
+    c2.setBox("content-box");
+    await awaitNextFrame(); // todo remove excess awaits
+    await awaitNextFrame();
+    await awaitNextFrame();
+    controller.assertRenderCount(4);
+    await controller.setSize({ width: 50, height: 100 });
+    controller.assertMeasuredSize({ width: 50, height: 100 });
+  });
+
+  // TODO
+  // to test:
+  // - no box given should observe content-box
+  // - test border box reported
+  // - test border-box and devicePixelContentBoxSize in non-supporting browsers that are supporting RO (should return content-box data (not ideal, but better than nothing))
+  // - test falling back to contentRect in browsers where contentRect is present, but not contentBoxSize
+  // - test FF with non-sequence sizes
+  // - test onResize should not be reporting the same values
 });

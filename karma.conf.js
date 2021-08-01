@@ -3,8 +3,8 @@ module.exports = function (karmaConfig) {
   const { BS_USERNAME, BS_ACCESS_KEY } = process.env;
 
   let testFilePattern = "tests/*.tsx";
-  // const testFilePattern = "tests/basic.tsx";
-  // const testFilePattern = "tests/testing-lib.tsx";
+  // let testFilePattern = "tests/basic.tsx";
+  // let testFilePattern = "tests/testing-lib.tsx";
 
   let transpileExcludePattern = /node_modules/;
   let presetEndModules = false;

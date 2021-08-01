@@ -85,6 +85,7 @@
     "@types/react-dom": "^17.0.9",
     "babel-loader": "^8.1.0",
     "delay": "^5.0.0",
+    "detect-browser": "^5.2.0",
     "husky": "^7.0.0",
     "karma": "^6.3.4",
     "karma-browserstack-launcher": "^1.6.0",
@@ -103,7 +104,7 @@
     "rollup": "^2.6.1",
     "semantic-release": "^17.2.2",
     "size-limit": "^5.0.1",
-    "typescript": "^4.0.3"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1"
