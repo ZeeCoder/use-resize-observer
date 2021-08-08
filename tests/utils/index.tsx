@@ -5,13 +5,12 @@ import useMergedCallbackRef from "./useMergedCallbackRef";
 import awaitNextFrame from "./awaitNextFrame";
 import { detect } from "detect-browser";
 
-const rawBrowser = detect();
-export const browser = {
-  ...rawBrowser,
-  ...(rawBrowser && rawBrowser.version
-    ? { version: parseInt(rawBrowser.version) }
-    : null),
-};
+export const browser = detect() as Exclude<ReturnType<typeof detect>, null>;
+
+// Obviously this is not precise, as it only operates on the browsers we use for the tests.
+// @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry/borderBoxSize
+export const isBoxOptionSupportedByTheCurrentBrowser = () =>
+  browser.name !== "safari";
 
 export type Size = {
   width: number;

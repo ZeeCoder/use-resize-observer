@@ -39,8 +39,9 @@ function useResolvedElement<T extends HTMLElement>(
     }
 
     if (
-      lastReportRef.current?.element === element &&
-      lastReportRef.current?.reporter === callSubscriber
+      lastReportRef.current &&
+      lastReportRef.current.element === element &&
+      lastReportRef.current.reporter === callSubscriber
     ) {
       return;
     }
@@ -101,6 +102,7 @@ type ResizeObserverBoxOptions =
   | "content-box"
   | "device-pixel-content-box";
 
+// todo this generates a type in global, which is not what we want (?)
 declare global {
   interface ResizeObserverEntry {
     readonly devicePixelContentBoxSize: ReadonlyArray<ResizeObserverSize>;
@@ -140,7 +142,8 @@ const extractSize = (
   boxProp: "borderBoxSize" | "contentBoxSize" | "devicePixelContentBoxSize",
   sizeType: keyof ResizeObserverSize
 ): number => {
-  if (boxProp === "contentBoxSize" && !entry[boxProp]) {
+  if (!entry[boxProp]) {
+    // todo rephrase
     // The dimensions in `contentBoxSize` and `contentRect` are equivalent according to the spec.
     // See the 6th step in the description for the RO algorithm:
     // https://drafts.csswg.org/resize-observer/#create-and-populate-resizeobserverentry-h
@@ -148,7 +151,8 @@ const extractSize = (
     return entry.contentRect[sizeType === "inlineSize" ? "width" : "height"];
   }
 
-  return Array.isArray(entry[boxProp])
+  // A couple bytes smaller than calling Array.isArray() and just as effective here.
+  return entry[boxProp][0]
     ? entry[boxProp][0][sizeType]
     : // @ts-ignore todo remove
       entry[boxProp][sizeType];
@@ -227,12 +231,6 @@ function useResizeObserver<T extends HTMLElement>(
                   : opts.box === "device-pixel-content-box"
                   ? "devicePixelContentBoxSize"
                   : "contentBoxSize";
-
-              if (!entry[boxProp] && opts.box !== "content-box") {
-                // This browser does not support the current box type.
-                // We're doing the same check for "content-box" as that can fall back to using `contentRect`.
-                return;
-              }
 
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");

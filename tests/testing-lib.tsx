@@ -6,7 +6,7 @@ import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
-import { browser } from "./utils";
+import { browser, isBoxOptionSupportedByTheCurrentBrowser } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -360,15 +360,22 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     await controller.setSize({ width: 100, height: 200 });
 
     // Should report border-size
-    controller.assertMeasuredSize({ width: 142, height: 222 });
+    if (isBoxOptionSupportedByTheCurrentBrowser()) {
+      controller.assertMeasuredSize({ width: 142, height: 222 });
+    } else {
+      controller.assertMeasuredSize({ width: 100, height: 200 });
+    }
     controller.assertRenderCount(2);
 
     // Should be able to switch to observing content-box
     c2.setBox("content-box");
-    await awaitNextFrame(); // todo remove excess awaits
     await awaitNextFrame();
-    await awaitNextFrame();
-    controller.assertRenderCount(4);
+
+    if (isBoxOptionSupportedByTheCurrentBrowser()) {
+      controller.assertRenderCount(4);
+    } else {
+      controller.assertRenderCount(3);
+    }
     await controller.setSize({ width: 50, height: 100 });
     controller.assertMeasuredSize({ width: 50, height: 100 });
   });
