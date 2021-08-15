@@ -65,12 +65,10 @@ function useResolvedElement<T extends HTMLElement>(
   // On each render, we check whether a ref changed, or if we got a new raw
   // element.
   useEffect(() => {
-    // todo check comments here
-    // Note that this does not mean that "element" will necessarily be whatever
-    // the ref currently holds. It'll simply "update" `element` each render to
-    // the current ref value, but there's no guarantee that the ref value will
-    // not change later without a render.
-    // This may or may not be a problem depending on the specific use case.
+    // With this we're *technically* supporting cases where ref objects' current value changes, but only if there's a
+    // render accompanying that change as well.
+    // To guarantee we always have the right element, one must use the ref callback provided instead, but we support
+    // RefObjects to make the hook API more convenient in certain cases.
     callSubscriber();
   }, [callSubscriber]);
 
@@ -88,7 +86,6 @@ type ObservedSize = {
   height: number | undefined;
 };
 
-// todo this states that onResize can have undefined width / height, which I think is not the case. Check it.
 type ResizeHandler = (size: ObservedSize) => void;
 
 type HookResponse<T extends HTMLElement> = {
@@ -102,7 +99,6 @@ type ResizeObserverBoxOptions =
   | "content-box"
   | "device-pixel-content-box";
 
-// todo this generates a type in global, which is not what we want (?)
 declare global {
   interface ResizeObserverEntry {
     readonly devicePixelContentBoxSize: ReadonlyArray<ResizeObserverSize>;
@@ -134,27 +130,30 @@ declare global {
 // even though it seems we have access to results for all box types.
 // This also means that we get to keep the current api, being able to return a simple { width, height } pair,
 // regardless of box option.
-
-// Firefox currently does not return size sequences for `borderBoxSize` and `contentBoxSize` as the spec states,
-// so we're handling non-arrays here too.
 const extractSize = (
   entry: ResizeObserverEntry,
   boxProp: "borderBoxSize" | "contentBoxSize" | "devicePixelContentBoxSize",
   sizeType: keyof ResizeObserverSize
-): number => {
+): number | undefined => {
   if (!entry[boxProp]) {
-    // todo rephrase
-    // The dimensions in `contentBoxSize` and `contentRect` are equivalent according to the spec.
-    // See the 6th step in the description for the RO algorithm:
-    // https://drafts.csswg.org/resize-observer/#create-and-populate-resizeobserverentry-h
-    // > Set this.contentRect to logical this.contentBoxSize given target and observedBox of "content-box".
-    return entry.contentRect[sizeType === "inlineSize" ? "width" : "height"];
+    if (boxProp === "contentBoxSize") {
+      // The dimensions in `contentBoxSize` and `contentRect` are equivalent according to the spec.
+      // See the 6th step in the description for the RO algorithm:
+      // https://drafts.csswg.org/resize-observer/#create-and-populate-resizeobserverentry-h
+      // > Set this.contentRect to logical this.contentBoxSize given target and observedBox of "content-box".
+      // In real browser implementations of course these objects differ, but the width/height values should be equivalent.
+      return entry.contentRect[sizeType === "inlineSize" ? "width" : "height"];
+    }
+
+    return undefined;
   }
 
   // A couple bytes smaller than calling Array.isArray() and just as effective here.
   return entry[boxProp][0]
     ? entry[boxProp][0][sizeType]
-    : // @ts-ignore todo remove
+    : // TS complains about this, because the RO entry type follows the spec and does not reflect Firefox's current
+      // behaviour of returning objects instead of arrays for `borderBoxSize` and `contentBoxSize`.
+      // @ts-ignore
       entry[boxProp][sizeType];
 };
 
@@ -219,10 +218,6 @@ function useResizeObserver<T extends HTMLElement>(
           resizeObserverRef.current = {
             box: opts.box,
             instance: new ResizeObserver((entries) => {
-              if (!Array.isArray(entries)) {
-                return;
-              }
-
               const entry = entries[0];
 
               const boxProp =
@@ -235,15 +230,19 @@ function useResizeObserver<T extends HTMLElement>(
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");
 
-              const newWidth = Math.round(reportedWidth);
-              const newHeight = Math.round(reportedHeight);
+              const newWidth = reportedWidth
+                ? Math.round(reportedWidth)
+                : undefined;
+              const newHeight = reportedHeight
+                ? Math.round(reportedHeight)
+                : undefined;
+
               if (
                 previous.current.width !== newWidth ||
                 previous.current.height !== newHeight
               ) {
                 const newSize = { width: newWidth, height: newHeight };
                 if (onResizeRef.current) {
-                  // todo this should set the previous tracked values as well. Seems like onResize does not opt out of size values when they did not change.
                   onResizeRef.current(newSize);
                 } else {
                   previous.current.width = newWidth;

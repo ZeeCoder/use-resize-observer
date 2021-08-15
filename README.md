@@ -26,7 +26,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
 - [Throttle / Debounce](#throttle--debounce)
-- **Tested in real browsers** (Currently latest Chrome, Safari, Firefox and IE 11, sponsored by BrowserStack)
+- **Tested in real browsers** (Currently latest Chrome, Firefox, Edge, Safari, Opera, IE 11, iOS and Android, sponsored by BrowserStack)
 
 ## In Action
 

@@ -28,5 +28,5 @@ jobs:
         run: yarn test:create:ssr
       - name: Testing in Modern Browsers (BrowserStack)
         run: yarn test:bs:modern
-      - name: Testing in IE11 (BrowserStack)
-        run: yarn test:bs:ie
+      - name: Testing in Legacy Browsers (BrowserStack)
+        run: yarn test:bs:legacy

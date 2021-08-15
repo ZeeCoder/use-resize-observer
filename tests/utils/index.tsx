@@ -3,14 +3,18 @@ import ReactDOM from "react-dom";
 import useResizeObserver from "../..";
 import useMergedCallbackRef from "./useMergedCallbackRef";
 import awaitNextFrame from "./awaitNextFrame";
-import { detect } from "detect-browser";
 
-export const browser = detect() as Exclude<ReturnType<typeof detect>, null>;
-
-// Obviously this is not precise, as it only operates on the browsers we use for the tests.
-// @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry/borderBoxSize
-export const isBoxOptionSupportedByTheCurrentBrowser = () =>
-  browser.name !== "safari";
+// Creating an RO instance ahead of time as a "side effect" of using this module, to avoid affecting tests.
+export const supports = {
+  borderBox: false,
+  devicePixelContentBoxSize: false,
+};
+new ResizeObserver((entries) => {
+  supports.borderBox = Boolean(entries[0].borderBoxSize);
+  supports.devicePixelContentBoxSize = Boolean(
+    entries[0].devicePixelContentBoxSize
+  );
+}).observe(document.body);
 
 export type Size = {
   width: number;

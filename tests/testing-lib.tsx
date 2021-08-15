@@ -6,7 +6,7 @@ import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
-import { browser, isBoxOptionSupportedByTheCurrentBrowser } from "./utils";
+import { supports } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -51,7 +51,6 @@ describe("Testing Lib: Basics", () => {
   });
 });
 
-// todo instead of this being a separate block, just add it globally. Then each test has the option to utilise it.
 describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   let resizeObserverInstanceCount = 0;
   let resizeObserverObserveCount = 0;
@@ -319,28 +318,32 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
+  // todo separate box option testing to a separate describe block
   // This test will also make sure that firefox works, where the reported sizes are not returned in an array.
-  it("should be able to observer the border-box and switch to observing the content-box", async () => {
-    const controller = createController();
+  it("should support switching back-and-forth between box types", async () => {
+    const c1 = createController();
     type Controller = {
-      setBox: (box: ResizeObserverBoxOptions) => void;
+      setBox: (box: ResizeObserverBoxOptions) => Promise<void>;
     };
     const c2 = {} as Controller;
 
     const Test = () => {
       const [box, setBox] = useState<ResizeObserverBoxOptions>("border-box");
-      c2.setBox = setBox;
+      c2.setBox = useCallback(async (box) => {
+        setBox(box);
+        await awaitNextFrame();
+      }, []);
       const { ref, width, height } = useResizeObserver<HTMLDivElement>({ box });
 
       const mergedCallbackRef = useMergedCallbackRef(
         ref,
         (element: HTMLElement) => {
-          controller.provideSetSizeFunction(element);
+          c1.provideSetSizeFunction(element);
         }
       );
 
-      controller.incrementRenderCount();
-      controller.reportMeasuredSize({ width, height });
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize({ width, height });
 
       return (
         <div
@@ -353,39 +356,100 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     render(<Test />);
 
     // Default response on the first render before an actual measurement took place
-    controller.assertMeasuredSize({ width: undefined, height: undefined });
-    controller.assertRenderCount(1);
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+    c1.assertRenderCount(1);
 
     // Should react to component size changes.
-    await controller.setSize({ width: 100, height: 200 });
+    await c1.setSize({ width: 100, height: 200 });
 
     // Should report border-size
-    if (isBoxOptionSupportedByTheCurrentBrowser()) {
-      controller.assertMeasuredSize({ width: 142, height: 222 });
+    if (supports.borderBox) {
+      c1.assertRenderCount(2);
+      c1.assertMeasuredSize({ width: 142, height: 222 });
     } else {
-      controller.assertMeasuredSize({ width: 100, height: 200 });
+      // In non-supporting browser the hook would have nothing to report.
+      c1.assertRenderCount(1);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
     }
-    controller.assertRenderCount(2);
 
     // Should be able to switch to observing content-box
-    c2.setBox("content-box");
-    await awaitNextFrame();
+    await c2.setBox("content-box");
+    c1.assertMeasuredSize({ width: 100, height: 200 });
 
-    if (isBoxOptionSupportedByTheCurrentBrowser()) {
-      controller.assertRenderCount(4);
+    // 2 extra render should be happening:
+    // - One for setting the local `box` state
+    // - Another as a reaction to that coming from the hook, which would report the new values.
+    if (supports.borderBox) {
+      c1.assertRenderCount(4);
     } else {
-      controller.assertRenderCount(3);
+      c1.assertRenderCount(3);
     }
-    await controller.setSize({ width: 50, height: 100 });
-    controller.assertMeasuredSize({ width: 50, height: 100 });
+
+    // Switching back yet again should be reported with "undefined" in non-supporting browsers.
+    await c2.setBox("border-box");
+    if (supports.borderBox) {
+      c1.assertRenderCount(6);
+      c1.assertMeasuredSize({ width: 142, height: 222 });
+    } else {
+      // In non-supporting browser the hook would have nothing to report.
+      c1.assertRenderCount(5);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
+    }
   });
 
-  // TODO
-  // to test:
-  // - no box given should observe content-box
-  // - test border box reported
-  // - test border-box and devicePixelContentBoxSize in non-supporting browsers that are supporting RO (should return content-box data (not ideal, but better than nothing))
-  // - test falling back to contentRect in browsers where contentRect is present, but not contentBoxSize
-  // - test FF with non-sequence sizes
-  // - test onResize should not be reporting the same values
+  it("should be able to measure device pixel content box in supporting browsers", async () => {
+    const c1 = createController();
+    type Controller = {
+      setZoom: (zoom: number) => Promise<void>;
+    };
+    const c2 = {} as Controller;
+
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+        box: "device-pixel-content-box",
+      });
+      const localRef = useRef<HTMLDivElement | null>(null);
+      c2.setZoom = useCallback(async (zoom) => {
+        if (localRef.current) {
+          localRef.current.style.zoom = String(zoom);
+          await awaitNextFrame();
+        }
+      }, []);
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          localRef.current = element;
+          if (localRef.current) {
+            // @ts-ignore
+            window.s = localRef.current.style;
+          }
+          c1.provideSetSizeFunction(element);
+        }
+      );
+
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize({ width, height });
+
+      return <div ref={mergedCallbackRef}>lorem ipsum dolor sit amet</div>;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c1.assertRenderCount(1);
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c1.setSize({ width: 100, height: 200 });
+    if (supports.devicePixelContentBoxSize) {
+      c1.assertRenderCount(2);
+      c1.assertMeasuredSize({
+        width: Math.round(100 * devicePixelRatio),
+        height: Math.round(200 * devicePixelRatio),
+      });
+    } else {
+      c1.assertRenderCount(1);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
+    }
+  });
 });

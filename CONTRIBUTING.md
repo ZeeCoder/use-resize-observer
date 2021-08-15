@@ -1,10 +1,10 @@
 # CONTRIBUTING
 
-When contributing to this project, please keep in mind the following goals:
+When contributing to this project, please keep in mind the following:
 
 - The hook must remain as simple as possible. It's only a "proxy" to a
-  ResizeObserver instance, and shouldn't add features that the resize observer
-  doesn't do.
+  ResizeObserver instance, and shouldn't add features that itself does
+  not offer.
 - All features must be covered with test(s).
 
 It's also best to first submit an issue, before creating a pull request so that
@@ -28,10 +28,13 @@ While making changes you might want to watch the source files, and build them
 automatically, as well as having Karma run a (non-headless) Chrome instance
 every time a change was made.
 
-To do that:
+To do so:
 
 - Run `yarn src:watch` in a terminal tab
-- Run `KARMA_BROWSERS=Chrome yarn karma:watch` in another.
+- Run `yarn karma:watch` in another.
 
 Don't forget to run `yarn test` at the end once you're done with everything, to
 make sure the new code is tested for regressions.
+
+If you have a Browserstack account, then you can also run the tests in real browsers using the `test:bs:*` commands.
+Just make sure you have the following env variables set: `BS_USERNAME`, `BS_ACCESS_KEY`.
