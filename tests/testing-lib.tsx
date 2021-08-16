@@ -500,12 +500,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       const [rounder, setRounder] = useState<typeof Math.ceil | undefined>(
         () => Math.ceil
       );
-      const [size, setSize] = useState<ObservedSize>({
-        width: undefined,
-        height: undefined,
-      });
-      const { ref } = useResizeObserver<HTMLDivElement>({
-        onResize: setSize,
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
         round: rounder,
       });
 
@@ -523,7 +518,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       );
 
       c1.incrementRenderCount();
-      c1.reportMeasuredSize(size);
+      c1.reportMeasuredSize({ width, height });
 
       return <div ref={mergedCallbackRef} />;
     };
@@ -550,5 +545,66 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     await c2.replaceRoundFunction("unset");
     c1.assertRenderCount(7);
     c1.assertMeasuredSize({ width: 200, height: 300 });
+  });
+
+  it("should only re-render with a custom rounding function when it produces a new value", async () => {
+    const c = createController();
+    // A rounding function that "snaps" to its values.
+    const rounder = (n: number) => {
+      if (n < 500) {
+        return 0;
+      } else if (n < 1000) {
+        return 500;
+      }
+
+      return 1000;
+    };
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+        round: rounder,
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c.provideSetSizeFunction(element);
+        }
+      );
+
+      c.incrementRenderCount();
+      c.reportMeasuredSize({ width, height });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c.assertRenderCount(1);
+    c.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c.setSize({ width: 100, height: 100 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 0, height: 0 });
+
+    await c.setSize({ width: 200, height: 200 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 0, height: 0 });
+
+    await c.setSize({ width: 600, height: 600 });
+    c.assertRenderCount(3);
+    c.assertMeasuredSize({ width: 500, height: 500 });
+
+    await c.setSize({ width: 1100, height: 600 });
+    c.assertRenderCount(4);
+    c.assertMeasuredSize({ width: 1000, height: 500 });
+
+    await c.setSize({ width: 1100, height: 800 });
+    c.assertRenderCount(4);
+    c.assertMeasuredSize({ width: 1000, height: 500 });
+
+    await c.setSize({ width: 1100, height: 1100 });
+    c.assertRenderCount(5);
+    c.assertMeasuredSize({ width: 1000, height: 1000 });
   });
 });

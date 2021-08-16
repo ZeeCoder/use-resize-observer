@@ -26,7 +26,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - **Ships a polyfilled version**
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
-- [Throttle / Debounce](#throttle--debounce)
+- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints))
 - **Tested in real browsers** (Currently latest Chrome, Firefox, Edge, Safari, Opera, IE 11, iOS and Android, sponsored by BrowserStack)
 
 ## In Action
@@ -90,6 +90,48 @@ then you may want to feature-detect for support, and optionally include a polyfi
 Surma has a [very good article](https://web.dev/device-pixel-content-box/) on how this allows us to do pixel perfect
 rendering. At the time of writing, however this has very limited support.
 The advices on feature detection for `border-box` apply here too.
+
+### Custom Rounding
+
+By default this hook passes the measured values through `Math.round()`, to avoid re-rendering on every subpixel changes.
+
+If this is not what you want, then you can provide your own function:
+
+**Rounding Down Reported Values**
+
+```tsx
+const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+  round: Math.floor,
+});
+```
+
+**Skipping Rounding**
+
+```tsx
+import React from "react";
+import useResizeObserver from "use-resize-observer";
+
+// Outside the hook to ensure this instance does not change unnecessarily.
+const noop = (n) => n;
+
+const App = () => {
+  const {
+    ref,
+    width = 1,
+    height = 1,
+  } = useResizeObserver<HTMLDivElement>({ round: noop });
+
+  return (
+    <div ref={ref}>
+      Size: {width}x{height}
+    </div>
+  );
+};
+```
+
+Note that the round option is sensitive to the function reference, so make sure you either use `useCallback`
+or declare your rounding function outside of the hook's function scope, if it does not rely on any hook state.
+(As shown above.)
 
 ### Getting the Raw Element from the Default `RefCallback`
 
@@ -207,14 +249,21 @@ what you need, for example:
 - Throttle / debounce
 - Wrap in `requestAnimationFrame`
 
-## Throttle / Debounce
+## Hook Composition
+
+As this hook intends to remain low-level, it is encouraged to build on top of it via hook composition, if additional features are required.
+
+### Throttle / Debounce
 
 You might want to receive values less frequently than changes actually occur.
 
-While this hook does not come with its own implementation of throttling / debouncing,
-you can use the `onResize` callback to implement your own version:
-
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
+
+### Breakpoints
+
+Another popular concept are breakpoints. Here is an example for a simple hook accomplishing that.
+
+[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-breakpoints-3hiv8)
 
 ## Defaults (SSR)
 
