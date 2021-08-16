@@ -157,11 +157,14 @@ const extractSize = (
       entry[boxProp][sizeType];
 };
 
+type RoundingFunction = (n: number) => number;
+
 function useResizeObserver<T extends HTMLElement>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
     box?: ResizeObserverBoxOptions;
+    round?: RoundingFunction;
   } = {}
 ): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
@@ -170,10 +173,14 @@ function useResizeObserver<T extends HTMLElement>(
   const onResize = opts.onResize;
   const onResizeRef = useRef<ResizeHandler | undefined>(undefined);
   onResizeRef.current = onResize;
+  const round = opts.round || Math.round;
 
   // Using a single instance throughout the hook's lifetime
-  const resizeObserverRef =
-    useRef<{ box?: ResizeObserverBoxOptions; instance: ResizeObserver }>();
+  const resizeObserverRef = useRef<{
+    box?: ResizeObserverBoxOptions;
+    round?: RoundingFunction;
+    instance: ResizeObserver;
+  }>();
 
   const [size, setSize] = useState<{
     width?: number;
@@ -213,10 +220,12 @@ function useResizeObserver<T extends HTMLElement>(
         // This instance is also recreated when the `box` option changes, so that a new observation is fired if there was a previously observed element with a different box option.
         if (
           !resizeObserverRef.current ||
-          resizeObserverRef.current.box !== opts.box
+          resizeObserverRef.current.box !== opts.box ||
+          resizeObserverRef.current.round !== round
         ) {
           resizeObserverRef.current = {
             box: opts.box,
+            round,
             instance: new ResizeObserver((entries) => {
               const entry = entries[0];
 
@@ -230,11 +239,9 @@ function useResizeObserver<T extends HTMLElement>(
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");
 
-              const newWidth = reportedWidth
-                ? Math.round(reportedWidth)
-                : undefined;
+              const newWidth = reportedWidth ? round(reportedWidth) : undefined;
               const newHeight = reportedHeight
-                ? Math.round(reportedHeight)
+                ? round(reportedHeight)
                 : undefined;
 
               if (
@@ -264,7 +271,7 @@ function useResizeObserver<T extends HTMLElement>(
           }
         };
       },
-      [opts.box]
+      [opts.box, round]
     ),
     opts.ref
   );

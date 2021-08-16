@@ -489,4 +489,66 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c.assertRenderCount(2);
     c.assertMeasuredSize({ width: 100, height: 200 });
   });
+
+  it("should accept a custom rounding function, and adapt to function instance changes without unnecessary renders", async () => {
+    const c1 = createController();
+    type Controller = {
+      replaceRoundFunction: (fn: "multiply" | "unset") => void;
+    };
+    const c2 = {} as Controller;
+    const Test = () => {
+      const [rounder, setRounder] = useState<typeof Math.ceil | undefined>(
+        () => Math.ceil
+      );
+      const [size, setSize] = useState<ObservedSize>({
+        width: undefined,
+        height: undefined,
+      });
+      const { ref } = useResizeObserver<HTMLDivElement>({
+        onResize: setSize,
+        round: rounder,
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c1.provideSetSizeFunction(element);
+          c2.replaceRoundFunction = async (fn) => {
+            setRounder(() =>
+              fn === "multiply" ? (n: number) => Math.round(n * 2) : undefined
+            );
+            await awaitNextFrame();
+          };
+        }
+      );
+
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize(size);
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c1.assertRenderCount(1);
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c1.setSize({ width: 100.1, height: 200.1 });
+    c1.assertRenderCount(2);
+    c1.assertMeasuredSize({ width: 101, height: 201 });
+
+    // Testing normal re-renders
+    await c1.setSize({ width: 200.2, height: 300.2 });
+    c1.assertRenderCount(3);
+    c1.assertMeasuredSize({ width: 201, height: 301 });
+
+    await c2.replaceRoundFunction("multiply");
+    c1.assertRenderCount(5);
+    c1.assertMeasuredSize({ width: 400, height: 600 });
+
+    await c2.replaceRoundFunction("unset");
+    c1.assertRenderCount(7);
+    c1.assertMeasuredSize({ width: 200, height: 300 });
+  });
 });
