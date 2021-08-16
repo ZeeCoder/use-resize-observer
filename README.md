@@ -18,6 +18,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - Written in **TypeScript**.
 - **Tiny**: [500B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
 - Exposes an **onResize callback** if you need more control.
+- `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
@@ -60,40 +61,58 @@ const App = () => {
 };
 ```
 
-Note that "ref" here is a `RefCallback`, not a `RefObject`, meaning you won't be
-able to access "ref.current" if you need the element itself.
-To get the raw element, either you use your own RefObject (see later in this doc)
-or you hook in the returned ref callback, like so:
+To observe a different box size other than content box, pass in the `box` option, like so:
 
-### Getting the raw element from the default `RefCallback`
+```tsx
+const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+  box: "border-box",
+});
+```
+
+Note that if the browser does not support the given box type, then the hook won't report any sizes either.
+
+### Box Options
+
+Note that box options are experimental, and as such are not supported by all browsers that implemented ResizeObservers. (See [here](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry).)
+
+`content-box` (default)
+
+Safe to use by all browsers that implemented ResizeObservers. The hook internally will fall back to `contentRect` from
+the old spec in case `contentBoxSize` is not available.
+
+`border-box`
+
+Supported well for the most part by evergreen browsers. If you need to support older versions of these browsers however,
+then you may want to feature-detect for support, and optionally include a polyfill instead of the native implementation.
+
+`device-pixel-content-box`
+
+Surma has a [very good article](https://web.dev/device-pixel-content-box/) on how this allows us to do pixel perfect
+rendering. At the time of writing, however this has very limited support.
+The advices on feature detection for `border-box` apply here too.
+
+### Getting the Raw Element from the Default `RefCallback`
+
+Note that "ref" in the above examples is a `RefCallback`, not a `RefObject`, meaning you won't be
+able to access "ref.current" if you need the element itself.
+
+To get the raw element, either you use your own RefObject (see later in this doc),
+or you can merge the returned ref with one of your own:
 
 ```tsx
 import React, { useCallback, useEffect, useRef } from "react";
 import useResizeObserver from "use-resize-observer";
-
-const useMergedCallbackRef = (...callbacks: Function[]) => {
-  // Storing callbacks in a ref, so that we don't need to memoise them in
-  // renders when using this hook.
-  const callbacksRegistry = useRef<Function[]>(callbacks);
-
-  useEffect(() => {
-    callbacksRegistry.current = callbacks;
-  }, [...callbacks]);
-
-  return useCallback((element) => {
-    callbacksRegistry.current.forEach((callback) => callback(element));
-  }, []);
-};
+import mergeRefs from "react-merge-refs";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
-  const mergedCallbackRef = useMergedCallbackRef(
+  const mergedCallbackRef = mergeRefs([
     ref,
     (element: HTMLDivElement) => {
       // Do whatever you want with the `element`.
-    }
-  );
+    },
+  ]);
 
   return (
     <div ref={mergedCallbackRef}>
@@ -128,13 +147,13 @@ const { width, height } = useResizeObserver<HTMLDivElement>({
 });
 ```
 
-## Using a single hook to measure multiple refs
+## Using a Single Hook to Measure Multiple Refs
 
 The hook reacts to ref changes, as it resolves it to an element to observe.
 This means that you can freely change the custom `ref` option from one ref to
 another and back, and the hook will start observing whatever is set in its options.
 
-## Opting Out of (or Delaying) ResizeObserver instantiation
+## Opting Out of (or Delaying) ResizeObserver Instantiation
 
 In certain cases you might want to delay creating a ResizeObserver instance.
 
@@ -156,7 +175,7 @@ You can do one of the following depending on your needs:
   (This assumes you don't already use the polyfilled version, which would switch
   to the polyfill when no native implementation was available.)
 
-## The "onResize" callback
+## The "onResize" Callback
 
 By the default the hook will trigger a re-render on all changes to the target
 element's width and / or height.
@@ -250,8 +269,8 @@ import useResizeObserver from "use-resize-observer/polyfilled";
 
 Note that using the above will use the polyfill, [even if the native ResizeObserver is available](https://github.com/juggle/resize-observer#basic-usage).
 
-To use the polyfill as a fallback instead only when the native RO is unavailable, you can polyfill yourself instead,
-either in your app's entry file, or you could create a local useResizeObserver module, like so:
+To use the polyfill as a fallback only when the native RO is unavailable, you can polyfill yourself instead,
+either in your app's entry file, or you could create a local `useResizeObserver` module, like so:
 
 ```ts
 // useResizeObserver.ts

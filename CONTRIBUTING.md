@@ -2,9 +2,9 @@
 
 When contributing to this project, please keep in mind the following:
 
-- The hook must remain as simple as possible. It's only a "proxy" to a
-  ResizeObserver instance, and shouldn't add features that itself does
-  not offer.
+- The hook must remain as simple as possible. It's only a low-level "proxy" to a
+  ResizeObserver instance aiming for correctness, which should not add or polyfill
+  features on top. All that can be done by composing hooks.
 - All features must be covered with test(s).
 
 It's also best to first submit an issue, before creating a pull request so that
