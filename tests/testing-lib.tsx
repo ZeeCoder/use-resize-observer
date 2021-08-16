@@ -6,7 +6,7 @@ import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
-import { supports } from "./utils";
+import { ObservedSize, supports } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -431,7 +431,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       c1.incrementRenderCount();
       c1.reportMeasuredSize({ width, height });
 
-      return <div ref={mergedCallbackRef}>lorem ipsum dolor sit amet</div>;
+      return <div ref={mergedCallbackRef} />;
     };
 
     render(<Test />);
@@ -451,5 +451,42 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       c1.assertRenderCount(1);
       c1.assertMeasuredSize({ width: undefined, height: undefined });
     }
+  });
+
+  it("should not report repeated values with the onResize callback", async () => {
+    const c = createController();
+    const Test = () => {
+      const [size, setSize] = useState<ObservedSize>({
+        width: undefined,
+        height: undefined,
+      });
+      const { ref } = useResizeObserver<HTMLDivElement>({ onResize: setSize });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c.provideSetSizeFunction(element);
+        }
+      );
+
+      c.incrementRenderCount();
+      c.reportMeasuredSize(size);
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c.assertRenderCount(1);
+    c.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c.setSize({ width: 100, height: 200 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 100, height: 200 });
+
+    await c.setSize({ width: 100.2, height: 200.4 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 100, height: 200 });
   });
 });

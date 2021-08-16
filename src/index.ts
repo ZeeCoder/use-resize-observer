@@ -242,11 +242,11 @@ function useResizeObserver<T extends HTMLElement>(
                 previous.current.height !== newHeight
               ) {
                 const newSize = { width: newWidth, height: newHeight };
+                previous.current.width = newWidth;
+                previous.current.height = newHeight;
                 if (onResizeRef.current) {
                   onResizeRef.current(newSize);
                 } else {
-                  previous.current.width = newWidth;
-                  previous.current.height = newHeight;
                   if (!didUnmount.current) {
                     setSize(newSize);
                   }
