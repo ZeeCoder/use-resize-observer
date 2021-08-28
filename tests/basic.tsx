@@ -18,7 +18,6 @@ import {
   HandlerResolverComponentProps,
 } from "./utils";
 import awaitNextFrame from "./utils/awaitNextFrame";
-import delay from "./utils/delay";
 
 describe("Vanilla tests", () => {
   it("should render with undefined sizes at first", async () => {
@@ -42,12 +41,8 @@ describe("Vanilla tests", () => {
   });
 
   it("should follow size changes correctly with appropriate render count and without sub-pixels as they're used in CSS", async () => {
-    const {
-      setAndAssertSize,
-      setSize,
-      assertSize,
-      assertRenderCount,
-    } = await render(Observed, { waitForFirstMeasurement: true });
+    const { setAndAssertSize, setSize, assertSize, assertRenderCount } =
+      await render(Observed, { waitForFirstMeasurement: true });
 
     // Default render + first measurement
     assertRenderCount(2);
