@@ -32,17 +32,27 @@
     "src:watch": "rollup -c -w",
     "check:size": "size-limit",
     "check:types": "tsc -p tests",
-    "test": "run-s 'build' 'check:size' 'check:types' 'test:create:ssr' 'test:bs:*'",
+    "test": "run-s 'build' 'check:size' 'check:types' 'test:create:ssr' 'test:headless:chrome'",
     "test:create:ssr": "node ./tests/ssr/create-ssr-test.js",
     "test:chrome": "KARMA_BROWSERS=Chrome yarn karma:run",
     "test:headless:chrome": "KARMA_BROWSERS=ChromeHeadless yarn karma:run",
     "test:firefox": "KARMA_BROWSERS=Firefox yarn karma:run",
     "test:headless:firefox": "KARMA_BROWSERS=FirefoxHeadless yarn karma:run",
     "karma:run": "karma start --singleRun",
-    "karma:watch": "karma start",
+    "karma:watch": "KARMA_BROWSERS=Chrome karma start",
     "prepublish": "yarn build",
-    "test:bs:modern": "yarn karma:run --useBrowserStack",
-    "test:bs:ie": "yarn karma:run --useBrowserStack --runIeTests",
+    "test:bs:all": "run-s 'test:bs:modern' 'test:bs:legacy'",
+    "test:bs:modern": "KARMA_BROWSERS=modern yarn karma:run",
+    "test:bs:legacy": "KARMA_BROWSERS=legacy yarn karma:run",
+    "test:bs:chrome": "KARMA_BROWSERS=bs_chrome_latest yarn karma:run",
+    "test:bs:firefox": "KARMA_BROWSERS=bs_firefox_latest yarn karma:run",
+    "test:bs:safari": "KARMA_BROWSERS=bs_safari_13 yarn karma:run",
+    "test:bs:edge": "KARMA_BROWSERS=bs_edge_latest yarn karma:run",
+    "test:bs:opera": "KARMA_BROWSERS=bs_opera_latest yarn karma:run",
+    "test:bs:ie": "KARMA_BROWSERS=bs_ie_11 yarn karma:run",
+    "test:bs:ios_11": "KARMA_BROWSERS=bs_ios_11 yarn karma:run",
+    "test:bs:ios_14": "KARMA_BROWSERS=bs_ios_14 yarn karma:run",
+    "test:bs:samsung": "KARMA_BROWSERS=bs_samsung yarn karma:run",
     "prepare": "husky install"
   },
   "lint-staged": {
@@ -103,7 +113,8 @@
     "rollup": "^2.6.1",
     "semantic-release": "^17.2.2",
     "size-limit": "^5.0.1",
-    "typescript": "^4.0.3"
+    "typescript": "^4.3.5",
+    "webpack": "~4"
   },
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1"
