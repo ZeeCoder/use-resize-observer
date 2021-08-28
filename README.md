@@ -16,8 +16,9 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Highlights
 
 - Written in **TypeScript**.
-- **Tiny**: [500B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
+- **Tiny**: [645B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
 - Exposes an **onResize callback** if you need more control.
+- `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
@@ -25,8 +26,8 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - **Ships a polyfilled version**
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
-- [Throttle / Debounce](#throttle--debounce)
-- **Tested in real browsers** (Currently latest Chrome, Safari, Firefox and IE 11, sponsored by BrowserStack)
+- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints))
+- **Tested in real browsers** (Currently latest Chrome, Firefox, Edge, Safari, Opera, IE 11, iOS and Android, sponsored by BrowserStack)
 
 ## In Action
 
@@ -39,6 +40,23 @@ yarn add use-resize-observer --dev
 # or
 npm install use-resize-observer --save-dev
 ```
+
+## Options
+
+| Option   | Type                                                                                 | Description                                                                                                                   | Default        |
+| -------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| ref      | undefined &#124; RefObject &#124; HTMLElement                                        | A ref or element to observe.                                                                                                  | undefined      |
+| box      | undefined &#124; "border-box" &#124; "content-box" &#124; "device-pixel-content-box" | The [box model](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax) to use for observation.       | "content-box"  |
+| onResize | undefined &#124; ({ width?: number, height?: number }) => void                       | A callback receiving the element size. If given, then the hook will not return the size, and instead will call this callback. | undefined      |
+| round    | undefined &#124; (n: number) => number                                               | A function to use for rounding values instead of the default.                                                                 | `Math.round()` |
+
+## Response
+
+| Name   | Type                    | Description                                    |
+| ------ | ----------------------- | ---------------------------------------------- |
+| ref    | RefCallback             | A callback to be passed to React's "ref" prop. |
+| width  | undefined &#124; number | The width (or "blockSize") of the element.     |
+| height | undefined &#124; number | The height (or "inlineSize") of the element.   |
 
 ## Basic Usage
 
@@ -60,40 +78,100 @@ const App = () => {
 };
 ```
 
-Note that "ref" here is a `RefCallback`, not a `RefObject`, meaning you won't be
-able to access "ref.current" if you need the element itself.
-To get the raw element, either you use your own RefObject (see later in this doc)
-or you hook in the returned ref callback, like so:
+To observe a different box size other than content box, pass in the `box` option, like so:
 
-### Getting the raw element from the default `RefCallback`
+```tsx
+const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+  box: "border-box",
+});
+```
+
+Note that if the browser does not support the given box type, then the hook won't report any sizes either.
+
+### Box Options
+
+Note that box options are experimental, and as such are not supported by all browsers that implemented ResizeObservers. (See [here](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry).)
+
+`content-box` (default)
+
+Safe to use by all browsers that implemented ResizeObservers. The hook internally will fall back to `contentRect` from
+the old spec in case `contentBoxSize` is not available.
+
+`border-box`
+
+Supported well for the most part by evergreen browsers. If you need to support older versions of these browsers however,
+then you may want to feature-detect for support, and optionally include a polyfill instead of the native implementation.
+
+`device-pixel-content-box`
+
+Surma has a [very good article](https://web.dev/device-pixel-content-box/) on how this allows us to do pixel perfect
+rendering. At the time of writing, however this has very limited support.
+The advices on feature detection for `border-box` apply here too.
+
+### Custom Rounding
+
+By default this hook passes the measured values through `Math.round()`, to avoid re-rendering on every subpixel changes.
+
+If this is not what you want, then you can provide your own function:
+
+**Rounding Down Reported Values**
+
+```tsx
+const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+  round: Math.floor,
+});
+```
+
+**Skipping Rounding**
+
+```tsx
+import React from "react";
+import useResizeObserver from "use-resize-observer";
+
+// Outside the hook to ensure this instance does not change unnecessarily.
+const noop = (n) => n;
+
+const App = () => {
+  const {
+    ref,
+    width = 1,
+    height = 1,
+  } = useResizeObserver<HTMLDivElement>({ round: noop });
+
+  return (
+    <div ref={ref}>
+      Size: {width}x{height}
+    </div>
+  );
+};
+```
+
+Note that the round option is sensitive to the function reference, so make sure you either use `useCallback`
+or declare your rounding function outside of the hook's function scope, if it does not rely on any hook state.
+(As shown above.)
+
+### Getting the Raw Element from the Default `RefCallback`
+
+Note that "ref" in the above examples is a `RefCallback`, not a `RefObject`, meaning you won't be
+able to access "ref.current" if you need the element itself.
+
+To get the raw element, either you use your own RefObject (see later in this doc),
+or you can merge the returned ref with one of your own:
 
 ```tsx
 import React, { useCallback, useEffect, useRef } from "react";
 import useResizeObserver from "use-resize-observer";
-
-const useMergedCallbackRef = (...callbacks: Function[]) => {
-  // Storing callbacks in a ref, so that we don't need to memoise them in
-  // renders when using this hook.
-  const callbacksRegistry = useRef<Function[]>(callbacks);
-
-  useEffect(() => {
-    callbacksRegistry.current = callbacks;
-  }, [...callbacks]);
-
-  return useCallback((element) => {
-    callbacksRegistry.current.forEach((callback) => callback(element));
-  }, []);
-};
+import mergeRefs from "react-merge-refs";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
 
-  const mergedCallbackRef = useMergedCallbackRef(
+  const mergedCallbackRef = mergeRefs([
     ref,
     (element: HTMLDivElement) => {
       // Do whatever you want with the `element`.
-    }
-  );
+    },
+  ]);
 
   return (
     <div ref={mergedCallbackRef}>
@@ -128,13 +206,13 @@ const { width, height } = useResizeObserver<HTMLDivElement>({
 });
 ```
 
-## Using a single hook to measure multiple refs
+## Using a Single Hook to Measure Multiple Refs
 
 The hook reacts to ref changes, as it resolves it to an element to observe.
 This means that you can freely change the custom `ref` option from one ref to
 another and back, and the hook will start observing whatever is set in its options.
 
-## Opting Out of (or Delaying) ResizeObserver instantiation
+## Opting Out of (or Delaying) ResizeObserver Instantiation
 
 In certain cases you might want to delay creating a ResizeObserver instance.
 
@@ -156,7 +234,7 @@ You can do one of the following depending on your needs:
   (This assumes you don't already use the polyfilled version, which would switch
   to the polyfill when no native implementation was available.)
 
-## The "onResize" callback
+## The "onResize" Callback
 
 By the default the hook will trigger a re-render on all changes to the target
 element's width and / or height.
@@ -188,12 +266,13 @@ what you need, for example:
 - Throttle / debounce
 - Wrap in `requestAnimationFrame`
 
-## Throttle / Debounce
+## Hook Composition
+
+As this hook intends to remain low-level, it is encouraged to build on top of it via hook composition, if additional features are required.
+
+### Throttle / Debounce
 
 You might want to receive values less frequently than changes actually occur.
-
-While this hook does not come with its own implementation of throttling / debouncing,
-you can use the `onResize` callback to implement your own version:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
 
@@ -250,8 +329,8 @@ import useResizeObserver from "use-resize-observer/polyfilled";
 
 Note that using the above will use the polyfill, [even if the native ResizeObserver is available](https://github.com/juggle/resize-observer#basic-usage).
 
-To use the polyfill as a fallback instead only when the native RO is unavailable, you can polyfill yourself instead,
-either in your app's entry file, or you could create a local useResizeObserver module, like so:
+To use the polyfill as a fallback only when the native RO is unavailable, you can polyfill yourself instead,
+either in your app's entry file, or you could create a local `useResizeObserver` module, like so:
 
 ```ts
 // useResizeObserver.ts
