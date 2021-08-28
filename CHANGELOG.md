@@ -1,10 +1,20 @@
-## [7.0.1](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.0...v7.0.1) (2021-07-27)
-
+# [7.1.0](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.1...v7.1.0) (2021-08-28)
 
 ### Bug Fixes
 
-* Removed unnecessary entries.length check ([3211d33](https://github.com/ZeeCoder/use-resize-observer/commit/3211d338117b0d2a97ccb229683eb8458de81d01))
-* Undefined HTMLElement is no longer an issue in certain SSR edge cases. ([599cace](https://github.com/ZeeCoder/use-resize-observer/commit/599cace5c33ecd4276a0fe2848e0ed920f81e2fe)), closes [#74](https://github.com/ZeeCoder/use-resize-observer/issues/74) [#62](https://github.com/ZeeCoder/use-resize-observer/issues/62)
+- The `onResize` callback is no longer incorrectly called with the same values. ([29938a1](https://github.com/ZeeCoder/use-resize-observer/commit/29938a12e6393bd8f5dc98d7cccea3d291db6cf1))
+
+### Features
+
+- Added the `box` option ([f873597](https://github.com/ZeeCoder/use-resize-observer/commit/f873597744140698d941ac626a318ac82adcb736)), closes [#31](https://github.com/ZeeCoder/use-resize-observer/issues/31) [#57](https://github.com/ZeeCoder/use-resize-observer/issues/57)
+- Added the `round` option. ([1224bc8](https://github.com/ZeeCoder/use-resize-observer/commit/1224bc8f67bd72dd985b15ac359b7e9139cc7468)), closes [#55](https://github.com/ZeeCoder/use-resize-observer/issues/55) [#46](https://github.com/ZeeCoder/use-resize-observer/issues/46) [#61](https://github.com/ZeeCoder/use-resize-observer/issues/61)
+
+## [7.0.1](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.0...v7.0.1) (2021-07-27)
+
+### Bug Fixes
+
+- Removed unnecessary entries.length check ([3211d33](https://github.com/ZeeCoder/use-resize-observer/commit/3211d338117b0d2a97ccb229683eb8458de81d01))
+- Undefined HTMLElement is no longer an issue in certain SSR edge cases. ([599cace](https://github.com/ZeeCoder/use-resize-observer/commit/599cace5c33ecd4276a0fe2848e0ed920f81e2fe)), closes [#74](https://github.com/ZeeCoder/use-resize-observer/issues/74) [#62](https://github.com/ZeeCoder/use-resize-observer/issues/62)
 
 # [7.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v6.1.0...v7.0.0) (2020-11-11)
 
