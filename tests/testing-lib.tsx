@@ -6,6 +6,7 @@ import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
+import { ObservedSize, supports } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -17,9 +18,11 @@ describe("Testing Lib: Basics", () => {
     const controller = createController();
 
     const Test = () => {
-      const { ref, width = 0, height = 0 } = useResizeObserver<
-        HTMLDivElement
-      >();
+      const {
+        ref,
+        width = 0,
+        height = 0,
+      } = useResizeObserver<HTMLDivElement>();
 
       const mergedCallbackRef = useMergedCallbackRef(
         ref,
@@ -48,7 +51,6 @@ describe("Testing Lib: Basics", () => {
   });
 });
 
-// todo instead of this being a separate block, just add it globally. Then each test has the option to utilise it.
 describe("Testing Lib: Resize Observer Instance Counting Block", () => {
   let resizeObserverInstanceCount = 0;
   let resizeObserverObserveCount = 0;
@@ -103,14 +105,8 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       });
 
       controller.triggerRender = useRenderTrigger();
-      const mergedCallbackRef = useMergedCallbackRef(
-        ref,
-        (element: HTMLElement) => {
-          controller.provideSetSizeFunction(element);
-        }
-      );
 
-      return <div ref={mergedCallbackRef} />;
+      return <div ref={ref} />;
     };
 
     render(<Test />);
@@ -320,5 +316,296 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
 
     await awaitNextFrame();
     controller.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  // todo separate box option testing to a separate describe block
+  // This test will also make sure that firefox works, where the reported sizes are not returned in an array.
+  it("should support switching back-and-forth between box types", async () => {
+    const c1 = createController();
+    type Controller = {
+      setBox: (box: ResizeObserverBoxOptions) => Promise<void>;
+    };
+    const c2 = {} as Controller;
+
+    const Test = () => {
+      const [box, setBox] = useState<ResizeObserverBoxOptions>("border-box");
+      c2.setBox = useCallback(async (box) => {
+        setBox(box);
+        await awaitNextFrame();
+      }, []);
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({ box });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLElement) => {
+          c1.provideSetSizeFunction(element);
+        }
+      );
+
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize({ width, height });
+
+      return (
+        <div
+          ref={mergedCallbackRef}
+          style={{ padding: "10px 20px", border: "1px solid" }}
+        />
+      );
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+    c1.assertRenderCount(1);
+
+    // Should react to component size changes.
+    await c1.setSize({ width: 100, height: 200 });
+
+    // Should report border-size
+    if (supports.borderBox) {
+      c1.assertRenderCount(2);
+      c1.assertMeasuredSize({ width: 142, height: 222 });
+    } else {
+      // In non-supporting browser the hook would have nothing to report.
+      c1.assertRenderCount(1);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
+    }
+
+    // Should be able to switch to observing content-box
+    await c2.setBox("content-box");
+    c1.assertMeasuredSize({ width: 100, height: 200 });
+
+    // 2 extra render should be happening:
+    // - One for setting the local `box` state
+    // - Another as a reaction to that coming from the hook, which would report the new values.
+    if (supports.borderBox) {
+      c1.assertRenderCount(4);
+    } else {
+      c1.assertRenderCount(3);
+    }
+
+    // Switching back yet again should be reported with "undefined" in non-supporting browsers.
+    await c2.setBox("border-box");
+    if (supports.borderBox) {
+      c1.assertRenderCount(6);
+      c1.assertMeasuredSize({ width: 142, height: 222 });
+    } else {
+      // In non-supporting browser the hook would have nothing to report.
+      c1.assertRenderCount(5);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
+    }
+  });
+
+  it("should be able to measure device pixel content box in supporting browsers", async () => {
+    const c1 = createController();
+    type Controller = {
+      setZoom: (zoom: number) => Promise<void>;
+    };
+    const c2 = {} as Controller;
+
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+        box: "device-pixel-content-box",
+      });
+      const localRef = useRef<HTMLDivElement | null>(null);
+      c2.setZoom = useCallback(async (zoom) => {
+        if (localRef.current) {
+          // @ts-ignore
+          localRef.current.style.zoom = String(zoom);
+          await awaitNextFrame();
+        }
+      }, []);
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          localRef.current = element;
+          if (localRef.current) {
+            // @ts-ignore
+            window.s = localRef.current.style;
+          }
+          c1.provideSetSizeFunction(element);
+        }
+      );
+
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize({ width, height });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c1.assertRenderCount(1);
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c1.setSize({ width: 100, height: 200 });
+    if (supports.devicePixelContentBoxSize) {
+      c1.assertRenderCount(2);
+      c1.assertMeasuredSize({
+        width: Math.round(100 * devicePixelRatio),
+        height: Math.round(200 * devicePixelRatio),
+      });
+    } else {
+      c1.assertRenderCount(1);
+      c1.assertMeasuredSize({ width: undefined, height: undefined });
+    }
+  });
+
+  it("should not report repeated values with the onResize callback", async () => {
+    const c = createController();
+    const Test = () => {
+      const [size, setSize] = useState<ObservedSize>({
+        width: undefined,
+        height: undefined,
+      });
+      const { ref } = useResizeObserver<HTMLDivElement>({ onResize: setSize });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c.provideSetSizeFunction(element);
+        }
+      );
+
+      c.incrementRenderCount();
+      c.reportMeasuredSize(size);
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c.assertRenderCount(1);
+    c.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c.setSize({ width: 100, height: 200 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 100, height: 200 });
+
+    await c.setSize({ width: 100.2, height: 200.4 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  it("should accept a custom rounding function, and adapt to function instance changes without unnecessary renders", async () => {
+    const c1 = createController();
+    type Controller = {
+      replaceRoundFunction: (fn: "multiply" | "unset") => void;
+    };
+    const c2 = {} as Controller;
+    const Test = () => {
+      const [rounder, setRounder] = useState<typeof Math.ceil | undefined>(
+        () => Math.ceil
+      );
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+        round: rounder,
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c1.provideSetSizeFunction(element);
+          c2.replaceRoundFunction = async (fn) => {
+            setRounder(() =>
+              fn === "multiply" ? (n: number) => Math.round(n * 2) : undefined
+            );
+            await awaitNextFrame();
+          };
+        }
+      );
+
+      c1.incrementRenderCount();
+      c1.reportMeasuredSize({ width, height });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c1.assertRenderCount(1);
+    c1.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c1.setSize({ width: 100.1, height: 200.1 });
+    c1.assertRenderCount(2);
+    c1.assertMeasuredSize({ width: 101, height: 201 });
+
+    // Testing normal re-renders
+    await c1.setSize({ width: 200.2, height: 300.2 });
+    c1.assertRenderCount(3);
+    c1.assertMeasuredSize({ width: 201, height: 301 });
+
+    await c2.replaceRoundFunction("multiply");
+    c1.assertRenderCount(5);
+    c1.assertMeasuredSize({ width: 400, height: 600 });
+
+    await c2.replaceRoundFunction("unset");
+    c1.assertRenderCount(7);
+    c1.assertMeasuredSize({ width: 200, height: 300 });
+  });
+
+  it("should only re-render with a custom rounding function when it produces a new value", async () => {
+    const c = createController();
+    // A rounding function that "snaps" to its values.
+    const rounder = (n: number) => {
+      if (n < 500) {
+        return 0;
+      } else if (n < 1000) {
+        return 500;
+      }
+
+      return 1000;
+    };
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>({
+        round: rounder,
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          c.provideSetSizeFunction(element);
+        }
+      );
+
+      c.incrementRenderCount();
+      c.reportMeasuredSize({ width, height });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    // Default response on the first render before an actual measurement took place
+    c.assertRenderCount(1);
+    c.assertMeasuredSize({ width: undefined, height: undefined });
+
+    await c.setSize({ width: 100, height: 100 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 0, height: 0 });
+
+    await c.setSize({ width: 200, height: 200 });
+    c.assertRenderCount(2);
+    c.assertMeasuredSize({ width: 0, height: 0 });
+
+    await c.setSize({ width: 600, height: 600 });
+    c.assertRenderCount(3);
+    c.assertMeasuredSize({ width: 500, height: 500 });
+
+    await c.setSize({ width: 1100, height: 600 });
+    c.assertRenderCount(4);
+    c.assertMeasuredSize({ width: 1000, height: 500 });
+
+    await c.setSize({ width: 1100, height: 800 });
+    c.assertRenderCount(4);
+    c.assertMeasuredSize({ width: 1000, height: 500 });
+
+    await c.setSize({ width: 1100, height: 1100 });
+    c.assertRenderCount(5);
+    c.assertMeasuredSize({ width: 1000, height: 1000 });
   });
 });

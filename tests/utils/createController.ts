@@ -35,10 +35,16 @@ export default function createController() {
   let measuredWidth: number | undefined;
   let measuredHeight: number | undefined;
   const reportMeasuredSize = (params: SizeParams) => {
-    if (typeof params.width === "number") {
+    if (
+      typeof params.width === "number" ||
+      typeof params.width === "undefined"
+    ) {
       measuredWidth = params.width;
     }
-    if (typeof params.height === "number") {
+    if (
+      typeof params.height === "number" ||
+      typeof params.height === "undefined"
+    ) {
       measuredHeight = params.height;
     }
   };
