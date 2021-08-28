@@ -276,6 +276,12 @@ You might want to receive values less frequently than changes actually occur.
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-throttle-and-debounce-8uvsg)
 
+### Breakpoints
+
+Another popular concept are breakpoints. Here is an example for a simple hook accomplishing that.
+
+[CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-breakpoints-3hiv8)
+
 ## Defaults (SSR)
 
 On initial mount the ResizeObserver will take a little time to report on the
