@@ -1,3 +1,20 @@
+# [8.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.1...v8.0.0) (2021-08-28)
+
+### Bug Fixes
+
+- Removed `resize-observer-polyfill` in favour of `@juggle/resize-observer`. ([8afc8f6](https://github.com/ZeeCoder/use-resize-observer/commit/8afc8f6c52ee047a41ac107379ebdf27e1a95997))
+- The `onResize` callback is no longer incorrectly called with the same values. ([bd0f3c8](https://github.com/ZeeCoder/use-resize-observer/commit/bd0f3c8597bac0d853b88cf585256aac1bd4f554))
+
+### Features
+
+- Added the `box` option ([0ca6c23](https://github.com/ZeeCoder/use-resize-observer/commit/0ca6c23dd5573526f1dd716851083f922ca73f68)), closes [#31](https://github.com/ZeeCoder/use-resize-observer/issues/31) [#57](https://github.com/ZeeCoder/use-resize-observer/issues/57)
+- Added the `round` option. ([aa38199](https://github.com/ZeeCoder/use-resize-observer/commit/aa38199f21f60bd4a361a2198e9e5f200bf5287c)), closes [#55](https://github.com/ZeeCoder/use-resize-observer/issues/55) [#46](https://github.com/ZeeCoder/use-resize-observer/issues/46) [#61](https://github.com/ZeeCoder/use-resize-observer/issues/61)
+- Triggering the v8 release ([4373a1f](https://github.com/ZeeCoder/use-resize-observer/commit/4373a1f96a93ec467002dc56adb0f780cf639dc8))
+
+### BREAKING CHANGES
+
+- Triggering the v8 release, which was published as 7.1.0 by accident.
+
 # [7.1.0](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.1...v7.1.0) (2021-08-28)
 
 ### Bug Fixes
