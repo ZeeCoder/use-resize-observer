@@ -1,3 +1,14 @@
+# [9.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v8.0.0...v9.0.0) (2022-05-15)
+
+### Bug Fixes
+
+- Added some fixes for React 18. ([852d976](https://github.com/ZeeCoder/use-resize-observer/commit/852d976e481a215671be95964c6fa05825eee82a)), closes [#90](https://github.com/ZeeCoder/use-resize-observer/issues/90) [#91](https://github.com/ZeeCoder/use-resize-observer/issues/91) [#92](https://github.com/ZeeCoder/use-resize-observer/issues/92)
+
+### BREAKING CHANGES
+
+- The lib now takes "Element", not only "HTMLElement", to
+  be consistent with ResizeObserver.
+
 # [8.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v7.0.1...v8.0.0) (2021-08-28)
 
 ### Bug Fixes
