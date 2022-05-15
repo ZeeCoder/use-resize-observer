@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { hydrateRoot } from "react-dom/client";
 import React from "react";
 import delay from "delay";
 // opting out from ts checks
@@ -19,7 +19,7 @@ describe("SSR", () => {
       throw new Error("#app not found");
     }
 
-    ReactDOM.hydrate(<Test />, app);
+    hydrateRoot(app, <Test />);
 
     expect(app.textContent).toBe(`1x2`);
 

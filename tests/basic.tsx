@@ -1,391 +1,397 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  RefObject,
-  FunctionComponent,
-  RefCallback,
-} from "react";
+// Tests written with react testing library
+import React, { useRef, useState } from "react";
+import { render, cleanup, act } from "@testing-library/react";
+import createController from "./utils/createController";
 import useResizeObserver from "../";
-import {
-  createComponentHandler,
-  Observed,
-  render,
-  HandlerReceiver,
-  ObservedSize,
-  MultiHandlerResolverComponentProps,
-  ComponentHandler,
-  HandlerResolverComponentProps,
-} from "./utils";
+import useMergedCallbackRef from "./utils/useMergedCallbackRef";
 import awaitNextFrame from "./utils/awaitNextFrame";
+import { ObservedSize } from "./utils";
+import useRenderTrigger from "./utils/useRenderTrigger";
 
-describe("Vanilla tests", () => {
+afterEach(() => {
+  cleanup();
+});
+
+describe("Basic tests", () => {
   it("should render with undefined sizes at first", async () => {
-    const handler = await render(Observed);
-    handler.assertDefaultSize();
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={ref} />;
+    };
+
+    render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
   });
 
   it("should render with custom defaults", async () => {
-    const { assertSize } = await render(
-      Observed,
-      {},
-      {
-        defaultWidth: 24,
-        defaultHeight: 42,
-      }
-    );
+    const controller = createController();
+    const Test = () => {
+      const { ref, width = 24, height = 42 } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={ref} />;
+    };
 
     // By running this assertion immediately, it should check the default values
     // instead ot the first on-mount measurement.
-    assertSize({ width: 24, height: 42 });
+    render(<Test />);
+    controller.assertMeasuredSize({ width: 24, height: 42 });
   });
 
   it("should follow size changes correctly with appropriate render count and without sub-pixels as they're used in CSS", async () => {
-    const { setAndAssertSize, setSize, assertSize, assertRenderCount } =
-      await render(Observed, { waitForFirstMeasurement: true });
+    const controller = createController();
+    const Test = () => {
+      const { ref, width = 24, height = 42 } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+      controller.incrementRenderCount();
+
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
+
+      return <div ref={mergedCallbackRef} />;
+    };
 
     // Default render + first measurement
-    assertRenderCount(2);
+    render(<Test />);
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertRenderCount(2);
 
-    await setAndAssertSize({ width: 100, height: 200 });
-    assertRenderCount(3);
+    await act(async () => {
+      await controller.setSize({ width: 100, height: 200 });
+    });
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+    controller.assertRenderCount(3);
 
-    setSize({ width: 321, height: 456 });
-    await awaitNextFrame();
-    assertSize({ width: 321, height: 456 });
-    assertRenderCount(4);
+    await act(async () => {
+      await controller.setSize({ width: 321, height: 456 });
+    });
+    controller.assertMeasuredSize({ width: 321, height: 456 });
+    controller.assertRenderCount(4);
   });
 
   it("should handle multiple instances", async () => {
-    const Test: FunctionComponent<MultiHandlerResolverComponentProps> = ({
-      resolveHandler,
+    const Test = ({
+      controller,
+    }: {
+      controller: ReturnType<typeof createController>;
     }) => {
-      let resolveHandler1: HandlerReceiver = () => {};
-      let resolveHandler2: HandlerReceiver = () => {};
+      const { ref, width = 24, height = 42 } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+      controller.incrementRenderCount();
 
-      const handlersPromise = Promise.all([
-        new Promise<ComponentHandler>(
-          (resolve) => (resolveHandler1 = resolve as HandlerReceiver)
-        ),
-        new Promise<ComponentHandler>(
-          (resolve) => (resolveHandler2 = resolve as HandlerReceiver)
-        ),
-      ]);
-
-      useEffect(() => {
-        handlersPromise.then(
-          ([handler1, handler2]: [ComponentHandler, ComponentHandler]) => {
-            resolveHandler([handler1, handler2]);
-          }
-        );
-      }, []);
-
-      return (
-        <>
-          <Observed resolveHandler={resolveHandler1} />
-          <Observed resolveHandler={resolveHandler2} />
-        </>
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          controller.provideSetSizeFunction(element);
+        }
       );
+
+      return <div ref={mergedCallbackRef} />;
     };
-    const [handler1, handler2] = await render(Test, {
-      waitForFirstMeasurement: true,
+    const controller1 = createController();
+    const controller2 = createController();
+
+    render(
+      <>
+        <Test controller={controller1} />
+        <Test controller={controller2} />
+      </>
+    );
+
+    await act(async () => {
+      await controller1.setSize({ width: 100, height: 200 });
+      await controller2.setSize({ width: 300, height: 400 });
     });
 
-    await handler1.setAndAssertSize({ width: 100, height: 200 });
-    await handler2.setAndAssertSize({ width: 300, height: 400 });
+    controller1.assertMeasuredSize({ width: 100, height: 200 });
+    controller2.assertMeasuredSize({ width: 300, height: 400 });
 
-    // By the first measurement the component would've rendered three times:
-    // - First natural render with "undefined" values
-    // - Second with whatever size the window is
-    // - Third render with the values set above
-    handler1.assertRenderCount(3);
-    handler2.assertRenderCount(3);
+    controller1.assertRenderCount(2);
+    controller2.assertRenderCount(2);
 
-    await handler2.setAndAssertSize({ width: 321, height: 456 });
-
-    handler1.assertRenderCount(3);
-    handler2.assertRenderCount(4);
-
-    // Instance No. 1 should still be at the previous state.
-    handler1.assertSize({ width: 100, height: 200 });
+    await act(async () => {
+      await controller2.setSize({ width: 321, height: 456 });
+    });
+    controller1.assertMeasuredSize({ width: 100, height: 200 });
+    controller2.assertMeasuredSize({ width: 321, height: 456 });
+    controller1.assertRenderCount(2);
+    controller2.assertRenderCount(3);
   });
 
-  it("should handle custom refs", async () => {
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-    }) => {
+  it("should handle ref objects on mount", async () => {
+    const controller = createController();
+    const Test = () => {
       const ref = useRef(null);
       const { width, height } = useResizeObserver({ ref });
-      const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
-      currentSizeRef.current.height = height;
-      currentSizeRef.current.width = width;
+      controller.reportMeasuredSize({ width, height });
 
-      useEffect(() => {
-        resolveHandler(createComponentHandler({ currentSizeRef }));
-      }, []);
-
-      return (
-        <div ref={ref} style={{ width: 100, height: 200 }}>
-          {width}x{height}
-        </div>
-      );
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
     };
 
-    const handler = await render(Test);
-
-    // Default
-    handler.assertDefaultSize();
+    render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
 
     // Actual measurement
-    await awaitNextFrame();
-    handler.assertSize({ width: 100, height: 200 });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertMeasuredSize({ width: 100, height: 200 });
+  });
+
+  it("should handle ref objects calling onResize on mount", async () => {
+    const controller = createController();
+    const Test = () => {
+      const ref = useRef(null);
+      useResizeObserver({
+        ref,
+        onResize: (size) => {
+          controller.reportMeasuredSize(size);
+        },
+      });
+
+      return <div ref={ref} style={{ width: 100, height: 200 }} />;
+    };
+
+    render(<Test />);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+
+    // Actual measurement
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
   it("should be able to reuse the same ref to measure different elements", async () => {
     let switchRefs = (): void => {
       throw new Error(`"switchRefs" should've been implemented by now.`);
     };
-    const Test = ({ resolveHandler }: { resolveHandler: HandlerReceiver }) => {
+    const controller = createController();
+    const Test = () => {
       const ref1 = useRef<HTMLDivElement>(null);
       const ref2 = useRef<HTMLDivElement>(null);
-      const [stateRef, setStateRef] = useState<RefObject<HTMLDivElement>>(ref1); // Measures ref1 first
-      const sizeRef = useRef(null);
-      const { width, height } = useResizeObserver({ ref: stateRef });
-      const currentSizeRef = useRef<ObservedSize>({
-        width: undefined,
-        height: undefined,
-      });
-      currentSizeRef.current.width = width;
-      currentSizeRef.current.height = height;
-
-      useEffect(() => {
-        // Measures the second div on demand
-        switchRefs = () => setStateRef(ref2);
-
-        resolveHandler(createComponentHandler({ currentSizeRef }));
-      }, []);
+      const [stateRef, setStateRef] = useState(ref1); // Measuring ref1 first
+      switchRefs = () => setStateRef(ref2);
+      const response = useResizeObserver({ ref: stateRef });
+      controller.reportMeasuredSize(response);
 
       return (
         <>
-          <div ref={sizeRef}>
-            {width}x{height}
-          </div>
           <div ref={ref1} style={{ width: 100, height: 200 }} />
           <div ref={ref2} style={{ width: 150, height: 250 }} />
         </>
       );
     };
 
-    const handler = await render(Test);
+    render(<Test />);
 
     // Default
-    handler.assertDefaultSize();
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
 
     // Div 1 measurement
-    await awaitNextFrame();
-    handler.assertSize({ width: 100, height: 200 });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertMeasuredSize({ width: 100, height: 200 });
 
     // Div 2 measurement
-    switchRefs();
-    await awaitNextFrame();
-    handler.assertSize({ width: 150, height: 250 });
-  });
-
-  it("should be able to render without mock defaults", async () => {
-    const handler = await render(Observed);
-
-    // Default values should be undefined
-    handler.assertDefaultSize();
-
-    handler.setSize({ width: 100, height: 100 });
-    await awaitNextFrame();
-    handler.assertSize({ width: 100, height: 100 });
+    await act(async () => {
+      switchRefs();
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertMeasuredSize({ width: 150, height: 250 });
   });
 
   it("should not trigger unnecessary renders with the same width or height", async () => {
-    const handler = await render(Observed);
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+      controller.incrementRenderCount();
 
-    handler.assertDefaultSize();
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
 
     // Default render + first measurement
-    await awaitNextFrame();
-    handler.assertRenderCount(2);
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+    controller.assertRenderCount(2);
 
-    handler.setSize({ width: 100, height: 102 });
-    await awaitNextFrame();
-    handler.assertSize({ width: 100, height: 102 });
-    handler.assertRenderCount(3);
+    await act(async () => {
+      await controller.setSize({ width: 100, height: 102 });
+    });
+    controller.assertMeasuredSize({ width: 100, height: 102 });
+    controller.assertRenderCount(3);
 
     // Shouldn't trigger on subpixel values that are rounded to be the same as the
     // previous size
-    handler.setSize({ width: 100.4, height: 102.4 });
-    await awaitNextFrame();
-    handler.assertSize({ width: 100, height: 102 });
-    handler.assertRenderCount(3);
+    await act(async () => {
+      await controller.setSize({ width: 100.4, height: 102.4 });
+    });
+    controller.assertMeasuredSize({ width: 100, height: 102 });
+    controller.assertRenderCount(3);
   });
 
   it("should keep the same response instance between renders if nothing changed", async () => {
-    let assertSameInstance = (): void => {
-      throw new Error(
-        `"assertSameInstance" should've been implemented by now.`
-      );
+    const responses: ReturnType<typeof useResizeObserver>[] = [];
+    const controller = createController();
+    const Test = () => {
+      const response = useResizeObserver();
+      if (response.width) {
+        responses.push(response);
+      }
+      controller.triggerRender = useRenderTrigger();
+
+      return <div ref={response.ref} style={{ width: 10, height: 20 }} />;
     };
 
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-    }) => {
-      const previousResponseRef = useRef<
-        | ({
-            ref: RefCallback<HTMLElement>;
-          } & ObservedSize)
-        | null
-      >(null);
-      const response = useResizeObserver<HTMLDivElement>();
-      const [state, setState] = useState(false);
+    render(<Test />);
+    await act(async () => {
+      await awaitNextFrame();
+    });
 
-      const sameInstance = previousResponseRef.current === response;
-      previousResponseRef.current = response;
+    await act(async () => {
+      await controller.triggerRender();
+    });
+    // ignoring the first "undefined" measurement before uRO received the element
+    responses.unshift();
 
-      useEffect(() => {
-        if (response.width && response.height) {
-          // Triggering an extra render once the hook properly measured the element size once.
-          // This'll allow us to see if the hook keeps the same response object or not.
-          setState(true);
-        }
-      }, [response]);
-
-      useEffect(() => {
-        if (!state) {
-          return;
-        }
-
-        assertSameInstance = () => {
-          expect(sameInstance).toBe(true);
-        };
-
-        // Everything is set up, ready for assertions
-        resolveHandler({});
-      }, [state]);
-
-      return <div ref={response.ref}>{String(sameInstance)}</div>;
-    };
-
-    await render(Test);
-
-    assertSameInstance();
+    // As the size did not change between renders, the response objects should be the same by reference.
+    expect(responses.length).toBe(2);
+    expect(responses[0]).toBe(responses[1]);
   });
 
   it("should ignore invalid custom refs", async () => {
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-    }) => {
-      // Passing in an invalid custom ref.
-      // Same should be work if "null" or something similar gets passed in.
-      const { width, height } = useResizeObserver({
-        ref: {} as RefObject<HTMLDivElement>,
-      });
-      const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
-      currentSizeRef.current.width = width;
-      currentSizeRef.current.height = height;
+    const controller = createController();
+    const Test = () => {
+      const response = useResizeObserver({ ref: {} as HTMLDivElement });
+      controller.reportMeasuredSize(response);
 
-      useEffect(() => {
-        resolveHandler(createComponentHandler({ currentSizeRef }));
-      }, []);
-
-      return (
-        <div>
-          {width}x{height}
-        </div>
-      );
+      return <div />;
     };
 
-    const handler = await render(Test);
+    render(<Test />);
 
     // Since no refs were passed in with an element to be measured, the hook should
     // stay on the defaults
     await awaitNextFrame();
-    handler.assertDefaultSize();
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
   });
 
   it("should be able to work with onResize instead of rendering the values", async () => {
     const observations: ObservedSize[] = [];
-    const handler = await render(
-      Observed,
-      {},
-      { onResize: (size: ObservedSize) => observations.push(size) }
-    );
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver({
+        onResize: (size) => observations.push(size),
+      });
+      controller.reportMeasuredSize({ width, height });
+      controller.incrementRenderCount();
 
-    handler.setSize({ width: 100, height: 200 });
-    await awaitNextFrame();
-    handler.setSize({ width: 101, height: 201 });
-    await awaitNextFrame();
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          controller.provideSetSizeFunction(element);
+        }
+      );
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    render(<Test />);
+
+    await act(async () => {
+      await controller.setSize({ width: 100, height: 200 });
+      await controller.setSize({ width: 101, height: 201 });
+    });
 
     // Should stay at default as width/height is not passed to the hook response
     // when an onResize callback is given
-    handler.assertDefaultSize();
+    controller.assertMeasuredSize({ width: undefined, height: undefined });
 
     expect(observations.length).toBe(2);
     expect(observations[0]).toEqual({ width: 100, height: 200 });
     expect(observations[1]).toEqual({ width: 101, height: 201 });
 
     // Should render once on mount only
-    handler.assertRenderCount(1);
+    controller.assertRenderCount(1);
   });
 
-  it("should handle if the onResize handler changes properly with the correct render counts", async () => {
-    let changeOnResizeHandler: (fn: Function) => void = () => {};
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-      ...props
-    }) => {
-      const [onResizeHandler, setOnResizeHandler] = useState(() => () => {});
+  it("should handle if the onResize handler changes, with the correct render counts", async () => {
+    const controller = createController();
+    type OnResizeHandler = (size: ObservedSize) => {};
+    let changeOnResizeHandler = (handler: OnResizeHandler) => {};
+    const Test = () => {
+      const [onResize, setOnResize] = useState<OnResizeHandler>(() => () => {});
+      changeOnResizeHandler = (handler) => setOnResize(() => handler);
+      const { ref, width, height } = useResizeObserver({ onResize });
+      controller.reportMeasuredSize({ width, height });
+      controller.incrementRenderCount();
 
-      changeOnResizeHandler = (handler) => setOnResizeHandler(() => handler);
-
-      return (
-        <Observed
-          {...props}
-          onResize={onResizeHandler}
-          resolveHandler={resolveHandler}
-        />
+      const mergedCallbackRef = useMergedCallbackRef(
+        ref,
+        (element: HTMLDivElement) => {
+          controller.provideSetSizeFunction(element);
+        }
       );
+
+      return <div ref={mergedCallbackRef} />;
     };
 
-    const { assertRenderCount, setSize } = await render(Test, {
-      waitForFirstMeasurement: true,
-    });
+    render(<Test />);
 
     // Since `onResize` is used, no extra renders should've been triggered at this
     // point. (As opposed to the defaults where the hook would trigger a render
     // with the first measurement.)
-    assertRenderCount(1);
+    controller.assertRenderCount(1);
 
     const observations1: ObservedSize[] = [];
     const observations2: ObservedSize[] = [];
+    // Establishing a default onResize handler, which'll be measured when the resize handler is set.
+    await act(async () => {
+      await controller.setSize({ width: 1, height: 1 });
+    });
+    controller.assertRenderCount(1);
 
-    // Establishing a default, which'll be measured when the resize handler is set.
-    setSize({ width: 1, height: 1 });
-    await awaitNextFrame();
+    await act(async () => {
+      changeOnResizeHandler((size) => observations1.push(size));
+    });
+    await act(async () => {
+      await controller.setSize({ width: 1, height: 2 });
+      await controller.setSize({ width: 3, height: 4 });
+    });
+    controller.assertRenderCount(2);
 
-    assertRenderCount(1);
-
-    changeOnResizeHandler((size: ObservedSize) => observations1.push(size));
-    await awaitNextFrame();
-    setSize({ width: 1, height: 2 });
-    await awaitNextFrame();
-    setSize({ width: 3, height: 4 });
-
-    assertRenderCount(2);
-
-    await awaitNextFrame();
-    changeOnResizeHandler((size: ObservedSize) => observations2.push(size));
-    await awaitNextFrame();
-    setSize({ width: 5, height: 6 });
-    await awaitNextFrame();
-    setSize({ width: 7, height: 8 });
-    await awaitNextFrame();
-
-    assertRenderCount(3);
+    await act(async () => {
+      changeOnResizeHandler((size) => observations2.push(size));
+    });
+    await act(async () => {
+      await controller.setSize({ width: 5, height: 6 });
+      await controller.setSize({ width: 7, height: 8 });
+    });
+    controller.assertRenderCount(3);
 
     expect(observations1.length).toBe(2);
     expect(observations1[0]).toEqual({ width: 1, height: 2 });

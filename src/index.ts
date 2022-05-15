@@ -15,7 +15,7 @@ type SubscriberResponse = SubscriberCleanup | void;
 // refs, but then host hooks / components could not opt out of renders.
 // This could've been exported to its own module, but the current build doesn't
 // seem to work with module imports and I had no more time to spend on this...
-function useResolvedElement<T extends HTMLElement>(
+function useResolvedElement<T extends Element>(
   subscriber: (element: T) => SubscriberResponse,
   refOrElement?: T | RefObject<T> | null
 ): RefCallback<T> {
@@ -26,12 +26,15 @@ function useResolvedElement<T extends HTMLElement>(
   } | null>(null);
   const cleanupRef = useRef<SubscriberResponse | null>();
 
+  // Resolving ".current" purely so that a new callSubscriber instance is created when needed.
+  const refElement =
+    refOrElement && "current" in refOrElement ? refOrElement.current : null;
   const callSubscriber = useCallback(() => {
     let element = null;
     if (callbackRefElement.current) {
       element = callbackRefElement.current;
     } else if (refOrElement) {
-      if (refOrElement instanceof HTMLElement) {
+      if (refOrElement instanceof Element) {
         element = refOrElement;
       } else {
         element = refOrElement.current;
@@ -60,7 +63,7 @@ function useResolvedElement<T extends HTMLElement>(
     if (element) {
       cleanupRef.current = subscriber(element);
     }
-  }, [refOrElement, subscriber]);
+  }, [refOrElement, refElement, subscriber]);
 
   // On each render, we check whether a ref changed, or if we got a new raw
   // element.
@@ -88,7 +91,7 @@ type ObservedSize = {
 
 type ResizeHandler = (size: ObservedSize) => void;
 
-type HookResponse<T extends HTMLElement> = {
+type HookResponse<T extends Element> = {
   ref: RefCallback<T>;
 } & ObservedSize;
 
@@ -159,7 +162,7 @@ const extractSize = (
 
 type RoundingFunction = (n: number) => number;
 
-function useResizeObserver<T extends HTMLElement>(
+function useResizeObserver<T extends Element>(
   opts: {
     ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
@@ -194,6 +197,8 @@ function useResizeObserver<T extends HTMLElement>(
   // the component unmounted.
   const didUnmount = useRef(false);
   useEffect(() => {
+    didUnmount.current = false;
+
     return () => {
       didUnmount.current = true;
     };

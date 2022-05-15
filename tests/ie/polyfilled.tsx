@@ -1,13 +1,9 @@
 import "react-app-polyfill/ie11";
-import React, { FunctionComponent, useEffect, useRef } from "react";
-import {
-  createComponentHandler,
-  HandlerResolverComponentProps,
-  ObservedSize,
-  render,
-} from "../utils";
+import React from "react";
 import useResizeObserver from "../../polyfilled";
 import { ResizeObserver as ROP } from "@juggle/resize-observer";
+import createController from "../utils/createController";
+import { act, render } from "@testing-library/react";
 import awaitNextFrame from "../utils/awaitNextFrame";
 
 /**
@@ -29,28 +25,20 @@ describe("Polyfilled lib testing", () => {
   });
 
   it("should work with the polyfilled version", async () => {
-    const Test: FunctionComponent<HandlerResolverComponentProps> = ({
-      resolveHandler,
-    }) => {
-      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
-      const currentSizeRef = useRef<ObservedSize>({} as ObservedSize);
-      currentSizeRef.current.width = width;
-      currentSizeRef.current.height = height;
+    const controller = createController();
+    const Test = () => {
+      const response = useResizeObserver();
+      controller.reportMeasuredSize(response);
 
-      useEffect(() => {
-        resolveHandler(createComponentHandler({ currentSizeRef }));
-      }, []);
-
-      return (
-        <div style={{ width: 50, height: 40 }} ref={ref}>
-          {width}x{height}
-        </div>
-      );
+      return <div style={{ width: 50, height: 40 }} ref={response.ref} />;
     };
 
-    const { assertSize } = await render(Test);
+    render(<Test />);
 
-    await awaitNextFrame();
-    assertSize({ width: 50, height: 40 });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+
+    controller.assertMeasuredSize({ width: 50, height: 40 });
   });
 });

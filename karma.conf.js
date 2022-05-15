@@ -89,6 +89,7 @@ module.exports = function (karmaConfig) {
   );
 
   let testFilePattern = "tests/*.tsx";
+  // let testFilePattern = "tests/ssr.test.tsx";
   // let testFilePattern = "tests/basic.tsx";
   // let testFilePattern = "tests/testing-lib.tsx";
 

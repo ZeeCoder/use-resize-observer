@@ -1,11 +1,11 @@
-import ReactDOM from "react-dom";
+import { hydrateRoot } from "react-dom/client";
 import React from "react";
 import delay from "delay";
 // opting out from ts checks
 const Test = require("./ssr/Test");
 
 // This is replaced with the "server-generated" string before the tests are run.
-const html = `<div style="width:100px;height:200px" data-reactroot="">1x2</div>`;
+const html = `<div style="width:100px;height:200px">1x2</div>`;
 
 describe("SSR", () => {
   it("should render with the defaults first, then hydrate properly", async () => {
@@ -19,7 +19,7 @@ describe("SSR", () => {
       throw new Error("#app not found");
     }
 
-    ReactDOM.hydrate(<Test />, app);
+    hydrateRoot(app, <Test />);
 
     expect(app.textContent).toBe(`1x2`);
 

@@ -1,7 +1,7 @@
 // Tests written with react testing library
 import React, { useRef, useState, useCallback } from "react";
 import useResizeObserver from "../";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, act } from "@testing-library/react";
 import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
@@ -44,10 +44,55 @@ describe("Testing Lib: Basics", () => {
     controller.assertRenderCount(1);
 
     // Should react to component size changes.
-    await controller.setSize({ width: 100, height: 200 });
+    await act(async () => {
+      await controller.setSize({ width: 100, height: 200 });
+    });
 
     controller.assertMeasuredSize({ width: 100, height: 200 });
     controller.assertRenderCount(2);
+  });
+
+  it("should render normally in react 18 strict mode on mount", async () => {
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={ref} style={{ width: 100, height: 100 }} />;
+    };
+
+    render(
+      <React.StrictMode>
+        <Test />
+      </React.StrictMode>
+    );
+    await act(async () => {
+      await awaitNextFrame();
+    });
+
+    controller.assertMeasuredSize({ width: 100, height: 100 });
+  });
+
+  it("should call onResize on mount when a custom ref is used", async () => {
+    const controller = createController();
+    const Test = () => {
+      const ref = useRef(null);
+      useResizeObserver({
+        ref,
+        onResize: (size) => {
+          controller.reportMeasuredSize(size);
+        },
+      });
+
+      return <div ref={ref} style={{ width: 10, height: 20 }} />;
+    };
+
+    render(<Test />);
+    await act(async () => {
+      await awaitNextFrame();
+    });
+
+    controller.assertMeasuredSize({ width: 10, height: 20 });
   });
 });
 
@@ -111,8 +156,9 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
 
     render(<Test />);
 
-    await awaitNextFrame();
-    await controller.triggerRender();
+    act(() => {
+      controller.triggerRender();
+    });
 
     // Different onResize instances used to trigger the hook's internal useEffect,
     // resulting in the hook using a new ResizeObserver instance on each render
@@ -142,14 +188,14 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     };
 
     const { rerender } = render(<Test />);
-    await awaitNextFrame();
 
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(1);
     expect(resizeObserverUnobserveCount).toBe(0);
 
-    rerender(<Test observeNewElement={true} />);
-    await awaitNextFrame();
+    act(() => {
+      rerender(<Test observeNewElement={true} />);
+    });
 
     expect(resizeObserverInstanceCount).toBe(1);
     expect(resizeObserverObserveCount).toBe(2);
@@ -185,8 +231,13 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     expect(measuredHeight).toBe(undefined);
 
     // Actually kickstarting the hook by switching from null to a real ref.
-    rerender(<Test doMeasure={true} />);
-    await awaitNextFrame();
+    await act(async () => {
+      rerender(<Test doMeasure={true} />);
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
+
     expect(resizeObserverInstanceCount).toBe(1);
     expect(renderCount).toBe(3);
     expect(measuredWidth).toBe(100);
@@ -204,7 +255,8 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     // then set the ref from null, to its actual object value.
     // @see https://github.com/ZeeCoder/use-resize-observer/issues/43#issuecomment-674719609
     const Test = ({ mount = false }) => {
-      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+      const ref = useRef<HTMLDivElement>(null);
+      const { width, height } = useResizeObserver<HTMLDivElement>({ ref });
 
       controller.triggerRender = useRenderTrigger();
       controller.reportMeasuredSize({ width, height });
@@ -268,8 +320,12 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
 
     // Once mounted, the hook should automatically pick the new element up with
     // the RefCallback.
-    rerender(<Test mount={true} />);
-    await awaitNextFrame();
+    await act(async () => {
+      rerender(<Test mount={true} />);
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
@@ -283,10 +339,14 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       return <div ref={ref} style={{ width: 100, height: 200 }} />;
     };
 
-    render(<Test />);
+    act(() => {
+      render(<Test />);
+    });
     controller.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await awaitNextFrame();
+    await act(async () => {
+      await awaitNextFrame();
+    });
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
@@ -314,7 +374,9 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     render(<Test />);
     controller.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await awaitNextFrame();
+    await act(async () => {
+      await awaitNextFrame();
+    });
     controller.assertMeasuredSize({ width: 100, height: 200 });
   });
 
@@ -331,7 +393,6 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
       const [box, setBox] = useState<ResizeObserverBoxOptions>("border-box");
       c2.setBox = useCallback(async (box) => {
         setBox(box);
-        await awaitNextFrame();
       }, []);
       const { ref, width, height } = useResizeObserver<HTMLDivElement>({ box });
 
@@ -360,7 +421,9 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c1.assertRenderCount(1);
 
     // Should react to component size changes.
-    await c1.setSize({ width: 100, height: 200 });
+    await act(async () => {
+      await c1.setSize({ width: 100, height: 200 });
+    });
 
     // Should report border-size
     if (supports.borderBox) {
@@ -373,7 +436,12 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     }
 
     // Should be able to switch to observing content-box
-    await c2.setBox("content-box");
+    await act(async () => {
+      await c2.setBox("content-box");
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
     c1.assertMeasuredSize({ width: 100, height: 200 });
 
     // 2 extra render should be happening:
@@ -386,7 +454,12 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     }
 
     // Switching back yet again should be reported with "undefined" in non-supporting browsers.
-    await c2.setBox("border-box");
+    await act(async () => {
+      await c2.setBox("border-box");
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
     if (supports.borderBox) {
       c1.assertRenderCount(6);
       c1.assertMeasuredSize({ width: 142, height: 222 });
@@ -441,7 +514,9 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c1.assertRenderCount(1);
     c1.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await c1.setSize({ width: 100, height: 200 });
+    await act(async () => {
+      await c1.setSize({ width: 100, height: 200 });
+    });
     if (supports.devicePixelContentBoxSize) {
       c1.assertRenderCount(2);
       c1.assertMeasuredSize({
@@ -482,11 +557,15 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c.assertRenderCount(1);
     c.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await c.setSize({ width: 100, height: 200 });
+    await act(async () => {
+      await c.setSize({ width: 100, height: 200 });
+    });
     c.assertRenderCount(2);
     c.assertMeasuredSize({ width: 100, height: 200 });
 
-    await c.setSize({ width: 100.2, height: 200.4 });
+    await act(async () => {
+      await c.setSize({ width: 100.2, height: 200.4 });
+    });
     c.assertRenderCount(2);
     c.assertMeasuredSize({ width: 100, height: 200 });
   });
@@ -513,7 +592,6 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
             setRounder(() =>
               fn === "multiply" ? (n: number) => Math.round(n * 2) : undefined
             );
-            await awaitNextFrame();
           };
         }
       );
@@ -530,20 +608,35 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c1.assertRenderCount(1);
     c1.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await c1.setSize({ width: 100.1, height: 200.1 });
+    await act(async () => {
+      await c1.setSize({ width: 100.1, height: 200.1 });
+    });
     c1.assertRenderCount(2);
     c1.assertMeasuredSize({ width: 101, height: 201 });
 
     // Testing normal re-renders
-    await c1.setSize({ width: 200.2, height: 300.2 });
+
+    await act(async () => {
+      await c1.setSize({ width: 200.2, height: 300.2 });
+    });
     c1.assertRenderCount(3);
     c1.assertMeasuredSize({ width: 201, height: 301 });
 
-    await c2.replaceRoundFunction("multiply");
+    await act(async () => {
+      await c2.replaceRoundFunction("multiply");
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
     c1.assertRenderCount(5);
     c1.assertMeasuredSize({ width: 400, height: 600 });
 
-    await c2.replaceRoundFunction("unset");
+    await act(async () => {
+      await c2.replaceRoundFunction("unset");
+    });
+    await act(async () => {
+      await awaitNextFrame();
+    });
     c1.assertRenderCount(7);
     c1.assertMeasuredSize({ width: 200, height: 300 });
   });
@@ -584,27 +677,39 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     c.assertRenderCount(1);
     c.assertMeasuredSize({ width: undefined, height: undefined });
 
-    await c.setSize({ width: 100, height: 100 });
+    await act(async () => {
+      await c.setSize({ width: 100, height: 100 });
+    });
     c.assertRenderCount(2);
     c.assertMeasuredSize({ width: 0, height: 0 });
 
-    await c.setSize({ width: 200, height: 200 });
+    await act(async () => {
+      await c.setSize({ width: 200, height: 200 });
+    });
     c.assertRenderCount(2);
     c.assertMeasuredSize({ width: 0, height: 0 });
 
-    await c.setSize({ width: 600, height: 600 });
+    await act(async () => {
+      await c.setSize({ width: 600, height: 600 });
+    });
     c.assertRenderCount(3);
     c.assertMeasuredSize({ width: 500, height: 500 });
 
-    await c.setSize({ width: 1100, height: 600 });
+    await act(async () => {
+      await c.setSize({ width: 1100, height: 600 });
+    });
     c.assertRenderCount(4);
     c.assertMeasuredSize({ width: 1000, height: 500 });
 
-    await c.setSize({ width: 1100, height: 800 });
+    await act(async () => {
+      await c.setSize({ width: 1100, height: 800 });
+    });
     c.assertRenderCount(4);
     c.assertMeasuredSize({ width: 1000, height: 500 });
 
-    await c.setSize({ width: 1100, height: 1100 });
+    await act(async () => {
+      await c.setSize({ width: 1100, height: 1100 });
+    });
     c.assertRenderCount(5);
     c.assertMeasuredSize({ width: 1000, height: 1000 });
   });
