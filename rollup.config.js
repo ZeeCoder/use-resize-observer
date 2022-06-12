@@ -1,11 +1,15 @@
 import babel from "@rollup/plugin-babel";
 import inject from "@rollup/plugin-inject";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 const getConfig = ({ polyfill = false } = {}) => {
   const config = {
     input: "src/index.ts",
     output: [],
     plugins: [
+      nodeResolve({
+        extensions: [".ts"],
+      }),
       babel({
         extensions: ["ts"],
         // Seems like there's not really a difference in case of this lib, but
