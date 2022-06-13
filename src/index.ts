@@ -161,7 +161,7 @@ function useResizeObserver<T extends Element>(
       width: size.width,
       height: size.height,
     }),
-    [refCallback, size ? size.width : null, size ? size.height : null]
+    [refCallback, size.width, size.height]
   );
 }
 

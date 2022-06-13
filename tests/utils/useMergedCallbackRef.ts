@@ -13,7 +13,7 @@ const useMergedCallbackRef = (...callbacks: Function[]) => {
     callbacksRegistry.current = callbacks;
   }, [...callbacks]);
 
-  return useCallback((element) => {
+  return useCallback((element: any) => {
     callbacksRegistry.current.forEach((callback) => callback(element));
   }, []);
 };

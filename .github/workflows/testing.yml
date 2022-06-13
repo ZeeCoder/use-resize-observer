@@ -22,8 +22,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Checking File Size
         run: yarn check:size
+      - name: Checking Linting Rules
+        run: yarn check:lint
       - name: Checking Types
         run: yarn check:types
+      - name: Running Unit Tests
+        run: yarn test:unit
       - name: Testing SSR
         run: yarn test:create:ssr
       - name: Testing in Modern Browsers (BrowserStack)

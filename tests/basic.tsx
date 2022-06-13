@@ -341,7 +341,7 @@ describe("Basic tests", () => {
 
   it("should handle if the onResize handler changes, with the correct render counts", async () => {
     const controller = createController();
-    type OnResizeHandler = (size: ObservedSize) => {};
+    type OnResizeHandler = (size: ObservedSize) => void;
     let changeOnResizeHandler = (handler: OnResizeHandler) => {};
     const Test = () => {
       const [onResize, setOnResize] = useState<OnResizeHandler>(() => () => {});

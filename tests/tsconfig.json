@@ -6,8 +6,15 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
+    "declaration": false,
+    "emitDeclarationOnly": false,
     "jsx": "react",
-    "noEmit": true
+    "noEmit": true,
+    "typeRoots": [
+      "@types/karma", "../node_modules/@types"]
   },
-  "include": [".", "../src"]
+  "include": [".", "../src"],
+  "exclude": [
+    "../src/**/*.test.tsx"
+  ]
 }

@@ -1,17 +1,17 @@
 [
   {
     "path": "dist/bundle.esm.js",
-    "limit": "661B",
+    "limit": "648B",
     "gzip": true
   },
   {
     "path": "dist/bundle.cjs.js",
-    "limit": "637B",
+    "limit": "625B",
     "gzip": true
   },
   {
     "path": "polyfilled.js",
-    "limit": "3.4kB",
+    "limit": "3384B",
     "gzip": true
   }
 ]

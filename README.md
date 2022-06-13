@@ -16,7 +16,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Highlights
 
 - Written in **TypeScript**.
-- **Tiny**: [661B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
+- **Tiny**: [648B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
 - Exposes an **onResize callback** if you need more control.
 - `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.

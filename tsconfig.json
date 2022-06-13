@@ -8,7 +8,13 @@
     "outDir": "dist",
     "declaration": true,
     "emitDeclarationOnly": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "jsx": "react",
+    "typeRoots": [
+      "tests/@types/jest", "node_modules/@types"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/**/*.test.tsx"
+  ]
 }
