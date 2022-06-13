@@ -1,3 +1,10 @@
+## [9.0.1](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.0...v9.0.1) (2022-06-13)
+
+### Bug Fixes
+
+- Made element resolution compatbile with concurrent mode ([c9c6689](https://github.com/ZeeCoder/use-resize-observer/commit/c9c66894abeb8fefd5916a0c119be809357fcdf5))
+- Small changes and chores ([0cb6800](https://github.com/ZeeCoder/use-resize-observer/commit/0cb68008619976c45dfa133a332c75766a43d7d4))
+
 # [9.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v8.0.0...v9.0.0) (2022-05-15)
 
 ### Bug Fixes
