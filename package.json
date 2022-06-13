@@ -1,6 +1,6 @@
 {
   "name": "use-resize-observer",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.esm.js",
   "types": "dist/index.d.ts",

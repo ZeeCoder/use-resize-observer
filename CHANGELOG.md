@@ -1,3 +1,9 @@
+## [9.0.2](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.1...v9.0.2) (2022-06-13)
+
+### Bug Fixes
+
+- trigger release ([01fccc6](https://github.com/ZeeCoder/use-resize-observer/commit/01fccc6bf5036903a650b42ded58fda4e2907149))
+
 ## [9.0.1](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.0...v9.0.1) (2022-06-13)
 
 ### Bug Fixes
