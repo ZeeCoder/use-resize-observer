@@ -12,7 +12,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 [![npm version](https://badge.fury.io/js/use-resize-observer.svg)](https://npmjs.com/package/use-resize-observer)
 [![build](https://github.com/ZeeCoder/use-resize-observer/workflows/Testing/badge.svg)](https://github.com/ZeeCoder/use-resize-observer/actions/workflows/testing.yml)
-[![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=WDdodmcvY2FwdmY4QlY3cFV6eXNUaXlJR0g4SnAxNWRwd0pJMWIxanhOVT0tLXErNE9jMXZva0FoWDhyY3RWdnNBY3c9PQ==--6f6abad49544e8b86c6b94da4cb357325f6cb8e8)](https://automate.browserstack.com/public-build/WDdodmcvY2FwdmY4QlY3cFV6eXNUaXlJR0g4SnAxNWRwd0pJMWIxanhOVT0tLXErNE9jMXZva0FoWDhyY3RWdnNBY3c9PQ==--6f6abad49544e8b86c6b94da4cb357325f6cb8e8)
+[![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)](https://automate.browserstack.com/public-build/aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)
 
 ## Highlights
 
