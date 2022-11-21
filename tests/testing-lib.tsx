@@ -1,12 +1,17 @@
 // Tests written with react testing library
 import React, { useRef, useState, useCallback } from "react";
-import useResizeObserver from "../";
+import useResizeObserver, {
+  ResizeHandler,
+  ObservedSize,
+  ResizeObserverBoxOptions,
+  RoundingFunction,
+} from "../";
 import { render, cleanup, act } from "@testing-library/react";
 import useRenderTrigger from "./utils/useRenderTrigger";
 import awaitNextFrame from "./utils/awaitNextFrame";
 import createController from "./utils/createController";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
-import { ObservedSize, supports } from "./utils";
+import { supports } from "./utils";
 
 afterEach(() => {
   cleanup();
@@ -77,11 +82,13 @@ describe("Testing Lib: Basics", () => {
     const controller = createController();
     const Test = () => {
       const ref = useRef(null);
+      // Declaring onResize here only to test the availability and correctness of the exported `ResizeHandler` function
+      const onResize: ResizeHandler = (size) => {
+        controller.reportMeasuredSize(size);
+      };
       useResizeObserver({
         ref,
-        onResize: (size) => {
-          controller.reportMeasuredSize(size);
-        },
+        onResize,
       });
 
       return <div ref={ref} style={{ width: 10, height: 20 }} />;
@@ -577,7 +584,7 @@ describe("Testing Lib: Resize Observer Instance Counting Block", () => {
     };
     const c2 = {} as Controller;
     const Test = () => {
-      const [rounder, setRounder] = useState<typeof Math.ceil | undefined>(
+      const [rounder, setRounder] = useState<RoundingFunction | undefined>(
         () => Math.ceil
       );
       const { ref, width, height } = useResizeObserver<HTMLDivElement>({

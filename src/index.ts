@@ -10,12 +10,12 @@ import {
 import useResolvedElement from "./utils/useResolvedElement";
 import extractSize from "./utils/extractSize";
 
-type ObservedSize = {
+export type ObservedSize = {
   width: number | undefined;
   height: number | undefined;
 };
 
-type ResizeHandler = (size: ObservedSize) => void;
+export type ResizeHandler = (size: ObservedSize) => void;
 
 type HookResponse<T extends Element> = {
   ref: RefCallback<T>;
@@ -23,7 +23,7 @@ type HookResponse<T extends Element> = {
 
 // Declaring my own type here instead of using the one provided by TS (available since 4.2.2), because this way I'm not
 // forcing consumers to use a specific TS version.
-type ResizeObserverBoxOptions =
+export type ResizeObserverBoxOptions =
   | "border-box"
   | "content-box"
   | "device-pixel-content-box";
@@ -34,7 +34,7 @@ declare global {
   }
 }
 
-type RoundingFunction = (n: number) => number;
+export type RoundingFunction = (n: number) => number;
 
 function useResizeObserver<T extends Element>(
   opts: {

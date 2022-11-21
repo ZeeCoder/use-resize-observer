@@ -2,10 +2,9 @@
 import React, { useRef, useState } from "react";
 import { render, cleanup, act } from "@testing-library/react";
 import createController from "./utils/createController";
-import useResizeObserver from "../";
+import useResizeObserver, { ObservedSize, ResizeHandler } from "../";
 import useMergedCallbackRef from "./utils/useMergedCallbackRef";
 import awaitNextFrame from "./utils/awaitNextFrame";
-import { ObservedSize } from "./utils";
 import useRenderTrigger from "./utils/useRenderTrigger";
 
 afterEach(() => {
@@ -341,10 +340,9 @@ describe("Basic tests", () => {
 
   it("should handle if the onResize handler changes, with the correct render counts", async () => {
     const controller = createController();
-    type OnResizeHandler = (size: ObservedSize) => void;
-    let changeOnResizeHandler = (handler: OnResizeHandler) => {};
+    let changeOnResizeHandler = (handler: ResizeHandler) => {};
     const Test = () => {
-      const [onResize, setOnResize] = useState<OnResizeHandler>(() => () => {});
+      const [onResize, setOnResize] = useState<ResizeHandler>(() => () => {});
       changeOnResizeHandler = (handler) => setOnResize(() => handler);
       const { ref, width, height } = useResizeObserver({ onResize });
       controller.reportMeasuredSize({ width, height });

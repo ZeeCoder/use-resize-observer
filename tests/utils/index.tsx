@@ -11,8 +11,3 @@ new ResizeObserver((entries) => {
     entries[0].devicePixelContentBoxSize
   );
 }).observe(document.body);
-
-export type ObservedSize = {
-  width: number | undefined;
-  height: number | undefined;
-};
