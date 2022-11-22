@@ -1,3 +1,13 @@
+# [9.1.0](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.2...v9.1.0) (2022-11-22)
+
+### Bug Fixes
+
+- trigger release ([da154e1](https://github.com/ZeeCoder/use-resize-observer/commit/da154e1db4e1c2b21fef722d998fd2adaba46d9f))
+
+### Features
+
+- Exported some TS types ([3895bdf](https://github.com/ZeeCoder/use-resize-observer/commit/3895bdf98687f285e707697d451231ab7f46d189)), closes [#98](https://github.com/ZeeCoder/use-resize-observer/issues/98)
+
 # [9.1.0-alpha.1](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.2...v9.1.0-alpha.1) (2022-11-21)
 
 ### Features
