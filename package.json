@@ -33,7 +33,7 @@
     "check:size": "size-limit",
     "check:types": "tsc -p tests",
     "check:lint": "eslint src/**",
-    "test": "run-s 'build' 'check:size' 'check:types' 'check:lint' 'test:unit' 'test:create:ssr' 'test:headless:chrome'",
+    "test": "run-s 'build' 'test:unit' 'test:create:ssr' 'test:headless:chrome' 'check:size' 'check:types' 'check:lint'",
     "test:unit": "jest",
     "test:create:ssr": "node ./tests/ssr/create-ssr-test.js",
     "test:chrome": "KARMA_BROWSERS=Chrome yarn karma:run",

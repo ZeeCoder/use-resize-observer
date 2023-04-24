@@ -78,6 +78,27 @@ describe("Testing Lib: Basics", () => {
     controller.assertMeasuredSize({ width: 100, height: 100 });
   });
 
+  it("should report 0 width/height size", async () => {
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver();
+      controller.reportMeasuredSize({ width, height });
+
+      return <div ref={ref} style={{ width: 0, height: 0 }} />;
+    };
+
+    render(
+      <React.StrictMode>
+        <Test />
+      </React.StrictMode>
+    );
+    await act(async () => {
+      await awaitNextFrame();
+    });
+
+    controller.assertMeasuredSize({ width: 0, height: 0 });
+  });
+
   it("should call onResize on mount when a custom ref is used", async () => {
     const controller = createController();
     const Test = () => {

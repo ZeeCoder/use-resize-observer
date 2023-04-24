@@ -118,10 +118,10 @@ function useResizeObserver<T extends Element>(
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");
 
-              const newWidth = reportedWidth != null ? round(reportedWidth) : undefined;
-              const newHeight = reportedHeight != null
-                ? round(reportedHeight)
-                : undefined;
+              const newWidth =
+                reportedWidth != null ? round(reportedWidth) : undefined;
+              const newHeight =
+                reportedHeight != null ? round(reportedHeight) : undefined;
 
               if (
                 previous.current.width !== newWidth ||
