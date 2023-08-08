@@ -38,16 +38,19 @@ export type RoundingFunction = (n: number) => number;
 
 function useResizeObserver<T extends Element>(
   opts: {
+    host: Window & typeof globalThis,
     ref?: RefObject<T> | T | null | undefined;
     onResize?: ResizeHandler;
     box?: ResizeObserverBoxOptions;
     round?: RoundingFunction;
-  } = {}
+  } = {
+    host: window
+  }
 ): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
   // effect dep array, and just passing in an anonymous function without memoising
   // will not reinstantiate the hook's ResizeObserver.
-  const onResize = opts.onResize;
+  const { onResize, host } = opts;
   const onResizeRef = useRef<ResizeHandler | undefined>(undefined);
   onResizeRef.current = onResize;
   const round = opts.round || Math.round;
@@ -152,6 +155,7 @@ function useResizeObserver<T extends Element>(
       },
       [opts.box, round]
     ),
+    host,
     opts.ref
   );
 

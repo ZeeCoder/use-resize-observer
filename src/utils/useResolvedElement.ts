@@ -7,7 +7,8 @@ type SubscriberResponse = SubscriberCleanupFunction | void;
 // refs to such extent, but then composing hooks and components could not opt out of unnecessary renders.
 export default function useResolvedElement<T extends Element>(
   subscriber: (element: T) => SubscriberResponse,
-  refOrElement?: T | RefObject<T> | null
+  host: Window & typeof globalThis = window,
+  refOrElement?: T | RefObject<T> | null,
 ): RefCallback<T> {
   const lastReportRef = useRef<{
     element: T | null;
@@ -31,7 +32,7 @@ export default function useResolvedElement<T extends Element>(
     const element: T | null = cbElement
       ? cbElement
       : refOrElement
-      ? refOrElement instanceof Element
+      ? refOrElement instanceof host.Element
         ? refOrElement
         : refOrElement.current
       : null;
