@@ -56,8 +56,8 @@ npm install use-resize-observer --save-dev
 | Name   | Type                    | Description                                    |
 | ------ | ----------------------- | ---------------------------------------------- |
 | ref    | RefCallback             | A callback to be passed to React's "ref" prop. |
-| width  | undefined &#124; number | The width (or "blockSize") of the element.     |
-| height | undefined &#124; number | The height (or "inlineSize") of the element.   |
+| width  | undefined &#124; number | The width (or "inlineSize") of the element.     |
+| height | undefined &#124; number | The height (or "blockSize") of the element.   |
 
 ## Basic Usage
 
