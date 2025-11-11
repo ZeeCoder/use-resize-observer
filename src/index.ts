@@ -38,7 +38,7 @@ export type RoundingFunction = (n: number) => number;
 
 function useResizeObserver<T extends Element>(
   opts: {
-    ref?: RefObject<T> | T | null | undefined;
+    ref?: RefObject<T | null> | RefObject<any> | T | null | undefined;
     onResize?: ResizeHandler;
     box?: ResizeObserverBoxOptions;
     round?: RoundingFunction;
@@ -53,11 +53,14 @@ function useResizeObserver<T extends Element>(
   const round = opts.round || Math.round;
 
   // Using a single instance throughout the hook's lifetime
-  const resizeObserverRef = useRef<{
-    box?: ResizeObserverBoxOptions;
-    round?: RoundingFunction;
-    instance: ResizeObserver;
-  }>();
+  const resizeObserverRef = useRef<
+    | {
+        box?: ResizeObserverBoxOptions;
+        round?: RoundingFunction;
+        instance: ResizeObserver;
+      }
+    | undefined
+  >(undefined);
 
   const [size, setSize] = useState<{
     width?: number;
