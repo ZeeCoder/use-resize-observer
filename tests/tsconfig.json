@@ -10,11 +10,9 @@
     "emitDeclarationOnly": false,
     "jsx": "react",
     "noEmit": true,
-    "typeRoots": [
-      "@types/karma", "../node_modules/@types"]
+    "skipLibCheck": true,
+    "typeRoots": ["@types/karma", "../node_modules/@types"]
   },
   "include": [".", "../src"],
-  "exclude": [
-    "../src/**/*.test.tsx"
-  ]
+  "exclude": ["../src/**/*.test.tsx"]
 }

@@ -18,7 +18,7 @@ the required feature can be discussed, as well as the actual implementation.
 - Add new test(s) to cover the new feature in: `test/testing-lib.tsx`.
   Ignore the other test files, as they're fairly old and much harder to add new
   ones to them compared to just using react testing lib.
-- Run all the tests to ensure there are no regressions: `yarn test`,
+- Run all the tests to ensure there are no regressions: `pnpm test`,
 
 ## Using Watch Modes While Developing
 
@@ -30,10 +30,10 @@ every time a change was made.
 
 To do so:
 
-- Run `yarn src:watch` in a terminal tab
-- Run `yarn karma:watch` in another.
+- Run `pnpm src:watch` in a terminal tab
+- Run `pnpm karma:watch` in another.
 
-Don't forget to run `yarn test` at the end once you're done with everything, to
+Don't forget to run `pnpm test` at the end once you're done with everything, to
 make sure the new code is tested for regressions.
 
 If you have a Browserstack account, then you can also run the tests in real browsers using the `test:bs:*` commands.

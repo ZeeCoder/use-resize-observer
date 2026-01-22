@@ -5,9 +5,14 @@ export { default } from "./index";
 
 // Import and re-export ResizeObserver from the polyfill for global availability
 import { ResizeObserver } from "@juggle/resize-observer";
+
 // Make it available globally if needed
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-if (typeof globalThis !== "undefined" && !(globalThis as any).ResizeObserver) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).ResizeObserver = ResizeObserver;
+if (
+  typeof globalThis !== "undefined" &&
+  typeof (globalThis as typeof globalThis & { ResizeObserver?: unknown })
+    .ResizeObserver === "undefined"
+) {
+  (
+    globalThis as typeof globalThis & { ResizeObserver: typeof ResizeObserver }
+  ).ResizeObserver = ResizeObserver;
 }

@@ -1,6 +1,5 @@
 # use-resize-observer
 
-
 <h1 align="center">
 	<br>
 	<img width="250" src="https://raw.githubusercontent.com/ZeeCoder/use-resize-observer/master/media/Logo.png" alt="useResizeObserver">
@@ -37,7 +36,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Install
 
 ```sh
-yarn add use-resize-observer --dev
+pnpm add use-resize-observer --save-dev
 # or
 npm install use-resize-observer --save-dev
 ```
@@ -56,8 +55,8 @@ npm install use-resize-observer --save-dev
 | Name   | Type                    | Description                                    |
 | ------ | ----------------------- | ---------------------------------------------- |
 | ref    | RefCallback             | A callback to be passed to React's "ref" prop. |
-| width  | undefined &#124; number | The width (or "inlineSize") of the element.     |
-| height | undefined &#124; number | The height (or "blockSize") of the element.   |
+| width  | undefined &#124; number | The width (or "inlineSize") of the element.    |
+| height | undefined &#124; number | The height (or "blockSize") of the element.    |
 
 ## Basic Usage
 
