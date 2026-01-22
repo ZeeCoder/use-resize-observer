@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "target": "ES2020",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
@@ -11,11 +11,8 @@
     "emitDeclarationOnly": true,
     "noImplicitAny": true,
     "jsx": "react",
-    "typeRoots": [
-      "tests/@types/jest", "node_modules/@types"]
+    "typeRoots": ["tests/@types/jest", "node_modules/@types"]
   },
   "include": ["src"],
-  "exclude": [
-    "src/**/*.test.tsx"
-  ]
+  "exclude": ["src/**/*.test.tsx"]
 }

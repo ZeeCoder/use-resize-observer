@@ -1,6 +1,6 @@
 import "react-app-polyfill/ie11";
 import React from "react";
-import useResizeObserver from "../../polyfilled";
+import useResizeObserver from "../../src/polyfilled";
 import { ResizeObserver as ROP } from "@juggle/resize-observer";
 import createController from "../utils/createController";
 import { act, render } from "@testing-library/react";
