@@ -4,6 +4,7 @@ node_modules
 .vscode
 yarn-error.log*
 dist
-/polyfilled.js
-/polyfilled.d.ts
+/polyfilled.cjs
+/polyfilled.d.cts
+/polyfilled.d.cts.map
 local.log
