@@ -61,20 +61,6 @@ You now need React 18.2 or newer (18.2+ or 19). Anything older is no longer supp
 The build no longer transpiles down to ES5 / IE 11. If you must support very old
 browsers, transpile `node_modules/use-resize-observer` as part of your own build.
 
-## Behavioural fixes in v10
-
-These are not breaking for correct usage, but the behaviour is more correct now:
-
-- **Cross-window elements are observed.** An element from another window or a
-  cross-document iframe used to be silently ignored (it failed an
-  `instanceof Element` check). It is now observed correctly. (#100, #109, #113)
-- **A measured size of `0` is reported as `0`.** Previously a genuine `0`
-  dimension was reported as `undefined`, making it indistinguishable from
-  "not measured yet". `undefined` now means only "not measured yet". (#103)
-- **No more global type augmentation.** The library used to augment every
-  consumer's global `ResizeObserverEntry` type via the shipped `.d.ts`. Modern
-  `lib.dom` already declares those members, so the augmentation was removed.
-
 ## Not changing
 
 - The runtime API (`useResizeObserver(options)` and its `{ ref, width, height }`
