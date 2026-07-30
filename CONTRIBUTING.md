@@ -50,6 +50,19 @@ The first `pnpm test:browser` run needs the Playwright browsers:
 pnpm exec playwright install --with-deps chromium firefox webkit
 ```
 
+### Watching tests in a real (headed) browser
+
+To watch the tests run in a real browser window, override the headless default —
+but do it for **one engine at a time**. Launching all three headed browsers at
+once overwhelms the browser pool and a session's page can crash (you'll see an
+`[birpc] rpc is closed` / `Page crashed` unhandled error and a chunk of tests
+silently won't run). Headless is unaffected, which is why CI runs headless.
+
+```sh
+pnpm exec vitest --project 'browser (chromium)' --browser.headless=false
+# or 'browser (firefox)' / 'browser (webkit)'
+```
+
 ## Real-device tests (BrowserStack)
 
 The `tests/e2e` suite serves a static page that consumes the **packed tarball**
