@@ -1,5 +1,11 @@
 /// <reference types="webdriverio" />
+import { fileURLToPath } from "node:url";
 import { Local } from "browserstack-local";
+
+// Absolute path to the built static page. Resolved relative to THIS config file,
+// not the process cwd (wdio is launched from the repo root), so the static server
+// serves tests/e2e/app rather than a non-existent <root>/app.
+const appDir = fileURLToPath(new URL("app", import.meta.url));
 
 // Real-browser / real-device coverage on BrowserStack. This is the leg that
 // keeps Playwright out of the picture: BrowserStack's Playwright support is
@@ -18,6 +24,17 @@ import { Local } from "browserstack-local";
 // signal (see migration plan 2.5).
 const userName = process.env.BROWSERSTACK_USERNAME;
 const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
+
+// Fail fast (before spawning workers) if the credentials aren't visible to node.
+// A common gotcha: they're set as shell variables but not `export`ed, so `echo`
+// sees them but child processes don't.
+if (!userName || !accessKey) {
+  throw new Error(
+    "BrowserStack credentials are not visible to node. Make sure BROWSERSTACK_USERNAME " +
+      "and BROWSERSTACK_ACCESS_KEY are exported in this shell (verify with: " +
+      '`node -e "console.log(process.env.BROWSERSTACK_USERNAME)"`).',
+  );
+}
 
 const commonBstackOptions = {
   userName,
@@ -96,12 +113,14 @@ export const config: WebdriverIO.Config = {
       },
     },
     // --- Real mobile devices (why Playwright was rejected) ---
+    // Device names / OS versions get retired over time; verify against the live
+    // list (`automate/browsers.json` — see CONTRIBUTING) and adjust as needed.
     {
       browserName: "safari",
       "bstack:options": {
         ...commonBstackOptions,
-        deviceName: "iPhone 11",
-        osVersion: "14",
+        deviceName: "iPhone 15",
+        osVersion: "17",
         realMobile: true,
       },
     },
@@ -109,14 +128,14 @@ export const config: WebdriverIO.Config = {
       browserName: "chrome",
       "bstack:options": {
         ...commonBstackOptions,
-        deviceName: "Samsung Galaxy Note 10",
-        osVersion: "9.0",
+        deviceName: "Samsung Galaxy S23",
+        osVersion: "13.0",
         realMobile: true,
       },
     },
   ],
 
-  services: [["static-server", { folders: [{ mount: "/", path: "./app" }], port: 4567 }]],
+  services: [["static-server", { folders: [{ mount: "/", path: appDir }], port: 4567 }]],
 
   baseUrl: "http://localhost:4567",
 

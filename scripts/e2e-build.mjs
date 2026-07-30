@@ -37,13 +37,21 @@ console.log(`\n→ Installing dependencies + ${tgz} into the E2E app`);
 // npm (not pnpm) gives a self-contained node_modules the bundler can resolve
 // without workspace linking. Install react/react-dom from package.json first,
 // then the tarball with --no-save so the app's package.json stays version-free.
-run(npm, ["install", "--no-audit", "--no-fund", "--no-package-lock"], { cwd: appDir });
+run(npm, ["install", "--no-audit", "--no-fund", "--no-package-lock", "--loglevel=error"], {
+  cwd: appDir,
+});
 run(
   npm,
-  ["install", "--no-audit", "--no-fund", "--no-save", "--no-package-lock", join(root, tgz)],
-  {
-    cwd: appDir,
-  },
+  [
+    "install",
+    "--no-audit",
+    "--no-fund",
+    "--no-save",
+    "--no-package-lock",
+    "--loglevel=error",
+    join(root, tgz),
+  ],
+  { cwd: appDir },
 );
 
 console.log("\n→ Bundling the page with esbuild");
