@@ -57,6 +57,15 @@ export default function createController() {
     expect(measuredWidth).toBe(params.width);
     expect(measuredHeight).toBe(params.height);
   };
+  // Poll for a measured size instead of relying on a fixed frame wait. Use this
+  // after actions that make the hook tear down and recreate its ResizeObserver
+  // (changing `box` or `round`), where the new value only lands once the fresh RO
+  // fires its first callback — several async hops that a fixed wait can miss
+  // under real vsync (e.g. headed browsers).
+  const waitForMeasuredSize = (params: SizeParams) =>
+    expect
+      .poll(() => ({ width: measuredWidth, height: measuredHeight }), { timeout: 2000 })
+      .toEqual({ width: params.width, height: params.height });
   const assertInitialSize = (params: SizeParams) => {
     expect(initialSize?.width).toBe(params.width);
     expect(initialSize?.height).toBe(params.height);
@@ -68,6 +77,7 @@ export default function createController() {
     getRenderCount,
     reportMeasuredSize,
     assertMeasuredSize,
+    waitForMeasuredSize,
     assertInitialSize,
     setSize: setSizePlaceholder,
     provideSetSizeFunction: (_ref: HTMLElement | null) => {}, // Placeholder to make TS happy

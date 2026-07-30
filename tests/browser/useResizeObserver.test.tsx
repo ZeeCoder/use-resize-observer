@@ -588,25 +588,23 @@ describe("Box options", () => {
     await c1.setSize({ width: 100, height: 200 });
 
     if (supports.borderBox) {
-      c1.assertMeasuredSize({ width: 142, height: 222 });
+      await c1.waitForMeasuredSize({ width: 142, height: 222 });
     } else {
       // In a non-supporting browser the hook would have nothing to report.
-      c1.assertMeasuredSize({ width: undefined, height: undefined });
+      await c1.waitForMeasuredSize({ width: undefined, height: undefined });
     }
 
-    // Should be able to switch to observing content-box
+    // Should be able to switch to observing content-box (recreates the RO).
     await c2.setBox("content-box");
-    await awaitNextFrame();
-    c1.assertMeasuredSize({ width: 100, height: 200 });
+    await c1.waitForMeasuredSize({ width: 100, height: 200 });
 
     // Switching back to border-box reports the border-box size again (or stays
     // undefined in a non-supporting browser).
     await c2.setBox("border-box");
-    await awaitNextFrame();
     if (supports.borderBox) {
-      c1.assertMeasuredSize({ width: 142, height: 222 });
+      await c1.waitForMeasuredSize({ width: 142, height: 222 });
     } else {
-      c1.assertMeasuredSize({ width: undefined, height: undefined });
+      await c1.waitForMeasuredSize({ width: undefined, height: undefined });
     }
   });
 
@@ -692,16 +690,15 @@ describe("Rounding", () => {
     c1.assertMeasuredSize({ width: 201, height: 301 });
     expect(c1.getRenderCount()).toBe(base + 2);
 
-    // Replacing the rounding function re-measures with it: one render for the
-    // state change, one for the freshly measured (and newly rounded) value.
+    // Replacing the rounding function recreates the RO and re-measures with it:
+    // one render for the state change, one for the freshly measured (and newly
+    // rounded) value. Poll for the value, then assert the render count.
     await c2.replaceRoundFunction("multiply");
-    await awaitNextFrame();
-    c1.assertMeasuredSize({ width: 400, height: 600 });
+    await c1.waitForMeasuredSize({ width: 400, height: 600 });
     expect(c1.getRenderCount()).toBe(base + 4);
 
     await c2.replaceRoundFunction("unset");
-    await awaitNextFrame();
-    c1.assertMeasuredSize({ width: 200, height: 300 });
+    await c1.waitForMeasuredSize({ width: 200, height: 300 });
     expect(c1.getRenderCount()).toBe(base + 6);
   });
 
