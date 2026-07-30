@@ -14,17 +14,12 @@ import { useResizeObserver } from "use-resize-observer";
   keys: Object.keys(ns).sort(),
 };
 
-// Safari does not implement `device-pixel-content-box`; observing with it throws
-// synchronously, so feature-detect before ever using that box option.
-let supportsDevicePixelContentBox = false;
-try {
-  const ro = new ResizeObserver(() => {});
-  ro.observe(document.body, { box: "device-pixel-content-box" });
-  ro.disconnect();
-  supportsDevicePixelContentBox = true;
-} catch {
-  supportsDevicePixelContentBox = false;
-}
+// Safari does not implement `device-pixel-content-box`. Detecting via observe()
+// is unreliable — Playwright's WebKit throws on the unknown box option while real
+// Safari 13 silently ignores it — so feature-detect the entry property directly.
+const supportsDevicePixelContentBox =
+  typeof ResizeObserverEntry !== "undefined" &&
+  "devicePixelContentBoxSize" in ResizeObserverEntry.prototype;
 
 const SIZES = [
   { label: "100x200", width: 100, height: 200 },
