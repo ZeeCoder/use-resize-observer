@@ -4,6 +4,10 @@
     "noEmit": true,
     "declaration": false,
     "emitDeclarationOnly": false,
+    // Typecheck-only config covering both ../src and tests/. TS 6+ infers rootDir
+    // from the inherited outDir and would reject ../src as "outside rootDir", so
+    // set it to the repo root explicitly.
+    "rootDir": "..",
     "types": ["node"]
   },
   "include": ["../src", "node", "browser", "utils", "setup.ts", "react-dom-server.d.ts"],
