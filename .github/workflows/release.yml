@@ -17,7 +17,11 @@ jobs:
       # provenance is attached automatically.
       id-token: write
     steps:
+      # fetch-depth: 0 so semantic-release sees the full history + tags (it
+      # determines the last release from tags like v9.1.0).
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       # node >= 22.14 satisfies @semantic-release/npm@13's engines; the plugin
       # bundles npm 11.6.2 (OIDC-capable), so the runner's own npm doesn't matter.
