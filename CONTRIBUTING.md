@@ -79,19 +79,3 @@ BROWSERSTACK_USERNAME=... BROWSERSTACK_ACCESS_KEY=... pnpm test:e2e
 
 The credentials must be **exported** so node/WebdriverIO inherit them (a shell
 variable that `echo` prints is not enough).
-
-The capability matrix in `tests/e2e/wdio.conf.ts` pins specific devices/OS
-versions, which BrowserStack retires over time. To see what's currently
-available and fix an `invalid capabilities` / `Could not find device` error,
-query the live list:
-
-```sh
-# All supported OS + browser + real-device combos:
-curl -s -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
-  https://api.browserstack.com/automate/browsers.json > browsers.json
-
-# e.g. list real iOS devices:
-jq -r '.[] | select(.real_mobile==true and .os=="ios") | "\(.device) — iOS \(.os_version)"' browsers.json | sort -u
-# real Android devices:
-jq -r '.[] | select(.real_mobile==true and .os=="android") | "\(.device) — Android \(.os_version)"' browsers.json | sort -u
-```
