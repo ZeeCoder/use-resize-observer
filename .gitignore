@@ -3,7 +3,6 @@ node_modules
 .idea
 .vscode
 dist
-local.log
 release
 .baseline
 coverage
@@ -15,3 +14,9 @@ browsers.json
 tests/e2e/app/bundle.js
 tests/e2e/app/node_modules
 tests/e2e/app/package-lock.json
+
+# BrowserStack SDK / WebdriverIO run artifacts (E2E)
+*.log
+log/
+logs/
+.browserstack/
