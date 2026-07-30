@@ -76,6 +76,3 @@ BROWSERSTACK_USERNAME=... BROWSERSTACK_ACCESS_KEY=... pnpm test:e2e
 
 `pnpm test:e2e` builds + packs the library, installs the tarball into
 `tests/e2e/app`, bundles the page, and then runs WebdriverIO against BrowserStack.
-
-The credentials must be **exported** so node/WebdriverIO inherit them (a shell
-variable that `echo` prints is not enough).
