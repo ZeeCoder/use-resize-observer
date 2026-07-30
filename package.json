@@ -25,6 +25,7 @@
   "files": [
     "dist",
     "README.md",
+    "MIGRATION.md",
     "LICENSE",
     "CHANGELOG*",
     "CONTRIBUTING.md"

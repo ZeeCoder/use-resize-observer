@@ -14,21 +14,32 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![build](https://github.com/ZeeCoder/use-resize-observer/workflows/Testing/badge.svg)](https://github.com/ZeeCoder/use-resize-observer/actions/workflows/testing.yml)
 [![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)](https://automate.browserstack.com/public-build/aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)
 
+> **Upgrading from v9?** v10 has several breaking changes (named export, no
+> `/polyfilled` entrypoint, React 18.2+ only). See [MIGRATION.md](./MIGRATION.md).
+
 ## Highlights
 
 - Written in **TypeScript**.
-- **Tiny**: [648B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
+- **Zero runtime dependencies.**
+- **Tiny**: well under 1kB (minified, gzipped), monitored by [size-limit](https://github.com/ai/size-limit) ([budget](.size-limit.json)).
+- Ships **ESM and CJS** builds with correct `exports` conditions.
 - Exposes an **onResize callback** if you need more control.
 - `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
-- **Uses RefCallback by default** To address delayed mounts and changing ref elements.
-- **Ships a polyfilled version**
+- **Uses RefCallback by default** to address delayed mounts and changing ref elements.
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
 - Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints))
-- **Tested in real browsers** (Currently latest Chrome, Firefox, Edge, Safari, Opera, IE 11, iOS and Android, sponsored by BrowserStack)
+- **Tested in real browsers** (latest Chrome, Firefox, Edge and Safari, plus real iOS and Android devices, sponsored by BrowserStack)
+
+## Requirements
+
+- **React** `^18.2` or `^19`.
+- A **`ResizeObserver`** implementation. It is available in all modern browsers.
+  If you need to support an environment without it, polyfill it yourself in your
+  app's entry point (see [Polyfilling](#polyfilling)).
 
 ## In Action
 
@@ -36,10 +47,14 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 ## Install
 
+`use-resize-observer` is a runtime dependency:
+
 ```sh
-yarn add use-resize-observer --dev
+pnpm add use-resize-observer
 # or
-npm install use-resize-observer --save-dev
+npm install use-resize-observer
+# or
+yarn add use-resize-observer
 ```
 
 ## Options
@@ -61,12 +76,10 @@ npm install use-resize-observer --save-dev
 
 ## Basic Usage
 
-Note that the default builds are not polyfilled! For instructions and alternatives,
-see the [Transpilation / Polyfilling](#transpilation--polyfilling) section.
+`useResizeObserver` is a **named** export:
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
@@ -89,6 +102,30 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>({
 
 Note that if the browser does not support the given box type, then the hook won't report any sizes either.
 
+### Next.js App Router / React Server Components
+
+This is a hooks-only library, so it can only run in Client Components. In the
+Next.js App Router (or any React Server Components setup), the component that
+calls `useResizeObserver` must be a Client Component — add the `"use client"`
+directive at the top of your own file:
+
+```tsx
+"use client";
+
+import { useResizeObserver } from "use-resize-observer";
+
+export function Measured() {
+  const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+  return <div ref={ref}>{width}x{height}</div>;
+}
+```
+
+The library deliberately does **not** ship its own `"use client"` directive: for
+a hooks-only package that would be a no-op (a Server Component still cannot call a
+hook), and it would force the directive on every consumer. Without a client
+boundary you'll see an opaque `TypeError: (0 , ...useRef) is not a function` at
+prerender time — the fix is the `"use client"` on your calling component above.
+
 ### Box Options
 
 Note that box options are experimental, and as such are not supported by all browsers that implemented ResizeObservers. (See [here](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry).)
@@ -101,13 +138,13 @@ the old spec in case `contentBoxSize` is not available.
 `border-box`
 
 Supported well for the most part by evergreen browsers. If you need to support older versions of these browsers however,
-then you may want to feature-detect for support, and optionally include a polyfill instead of the native implementation.
+then you may want to feature-detect for support.
 
 `device-pixel-content-box`
 
 Surma has a [very good article](https://web.dev/device-pixel-content-box/) on how this allows us to do pixel perfect
-rendering. At the time of writing, however this has very limited support.
-The advices on feature detection for `border-box` apply here too.
+rendering. At the time of writing, however, this has limited support (notably, it is unsupported in Safari).
+Feature-detect before relying on it.
 
 ### Custom Rounding
 
@@ -126,8 +163,7 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>({
 **Skipping Rounding**
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 // Outside the hook to ensure this instance does not change unnecessarily.
 const noop = (n) => n;
@@ -160,8 +196,7 @@ To get the raw element, either you use your own RefObject (see later in this doc
 or you can merge the returned ref with one of your own:
 
 ```tsx
-import React, { useCallback, useEffect, useRef } from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 import mergeRefs from "react-merge-refs";
 
 const App = () => {
@@ -207,6 +242,8 @@ const { width, height } = useResizeObserver<HTMLDivElement>({
 });
 ```
 
+Elements from another window (for example a cross-document iframe) are supported too.
+
 ## Using a Single Hook to Measure Multiple Refs
 
 The hook reacts to ref changes, as it resolves it to an element to observe.
@@ -226,14 +263,9 @@ you run some tests, where the environment does not provide the `ResizeObserver`.
 
 ([See discussions](https://github.com/ZeeCoder/use-resize-observer/issues/40))
 
-You can do one of the following depending on your needs:
-
-- Use the default `ref` RefCallback, or provide a custom ref conditionally,
-  only when needed. The hook will not create a ResizeObserver instance up until
-  there's something there to actually observe.
-- Patch the test environment, and make a polyfill available as the ResizeObserver.
-  (This assumes you don't already use the polyfilled version, which would switch
-  to the polyfill when no native implementation was available.)
+Use the default `ref` RefCallback, or provide a custom ref conditionally, only
+when needed. The hook will not create a ResizeObserver instance until there's
+something there to actually observe.
 
 ## The "onResize" Callback
 
@@ -245,8 +277,7 @@ which'll simply receive the width and height of the element when it changes, so
 that you can decide what to do with it:
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 const App = () => {
   // width / height will not be returned here when the onResize callback is present
@@ -310,7 +341,9 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 ```
 
 Here "width" and "height" will be undefined until the ResizeObserver takes its
-first measurement.
+first measurement. A measured dimension of `0` is reported as `0` (not
+`undefined`), so you can distinguish a genuinely zero-sized element from one that
+has not been measured yet.
 
 ## Container/Element Query with CSS-in-JS
 
@@ -320,38 +353,26 @@ container/element queries:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-container-query-with-css-in-js-iitxl)
 
-## Transpilation / Polyfilling
+## Polyfilling
 
-By default the library provides transpiled ES5 modules in CJS / ESM module formats.
+The library targets modern (ES2020) browsers and ships **no** ResizeObserver
+polyfill (the `use-resize-observer/polyfilled` entrypoint and the
+`@juggle/resize-observer` dependency were removed in v10 — the package now has
+zero runtime dependencies).
 
-Polyfilling is recommended to be done in the host app, and not within imported
-libraries, as that way consumers have control over the exact polyfills being used.
-
-That said, there's a [polyfilled](https://github.com/juggle/resize-observer)
-CJS module that can be used for convenience:
-
-```ts
-import useResizeObserver from "use-resize-observer/polyfilled";
-```
-
-Note that using the above will use the polyfill, [even if the native ResizeObserver is available](https://github.com/juggle/resize-observer#basic-usage).
-
-To use the polyfill as a fallback only when the native RO is unavailable, you can polyfill yourself instead,
-either in your app's entry file, or you could create a local `useResizeObserver` module, like so:
+Polyfilling is best done in the host app, and not within imported libraries, as
+that way consumers control the exact polyfills being used. If you need to support
+an environment without a native `ResizeObserver`, install a polyfill such as
+[@juggle/resize-observer](https://github.com/juggle/resize-observer) and make it
+available before the hook runs — for example in your app's entry point:
 
 ```ts
-// useResizeObserver.ts
 import { ResizeObserver } from "@juggle/resize-observer";
-import useResizeObserver from "use-resize-observer";
 
 if (!window.ResizeObserver) {
   window.ResizeObserver = ResizeObserver;
 }
-
-export default useResizeObserver;
 ```
-
-The same technique can also be used to provide any of your preferred ResizeObserver polyfills out there.
 
 ## Related
 

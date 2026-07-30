@@ -29,3 +29,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Publish with npm provenance (requires the id-token: write permission above).
+          NPM_CONFIG_PROVENANCE: true

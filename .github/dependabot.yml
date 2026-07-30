@@ -1,0 +1,23 @@
+# Keeps the toolchain current so the project never drifts as far out of date as
+# it did before v10. Groups dev-dependency bumps into a single weekly PR.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      dev-dependencies:
+        dependency-type: development
+    ignore:
+      # React majors are a deliberate, coordinated decision (peer range), not a bump.
+      - dependency-name: react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-dom
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
