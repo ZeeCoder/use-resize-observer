@@ -4,10 +4,8 @@ import { useRef } from "react";
 // why the import is typed manually — @types/react-dom@18 doesn't declare it).
 import { renderToString } from "react-dom/server.browser";
 import { hydrateRoot } from "react-dom/client";
-import { act } from "react";
 import { expect, test } from "vitest";
 import { useResizeObserver } from "../../src";
-import awaitNextFrame from "../utils/awaitNextFrame";
 
 // The self-contained successor to the old codegen'd SSR test: render to a string,
 // inject it, hydrate it, and assert the default -> measured transition — all in
@@ -35,12 +33,12 @@ test("hydrates server markup and transitions from default to measured size", asy
   expect(container.textContent).toContain("1x2");
 
   // 3. Hydrate. The client's first render must match the server markup (still the
-  //    defaults), so there is no hydration mismatch.
-  await act(async () => {
-    hydrateRoot(container, <Test />);
-  });
+  //    defaults), so there is no hydration mismatch. Browser mode is a real
+  //    environment (not an `act` environment), so no `act()` wrapper is needed —
+  //    React flushes the hydration effects on its own.
+  hydrateRoot(container, <Test />);
 
-  // 4. Once the ResizeObserver measures the element, the size updates in place.
-  await awaitNextFrame();
-  expect(container.textContent).toContain("100x200");
+  // 4. Once hydration effects run and the ResizeObserver measures the element,
+  //    the size updates in place. Poll for it rather than waiting a fixed frame.
+  await expect.poll(() => container.textContent, { timeout: 2000 }).toContain("100x200");
 });
