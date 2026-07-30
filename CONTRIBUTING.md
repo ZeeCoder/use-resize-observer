@@ -78,11 +78,7 @@ BROWSERSTACK_USERNAME=... BROWSERSTACK_ACCESS_KEY=... pnpm test:e2e
 `tests/e2e/app`, bundles the page, and then runs WebdriverIO against BrowserStack.
 
 The credentials must be **exported** so node/WebdriverIO inherit them (a shell
-variable that `echo` prints is not enough). Verify with:
-
-```sh
-node -e "console.log(process.env.BROWSERSTACK_USERNAME, !!process.env.BROWSERSTACK_ACCESS_KEY)"
-```
+variable that `echo` prints is not enough).
 
 The capability matrix in `tests/e2e/wdio.conf.ts` pins specific devices/OS
 versions, which BrowserStack retires over time. To see what's currently
