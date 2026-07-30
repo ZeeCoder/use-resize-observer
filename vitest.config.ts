@@ -29,7 +29,17 @@ export default defineConfig({
             enabled: true,
             headless: true,
             provider: playwright(),
-            instances: [{ browser: "chromium" }, { browser: "firefox" }, { browser: "webkit" }],
+            instances: [
+              {
+                browser: "chromium",
+                // Stability flags for headed runs on Linux: avoid renderer
+                // "Page crashed" from a small /dev/shm and from flaky GPU drivers.
+                // Harmless (and often already implied) for headless / CI runs.
+                launchOptions: { args: ["--disable-dev-shm-usage", "--disable-gpu"] },
+              },
+              { browser: "firefox" },
+              { browser: "webkit" },
+            ],
           },
         },
       },
