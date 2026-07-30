@@ -47,8 +47,6 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 ## Install
 
-`use-resize-observer` is a runtime dependency:
-
 ```sh
 pnpm add use-resize-observer
 # or
