@@ -29,10 +29,16 @@ export default function useResolvedElement<T extends Element>(
     const cbElement = cbElementRef.current;
     const refOrElement = refOrElementRef.current;
     // Ugly ternary. But smaller than an if-else block.
+    // Duck-typing element-ness via `nodeType` instead of `instanceof Element`, so
+    // that elements from another window / cross-document iframe are recognised as
+    // elements rather than mistaken for a ref object and silently never observed.
+    // `nodeType` is present on elements from any window but absent on ref objects
+    // (and on invalid `{}` refs, which then resolve to `undefined` and are
+    // ignored). @see issues #100, #109, #113
     const element: T | null = cbElement
       ? cbElement
       : refOrElement
-        ? refOrElement instanceof Element
+        ? "nodeType" in refOrElement
           ? refOrElement
           : refOrElement.current
         : null;

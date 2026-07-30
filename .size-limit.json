@@ -9,7 +9,7 @@
   {
     "name": "cjs",
     "path": "dist/index.cjs",
-    "limit": "975 B",
+    "limit": "1000 B",
     "gzip": true,
     "ignore": ["react"]
   }

@@ -90,10 +90,15 @@ function useResizeObserver<T extends Element>(
           resizeObserverRef.current.box !== opts.box ||
           resizeObserverRef.current.round !== round
         ) {
+          // Use the observed element's own window's ResizeObserver, so elements
+          // living in another window / cross-document iframe are observed
+          // correctly (their own document's observer). Falls back to the current
+          // window's constructor. @see issues #100, #109, #113
+          const RO = element.ownerDocument.defaultView?.ResizeObserver ?? ResizeObserver;
           resizeObserverRef.current = {
             box: opts.box,
             round,
-            instance: new ResizeObserver((entries) => {
+            instance: new RO((entries) => {
               const entry = entries[0];
 
               const boxProp =
@@ -106,8 +111,11 @@ function useResizeObserver<T extends Element>(
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");
 
-              const newWidth = reportedWidth ? round(reportedWidth) : undefined;
-              const newHeight = reportedHeight ? round(reportedHeight) : undefined;
+              // A genuinely measured size of 0 must be reported as `0`, not
+              // `undefined` — `undefined` means "not measured yet". Only a missing
+              // box size (unsupported box option) stays `undefined`. @see issue #103
+              const newWidth = reportedWidth === undefined ? undefined : round(reportedWidth);
+              const newHeight = reportedHeight === undefined ? undefined : round(reportedHeight);
 
               if (previous.current.width !== newWidth || previous.current.height !== newHeight) {
                 const newSize = { width: newWidth, height: newHeight };

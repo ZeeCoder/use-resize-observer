@@ -225,6 +225,26 @@ describe("Basics", () => {
     await awaitNextFrame();
     controller.assertMeasuredSize({ width: undefined, height: undefined });
   });
+
+  it("reports a genuinely-zero dimension as 0, not undefined (#103)", async () => {
+    const controller = createController();
+    const Test = () => {
+      const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+      controller.reportMeasuredSize({ width, height });
+
+      // A visible element with a real height of 0 — distinct from "not measured".
+      return <div ref={ref} style={{ width: 100, height: 0 }} />;
+    };
+
+    await render(<Test />);
+    // Before any measurement, both dimensions are unknown (undefined).
+    controller.assertInitialSize({ width: undefined, height: undefined });
+
+    // After measurement, the zero height must be reported as 0, not undefined,
+    // so consumers can tell a measured 0 apart from a not-yet-measured element.
+    await awaitNextFrame();
+    controller.assertMeasuredSize({ width: 100, height: 0 });
+  });
 });
 
 describe("Custom refs", () => {
