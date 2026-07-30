@@ -19,9 +19,8 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const run = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { stdio: "inherit", cwd: root, shell: false, ...opts });
 
-// pnpm on Windows is a .cmd shim; resolve via the `pnpm exec` wrapper through node.
-const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const pnpm = "pnpm";
+const npm = "npm";
 
 console.log("→ Building");
 run(pnpm, ["build"]);

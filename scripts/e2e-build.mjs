@@ -17,8 +17,8 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const appDir = join(root, "tests", "e2e", "app");
 const run = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { stdio: "inherit", cwd: root, ...opts });
-const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const pnpm = "pnpm";
+const npm = "npm";
 
 console.log("→ Building + packing the library");
 run(pnpm, ["build"]);
