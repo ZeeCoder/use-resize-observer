@@ -36,6 +36,12 @@ if (!userName || !accessKey) {
   );
 }
 
+// Unique per run, so BrowserStack shows each run as its own build instead of
+// collapsing every "local" run into a single, perpetually-open build.
+const buildName = process.env.GITHUB_RUN_ID
+  ? `ci-${process.env.GITHUB_RUN_ID}`
+  : `local ${new Date().toISOString()}`;
+
 const commonBstackOptions = {
   userName,
   accessKey,
@@ -43,7 +49,7 @@ const commonBstackOptions = {
   // served on localhost.
   local: true,
   projectName: "use-resize-observer",
-  buildName: process.env.GITHUB_RUN_ID ? `ci-${process.env.GITHUB_RUN_ID}` : "local",
+  buildName,
   seleniumVersion: "4.20.0",
 };
 
