@@ -10,3 +10,6 @@ coverage
 *.tgz
 .vitest-attachments
 **/__screenshots__
+tests/e2e/app/bundle.js
+tests/e2e/app/node_modules
+tests/e2e/app/package-lock.json

@@ -1,0 +1,10 @@
+{
+  "name": "use-resize-observer-e2e-app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Static page that consumes the packed use-resize-observer tarball for the BrowserStack E2E suite.",
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}
