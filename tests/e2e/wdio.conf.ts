@@ -98,7 +98,17 @@ export const config: WebdriverIO.Config = {
   ],
 
   services: [
-    ["browserstack", { browserstackLocal: true }],
+    [
+      "browserstack",
+      {
+        browserstackLocal: true,
+        // We only need plain Automate sessions. The service otherwise auto-enables
+        // Test Observability + Accessibility, which download a separate SDK/CLI
+        // binary and add auth/setup surface we don't want here.
+        testObservability: false,
+        accessibility: false,
+      },
+    ],
     ["static-server", { folders: [{ mount: "/", path: "./app" }], port: 4567 }],
   ],
 
