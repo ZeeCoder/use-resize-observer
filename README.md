@@ -330,9 +330,7 @@ container/element queries:
 ## Polyfilling
 
 The library targets modern (ES2020) browsers and ships **no** ResizeObserver
-polyfill (the `use-resize-observer/polyfilled` entrypoint and the
-`@juggle/resize-observer` dependency were removed in v10 — the package now has
-zero runtime dependencies).
+polyfill. It has zero runtime dependencies.
 
 Polyfilling is best done in the host app, and not within imported libraries, as
 that way consumers control the exact polyfills being used. If you need to support
