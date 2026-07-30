@@ -14,15 +14,10 @@ type HookResponse<T extends Element> = {
   ref: RefCallback<T>;
 } & ObservedSize;
 
-// Declaring my own type here instead of using the one provided by TS (available since 4.2.2), because this way I'm not
-// forcing consumers to use a specific TS version.
+// Exporting our own union as part of the public API. It mirrors the built-in
+// `ResizeObserverBoxOptions` from lib.dom, but declaring it here keeps the
+// exported type stable regardless of the consumer's TypeScript/lib version.
 export type ResizeObserverBoxOptions = "border-box" | "content-box" | "device-pixel-content-box";
-
-declare global {
-  interface ResizeObserverEntry {
-    readonly devicePixelContentBoxSize: ReadonlyArray<ResizeObserverSize>;
-  }
-}
 
 export type RoundingFunction = (n: number) => number;
 
