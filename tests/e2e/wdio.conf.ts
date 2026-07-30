@@ -49,6 +49,19 @@ const commonBstackOptions = {
 
 const bsLocal = new Local();
 
+// Remember the first failure so we can report a useful reason on BrowserStack.
+let firstFailureReason = "";
+
+// Send a BrowserStack JS-executor command (session naming / status). Best-effort:
+// a marking failure must never fail the actual test run.
+const bstackExec = async (payload: object) => {
+  try {
+    await browser.executeScript(`browserstack_executor: ${JSON.stringify(payload)}`, []);
+  } catch {
+    // ignore
+  }
+};
+
 export const config: WebdriverIO.Config = {
   runner: "local",
   tsConfigPath: "./tsconfig.json",
@@ -147,6 +160,39 @@ export const config: WebdriverIO.Config = {
   waitforTimeout: 15000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 3,
+
+  // --- Session labelling on BrowserStack (the useful part of the dropped SDK) ---
+  // Name the session and print its dashboard link, so runs are easy to find.
+  beforeSuite: async (suite) => {
+    await bstackExec({ action: "setSessionName", arguments: { name: suite.title } });
+    try {
+      const raw = await browser.executeScript(
+        'browserstack_executor: {"action": "getSessionDetails"}',
+        [],
+      );
+      const details = JSON.parse(raw as string);
+      console.log(`🔗 BrowserStack session: ${details.public_url ?? details.browser_url}`);
+    } catch {
+      // non-fatal
+    }
+  },
+  // Capture the first failure reason to report on the session.
+  afterTest: (_test, _context, result) => {
+    if (!result.passed && !firstFailureReason) {
+      firstFailureReason = result.error?.message ?? "Test failed";
+    }
+  },
+  // Mark the session passed/failed so the dashboard shows red/green with a reason.
+  after: async (exitCode) => {
+    await bstackExec({
+      action: "setSessionStatus",
+      arguments: {
+        status: exitCode === 0 ? "passed" : "failed",
+        reason:
+          exitCode === 0 ? "All specs passed" : firstFailureReason || "One or more specs failed",
+      },
+    });
+  },
 
   // Start / stop the BrowserStackLocal tunnel around the run.
   onPrepare: () =>
