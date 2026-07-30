@@ -13,7 +13,7 @@ test("should receive the element with the provided callback ref", () => {
       useCallback((element: Element) => {
         elements.push(element);
         return cleanupMock;
-      }, [])
+      }, []),
     );
 
     return <div ref={ref} />;
@@ -42,7 +42,7 @@ test("should be able to reuse the callback ref to get different elements", () =>
       useCallback((element: Element) => {
         elements.push(element);
         return cleanupMock;
-      }, [])
+      }, []),
     );
 
     if (swap) {
@@ -85,7 +85,7 @@ test("should be able to use a raw element", () => {
         elements.push(element);
         return cleanupMock;
       }, []),
-      element
+      element,
     );
 
     return null;
@@ -116,7 +116,7 @@ test("should be able to use a ref object", () => {
         elements.push(element);
         return cleanupMock;
       }, []),
-      ref
+      ref,
     );
 
     return <div ref={ref} />;
@@ -146,7 +146,7 @@ test("should prioritise the ref callback over a ref object argument", () => {
         elements.push(element);
         return cleanupMock;
       }, []),
-      refObject
+      refObject,
     );
 
     return (
@@ -188,7 +188,7 @@ test("should prioritise the ref callback over an element argument", () => {
         elements.push(element);
         return cleanupMock;
       }, []),
-      element
+      element,
     );
 
     return <div ref={refCallback} />;
@@ -224,7 +224,7 @@ test("should be able to switch from a ref callback to a ref object", () => {
         elements.push(element);
         return () => cleanupsDone.push(element);
       }, []),
-      refObject
+      refObject,
     ); // ref object is ignored until the ref callback provides a value
 
     useEffect(() => {
@@ -281,7 +281,7 @@ test("should be able to switch from a ref object to a ref callback", () => {
         elements.push(element);
         return () => cleanupsDone.push(element);
       }, []),
-      ref1
+      ref1,
     );
 
     useEffect(() => {
@@ -338,7 +338,7 @@ test("should be able to switch back and forth between a ref object and a ref cal
 
         return () => cleanupsDone.push(element);
       }, []),
-      refObject
+      refObject,
     );
 
     return (
@@ -392,7 +392,7 @@ test("should not unnecessarily call the subscriber between renders", () => {
     const refCallback = useResolvedElement(
       useCallback((element: Element) => {
         elements.push(element);
-      }, [])
+      }, []),
     );
     triggerRender = useRenderTrigger();
 
@@ -429,9 +429,7 @@ test("should call the subscriber function if its identity changes, even if the e
       elements2.push(element);
       return cleanupMock2;
     }, []);
-    const refCallback = useResolvedElement(
-      switchToSubscriber2 ? subscriber2 : subscriber1
-    );
+    const refCallback = useResolvedElement(switchToSubscriber2 ? subscriber2 : subscriber1);
 
     return <div ref={refCallback} />;
   };
@@ -471,10 +469,7 @@ test("should call the subscriber function if its identity changes, even if the e
       elements2.push(element);
       return cleanupMock2;
     }, []);
-    useResolvedElement(
-      switchToSubscriber2 ? subscriber2 : subscriber1,
-      refObject
-    );
+    useResolvedElement(switchToSubscriber2 ? subscriber2 : subscriber1, refObject);
 
     return <div ref={refObject} />;
   };
@@ -514,10 +509,7 @@ test("should call the subscriber function if its identity changes, even if the e
       elements2.push(element);
       return cleanupMock2;
     }, []);
-    useResolvedElement(
-      switchToSubscriber2 ? subscriber2 : subscriber1,
-      element
-    );
+    useResolvedElement(switchToSubscriber2 ? subscriber2 : subscriber1, element);
 
     return null;
   };
@@ -551,7 +543,7 @@ test("should be able to reuse a ref callback to get a different element", () => 
         elements.push(element);
 
         return () => cleanupsDone.push(element);
-      }, [])
+      }, []),
     );
 
     if (getOtherElement) {
@@ -599,7 +591,7 @@ test("should be able to reuse a ref object to get a different element", () => {
 
         return () => cleanupsDone.push(element);
       }, []),
-      ref
+      ref,
     );
 
     return (

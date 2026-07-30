@@ -1,4 +1,5 @@
-import { RefCallback, RefObject, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import type { RefCallback, RefObject } from "react";
 
 type SubscriberCleanupFunction = () => void;
 type SubscriberResponse = SubscriberCleanupFunction | void;
@@ -7,7 +8,7 @@ type SubscriberResponse = SubscriberCleanupFunction | void;
 // refs to such extent, but then composing hooks and components could not opt out of unnecessary renders.
 export default function useResolvedElement<T extends Element>(
   subscriber: (element: T) => SubscriberResponse,
-  refOrElement?: T | RefObject<T> | null
+  refOrElement?: T | RefObject<T> | null,
 ): RefCallback<T> {
   const lastReportRef = useRef<{
     element: T | null;
@@ -31,10 +32,10 @@ export default function useResolvedElement<T extends Element>(
     const element: T | null = cbElement
       ? cbElement
       : refOrElement
-      ? refOrElement instanceof Element
-        ? refOrElement
-        : refOrElement.current
-      : null;
+        ? refOrElement instanceof Element
+          ? refOrElement
+          : refOrElement.current
+        : null;
 
     if (
       lastReportRef.current &&
@@ -71,6 +72,6 @@ export default function useResolvedElement<T extends Element>(
       cbElementRef.current = element;
       evaluateSubscription();
     },
-    [evaluateSubscription]
+    [evaluateSubscription],
   );
 }

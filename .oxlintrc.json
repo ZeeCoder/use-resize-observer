@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "react-perf", "typescript", "oxc"],
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error"
+  },
+  "ignorePatterns": ["dist", "node_modules", ".baseline", "release", "coverage"]
+}

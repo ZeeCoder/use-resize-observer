@@ -1,12 +1,5 @@
-import {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  RefObject,
-  RefCallback,
-  useCallback,
-} from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import type { RefObject, RefCallback } from "react";
 import useResolvedElement from "./utils/useResolvedElement";
 import extractSize from "./utils/extractSize";
 
@@ -23,10 +16,7 @@ type HookResponse<T extends Element> = {
 
 // Declaring my own type here instead of using the one provided by TS (available since 4.2.2), because this way I'm not
 // forcing consumers to use a specific TS version.
-export type ResizeObserverBoxOptions =
-  | "border-box"
-  | "content-box"
-  | "device-pixel-content-box";
+export type ResizeObserverBoxOptions = "border-box" | "content-box" | "device-pixel-content-box";
 
 declare global {
   interface ResizeObserverEntry {
@@ -42,7 +32,7 @@ function useResizeObserver<T extends Element>(
     onResize?: ResizeHandler;
     box?: ResizeObserverBoxOptions;
     round?: RoundingFunction;
-  } = {}
+  } = {},
 ): HookResponse<T> {
   // Saving the callback as a ref. With this, I don't need to put onResize in the
   // effect dep array, and just passing in an anonymous function without memoising
@@ -112,21 +102,16 @@ function useResizeObserver<T extends Element>(
                 opts.box === "border-box"
                   ? "borderBoxSize"
                   : opts.box === "device-pixel-content-box"
-                  ? "devicePixelContentBoxSize"
-                  : "contentBoxSize";
+                    ? "devicePixelContentBoxSize"
+                    : "contentBoxSize";
 
               const reportedWidth = extractSize(entry, boxProp, "inlineSize");
               const reportedHeight = extractSize(entry, boxProp, "blockSize");
 
               const newWidth = reportedWidth ? round(reportedWidth) : undefined;
-              const newHeight = reportedHeight
-                ? round(reportedHeight)
-                : undefined;
+              const newHeight = reportedHeight ? round(reportedHeight) : undefined;
 
-              if (
-                previous.current.width !== newWidth ||
-                previous.current.height !== newHeight
-              ) {
+              if (previous.current.width !== newWidth || previous.current.height !== newHeight) {
                 const newSize = { width: newWidth, height: newHeight };
                 previous.current.width = newWidth;
                 previous.current.height = newHeight;
@@ -150,9 +135,9 @@ function useResizeObserver<T extends Element>(
           }
         };
       },
-      [opts.box, round]
+      [opts.box, round],
     ),
-    opts.ref
+    opts.ref,
   );
 
   return useMemo(
@@ -161,8 +146,8 @@ function useResizeObserver<T extends Element>(
       width: size.width,
       height: size.height,
     }),
-    [refCallback, size.width, size.height]
+    [refCallback, size.width, size.height],
   );
 }
 
-export default useResizeObserver;
+export { useResizeObserver };

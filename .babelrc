@@ -1,3 +1,0 @@
-{
-  "presets": ["@babel/typescript", ["@babel/preset-env", { "loose": true }]]
-}
