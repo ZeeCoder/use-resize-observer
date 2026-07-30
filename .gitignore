@@ -11,6 +11,7 @@ coverage
 .vitest-attachments
 **/__screenshots__
 V10-MIGRATION-PLAN.md
+browsers.json
 tests/e2e/app/bundle.js
 tests/e2e/app/node_modules
 tests/e2e/app/package-lock.json
