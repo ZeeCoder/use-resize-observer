@@ -5,32 +5,77 @@ on:
       - master
       - alpha
 jobs:
-  testing:
+  # Static checks + node tests + packaging validation. Cheap, run once.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Installing Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Building
+        run: pnpm build
+      - name: Checking Format
+        run: pnpm check:format
+      - name: Checking Linting Rules
+        run: pnpm check:lint
+      - name: Checking Types
+        run: pnpm check:types
+      - name: Checking File Size
+        run: pnpm check:size
+      - name: Node Tests
+        run: pnpm test:node
+      - name: Packaging Validation (publint + attw + smoke)
+        run: pnpm test:pack
+
+  # Component tests in real browsers via Playwright, on both supported React majors.
+  browser:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        react: ["18", "19"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Pin React ${{ matrix.react }}
+        if: matrix.react == '18'
+        run: |
+          pnpm pkg set "pnpm.overrides.react=^18.2.0" \
+                       "pnpm.overrides.react-dom=^18.2.0" \
+                       "pnpm.overrides.@types/react=^18.3.0" \
+                       "pnpm.overrides.@types/react-dom=^18.3.0"
+      - name: Installing Dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Installing Playwright Browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Browser Tests (React ${{ matrix.react }})
+        run: pnpm test:browser
+
+  # Real-device coverage on BrowserStack. React 19 only (see migration plan 2.5).
+  e2e:
     runs-on: ubuntu-latest
     env:
-      BS_ACCESS_KEY: ${{ secrets.BS_ACCESS_KEY }}
-      BS_USERNAME: ${{ secrets.BS_USERNAME }}
+      BROWSERSTACK_USERNAME: ${{ secrets.BS_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BS_ACCESS_KEY }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          always-auth: true
-          node-version: 14
+          node-version: 22
+          cache: pnpm
       - name: Installing Dependencies
-        run: yarn install --frozen-lockfile
-      - name: Checking File Size
-        run: yarn check:size
-      - name: Checking Linting Rules
-        run: yarn check:lint
-      - name: Checking Types
-        run: yarn check:types
-      - name: Running Unit Tests
-        run: yarn test:unit
-      - name: Testing SSR
-        run: yarn test:create:ssr
-      - name: Testing in Modern Browsers (BrowserStack)
-        run: yarn test:bs:modern
-      - name: Testing in Legacy Browsers (BrowserStack)
-        run: yarn test:bs:legacy
+        run: pnpm install --frozen-lockfile
+      - name: Building
+        run: pnpm build
+      - name: E2E (WebdriverIO + BrowserStack)
+        run: pnpm test:e2e
