@@ -29,8 +29,9 @@ both ESM and CJS.
 ```
 
 If you relied on the bundled polyfill, polyfill `ResizeObserver` yourself in your
-app's entry point (this is the recommended approach anyway — the app controls the
-polyfill, not the library):
+app's entry point instead.
+
+This way the app controls the polyfill, not the library.
 
 ```ts
 import { ResizeObserver } from "@juggle/resize-observer";
