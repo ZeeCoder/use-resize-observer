@@ -55,6 +55,10 @@ const commonBstackOptions = {
   projectName: "use-resize-observer",
   buildName,
   seleniumVersion: "4.20.0",
+  // Disable the accessibility scan at the capability level (the service reads it
+  // from here, not just the service options), which silences the repeated
+  // "Accessibility Automation will run only on Chrome browsers" warning.
+  accessibility: false,
 };
 
 export const config: WebdriverIO.Config = {
