@@ -8,6 +8,7 @@
     "coverage",
     "pnpm-lock.yaml",
     "**/*.md",
-    ".claude"
+    ".claude",
+    "**/package.json"
   ]
 }
