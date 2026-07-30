@@ -8,3 +8,5 @@ release
 .baseline
 coverage
 *.tgz
+.vitest-attachments
+**/__screenshots__

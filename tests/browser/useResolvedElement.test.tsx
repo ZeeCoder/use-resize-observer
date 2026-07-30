@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { act, render } from "@testing-library/react";
-import useResolvedElement from "./useResolvedElement";
-import useRenderTrigger from "../../tests/utils/useRenderTrigger";
+import { useCallback, useEffect, useRef } from "react";
+import { expect, test, vi } from "vitest";
+import { render } from "vitest-browser-react";
+import useResolvedElement from "../../src/utils/useResolvedElement";
+import useRenderTrigger from "../utils/useRenderTrigger";
 
-test("should receive the element with the provided callback ref", () => {
+test("should receive the element with the provided callback ref", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
   const Test = () => {
     renderCount++;
     const ref = useResolvedElement(
@@ -19,22 +20,20 @@ test("should receive the element with the provided callback ref", () => {
     return <div ref={ref} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(1);
   expect(cleanupMock).toHaveBeenCalledTimes(1);
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should be able to reuse the callback ref to get different elements", () => {
+test("should be able to reuse the callback ref to get different elements", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
 
   const Test = ({ swap }: { swap?: boolean }) => {
     renderCount++;
@@ -52,32 +51,28 @@ test("should be able to reuse the callback ref to get different elements", () =>
     return <div ref={ref} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
 
-  act(() => {
-    rerender(<Test swap={true} />);
-  });
+  await rerender(<Test swap={true} />);
   expect(renderCount).toBe(2);
   expect(cleanupMock).toHaveBeenCalledTimes(1);
   expect(cleanupMock).toHaveBeenCalledWith();
   expect(elements.length).toBe(2);
   expect(elements[0]).not.toBe(elements[1]);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(2);
   expect(cleanupMock).toHaveBeenCalledTimes(2);
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should be able to use a raw element", () => {
+test("should be able to use a raw element", async () => {
   const element = document.createElement("div");
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
   const Test = () => {
     renderCount++;
     useResolvedElement(
@@ -91,23 +86,21 @@ test("should be able to use a raw element", () => {
     return null;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0]).toBe(element);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(1);
   expect(cleanupMock).toHaveBeenCalledTimes(1);
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should be able to use a ref object", () => {
+test("should be able to use a ref object", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
   const Test = () => {
     renderCount++;
     const ref = useRef<HTMLDivElement>(null);
@@ -122,22 +115,20 @@ test("should be able to use a ref object", () => {
     return <div ref={ref} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(1);
   expect(cleanupMock).toHaveBeenCalledTimes(1);
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should prioritise the ref callback over a ref object argument", () => {
+test("should prioritise the ref callback over a ref object argument", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
   const Test = () => {
     renderCount++;
     const refObject = useRef<HTMLSpanElement>(null);
@@ -157,14 +148,12 @@ test("should prioritise the ref callback over a ref object argument", () => {
     );
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(1);
   // The reason the span is reported when the component unmounts is because on unmount the ref callback is called with a null value.
   // This means that the hook now receives nothing from the ref callback, and an element via the ref object, so it reports the latter.
@@ -176,10 +165,10 @@ test("should prioritise the ref callback over a ref object argument", () => {
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should prioritise the ref callback over an element argument", () => {
+test("should prioritise the ref callback over an element argument", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
-  const cleanupMock = jest.fn();
+  const cleanupMock = vi.fn();
   const element = document.createElement("span");
   const Test = () => {
     renderCount++;
@@ -194,14 +183,12 @@ test("should prioritise the ref callback over an element argument", () => {
     return <div ref={refCallback} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   // The explanation for this behaviour is the same as above.
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(2);
@@ -211,7 +198,7 @@ test("should prioritise the ref callback over an element argument", () => {
   expect(cleanupMock).toHaveBeenCalledWith();
 });
 
-test("should be able to switch from a ref callback to a ref object", () => {
+test("should be able to switch from a ref callback to a ref object", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   // Tracking elements for cleanups for this test to assert that the right cleanup functions are called in the right order.
@@ -241,14 +228,12 @@ test("should be able to switch from a ref callback to a ref object", () => {
     );
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<Test switchToRefObject={true} />);
-  });
+  await rerender(<Test switchToRefObject={true} />);
 
   expect(renderCount).toBe(2);
   expect(cleanupsDone.length).toBe(1);
@@ -257,9 +242,7 @@ test("should be able to switch from a ref callback to a ref object", () => {
   expect(elements[0].tagName).toBe("DIV");
   expect(elements[1].tagName).toBe("SPAN");
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(cleanupsDone.length).toBe(2);
@@ -267,7 +250,7 @@ test("should be able to switch from a ref callback to a ref object", () => {
   expect(cleanupsDone[1]).toBe(elements[1]);
 });
 
-test("should be able to switch from a ref object to a ref callback", () => {
+test("should be able to switch from a ref object to a ref callback", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   // Tracking elements for cleanups for this test to assert that the right cleanup functions are called in the right order.
@@ -298,14 +281,12 @@ test("should be able to switch from a ref object to a ref callback", () => {
     );
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<Test switchToRefCallback={true} />);
-  });
+  await rerender(<Test switchToRefCallback={true} />);
 
   expect(renderCount).toBe(2);
   expect(cleanupsDone.length).toBe(1);
@@ -314,9 +295,7 @@ test("should be able to switch from a ref object to a ref callback", () => {
   expect(elements[0].tagName).toBe("DIV");
   expect(elements[1].tagName).toBe("SPAN");
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(cleanupsDone.length).toBe(2);
@@ -324,7 +303,7 @@ test("should be able to switch from a ref object to a ref callback", () => {
   expect(cleanupsDone[1]).toBe(elements[1]);
 });
 
-test("should be able to switch back and forth between a ref object and a ref callback", () => {
+test("should be able to switch back and forth between a ref object and a ref callback", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   // Tracking elements for cleanups for this test to assert that the right cleanup functions are called in the right order.
@@ -349,31 +328,25 @@ test("should be able to switch back and forth between a ref object and a ref cal
     );
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<Test renderSpan={true} />);
-  });
+  await rerender(<Test renderSpan={true} />);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(elements[0].tagName).toBe("DIV");
   expect(elements[1].tagName).toBe("SPAN");
 
-  act(() => {
-    rerender(<Test renderSpan={false} />);
-  });
+  await rerender(<Test renderSpan={false} />);
   expect(renderCount).toBe(3);
   expect(elements.length).toBe(3);
   expect(elements[0].tagName).toBe("DIV");
   expect(elements[1].tagName).toBe("SPAN");
   expect(elements[2].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
 
   expect(renderCount).toBe(3);
   expect(elements.length).toBe(3);
@@ -383,7 +356,7 @@ test("should be able to switch back and forth between a ref object and a ref cal
   expect(cleanupsDone[2]).toBe(elements[2]);
 });
 
-test("should not unnecessarily call the subscriber between renders", () => {
+test("should not unnecessarily call the subscriber between renders", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   let triggerRender: ReturnType<typeof useRenderTrigger>;
@@ -399,26 +372,24 @@ test("should not unnecessarily call the subscriber between renders", () => {
     return <div ref={refCallback} />;
   };
 
-  render(<Test />);
+  await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    triggerRender();
-  });
+  await triggerRender!();
 
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 });
 
-test("should call the subscriber function if its identity changes, even if the element didn't with ref callback", () => {
+test("should call the subscriber function if its identity changes, even if the element didn't with ref callback", async () => {
   let renderCount = 0;
   const elements1: Element[] = [];
   const elements2: Element[] = [];
-  const cleanupMock1 = jest.fn();
-  const cleanupMock2 = jest.fn();
+  const cleanupMock1 = vi.fn();
+  const cleanupMock2 = vi.fn();
   const Test = ({ switchToSubscriber2 }: { switchToSubscriber2?: boolean }) => {
     renderCount++;
     const subscriber1 = useCallback((element: Element) => {
@@ -434,15 +405,13 @@ test("should call the subscriber function if its identity changes, even if the e
     return <div ref={refCallback} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements1.length).toBe(1);
   expect(elements1[0].tagName).toBe("DIV");
   expect(elements2.length).toBe(0);
 
-  act(() => {
-    rerender(<Test switchToSubscriber2={true} />);
-  });
+  await rerender(<Test switchToSubscriber2={true} />);
 
   expect(renderCount).toBe(2);
   expect(elements1.length).toBe(1);
@@ -452,12 +421,12 @@ test("should call the subscriber function if its identity changes, even if the e
   expect(elements1[0]).toBe(elements2[0]);
 });
 
-test("should call the subscriber function if its identity changes, even if the element didn't with ref object", () => {
+test("should call the subscriber function if its identity changes, even if the element didn't with ref object", async () => {
   let renderCount = 0;
   const elements1: Element[] = [];
   const elements2: Element[] = [];
-  const cleanupMock1 = jest.fn();
-  const cleanupMock2 = jest.fn();
+  const cleanupMock1 = vi.fn();
+  const cleanupMock2 = vi.fn();
   const Test = ({ switchToSubscriber2 }: { switchToSubscriber2?: boolean }) => {
     renderCount++;
     const refObject = useRef<HTMLDivElement>(null);
@@ -474,15 +443,13 @@ test("should call the subscriber function if its identity changes, even if the e
     return <div ref={refObject} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements1.length).toBe(1);
   expect(elements1[0].tagName).toBe("DIV");
   expect(elements2.length).toBe(0);
 
-  act(() => {
-    rerender(<Test switchToSubscriber2={true} />);
-  });
+  await rerender(<Test switchToSubscriber2={true} />);
 
   expect(renderCount).toBe(2);
   expect(elements1.length).toBe(1);
@@ -492,12 +459,12 @@ test("should call the subscriber function if its identity changes, even if the e
   expect(elements1[0]).toBe(elements2[0]);
 });
 
-test("should call the subscriber function if its identity changes, even if the element didn't with raw element", () => {
+test("should call the subscriber function if its identity changes, even if the element didn't with raw element", async () => {
   let renderCount = 0;
   const elements1: Element[] = [];
   const elements2: Element[] = [];
-  const cleanupMock1 = jest.fn();
-  const cleanupMock2 = jest.fn();
+  const cleanupMock1 = vi.fn();
+  const cleanupMock2 = vi.fn();
   const element = document.createElement("div");
   const Test = ({ switchToSubscriber2 }: { switchToSubscriber2?: boolean }) => {
     renderCount++;
@@ -514,15 +481,13 @@ test("should call the subscriber function if its identity changes, even if the e
     return null;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements1.length).toBe(1);
   expect(elements1[0]).toBe(element);
   expect(elements2.length).toBe(0);
 
-  act(() => {
-    rerender(<Test switchToSubscriber2={true} />);
-  });
+  await rerender(<Test switchToSubscriber2={true} />);
 
   expect(renderCount).toBe(2);
   expect(elements1.length).toBe(1);
@@ -532,7 +497,7 @@ test("should call the subscriber function if its identity changes, even if the e
   expect(elements1[0]).toBe(elements2[0]);
 });
 
-test("should be able to reuse a ref callback to get a different element", () => {
+test("should be able to reuse a ref callback to get a different element", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   const cleanupsDone: Element[] = [];
@@ -553,14 +518,12 @@ test("should be able to reuse a ref callback to get a different element", () => 
     return <div ref={ref} />;
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
-  act(() => {
-    rerender(<Test getOtherElement={true} />);
-  });
+  await rerender(<Test getOtherElement={true} />);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(elements[0].tagName).toBe("DIV");
@@ -568,9 +531,7 @@ test("should be able to reuse a ref callback to get a different element", () => 
   expect(cleanupsDone.length).toBe(1);
   expect(cleanupsDone[0]).toBe(elements[0]);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(cleanupsDone.length).toBe(2);
@@ -578,7 +539,7 @@ test("should be able to reuse a ref callback to get a different element", () => 
   expect(cleanupsDone[1]).toBe(elements[1]);
 });
 
-test("should be able to reuse a ref object to get a different element", () => {
+test("should be able to reuse a ref object to get a different element", async () => {
   let renderCount = 0;
   const elements: Element[] = [];
   const cleanupsDone: Element[] = [];
@@ -602,15 +563,13 @@ test("should be able to reuse a ref object to get a different element", () => {
     );
   };
 
-  const { rerender } = render(<Test />);
+  const { rerender } = await render(<Test />);
   expect(renderCount).toBe(1);
   expect(elements.length).toBe(1);
   expect(elements[0].tagName).toBe("DIV");
 
   // We remove the currently rendered div, so that we get a different element on the second subscriber call.
-  act(() => {
-    rerender(<Test getOtherElement={true} />);
-  });
+  await rerender(<Test getOtherElement={true} />);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(elements[0].tagName).toBe("DIV");
@@ -619,9 +578,7 @@ test("should be able to reuse a ref object to get a different element", () => {
   expect(cleanupsDone.length).toBe(1);
   expect(cleanupsDone[0]).toBe(elements[0]);
 
-  act(() => {
-    rerender(<></>);
-  });
+  await rerender(<></>);
   expect(renderCount).toBe(2);
   expect(elements.length).toBe(2);
   expect(cleanupsDone.length).toBe(2);

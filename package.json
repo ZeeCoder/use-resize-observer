@@ -1,42 +1,52 @@
 {
   "name": "use-resize-observer",
   "version": "9.1.0",
+  "description": "A React hook that allows you to use a ResizeObserver to measure an element's size.",
+  "keywords": [
+    "container query",
+    "css in js",
+    "hook",
+    "measure",
+    "react",
+    "react hook",
+    "resize",
+    "resize hook",
+    "resize observer",
+    "resize observer hook",
+    "resize observer react hook",
+    "size",
+    "size hook",
+    "use-resize-observer",
+    "useresizeobserver"
+  ],
+  "license": "MIT",
+  "author": "Viktor Hubert <contact@hubertviktor.com>",
+  "repository": "git@github.com:ZeeCoder/use-resize-observer.git",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG*",
+    "CONTRIBUTING.md"
+  ],
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.mts", "default": "./dist/index.mjs" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
-  "engines": {
-    "node": ">=20"
-  },
-  "repository": "git@github.com:ZeeCoder/use-resize-observer.git",
-  "description": "A React hook that allows you to use a ResizeObserver to measure an element's size.",
-  "author": "Viktor Hubert <contact@hubertviktor.com>",
-  "license": "MIT",
-  "keywords": [
-    "react",
-    "hook",
-    "react hook",
-    "resize observer",
-    "resize observer hook",
-    "resize observer react hook",
-    "use-resize-observer",
-    "useresizeobserver",
-    "resize hook",
-    "size hook",
-    "container query",
-    "css in js",
-    "measure",
-    "size",
-    "resize"
-  ],
   "scripts": {
     "build": "tsdown",
     "prepack": "pnpm build",
@@ -52,23 +62,16 @@
     "test": "pnpm build && pnpm check:format && pnpm check:lint && pnpm check:types && pnpm check:size && pnpm test:node && pnpm test:pack",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{js,mjs,cjs,ts,tsx}": [
-      "oxfmt --write"
-    ]
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG*",
-    "CONTRIBUTING.md"
-  ],
-  "peerDependencies": {
-    "react": "^18.2.0 || ^19.0.0"
-  },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.4",
+    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@size-limit/preset-small-lib": "^13.0.2",
+    "@types/node": "^22.20.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.0",
@@ -82,17 +85,21 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "semantic-release": "^25.0.8",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.4",
-    "@semantic-release/npm": "^12.0.2",
-    "@semantic-release/release-notes-generator": "^14.0.3",
     "size-limit": "^13.0.2",
-    "@size-limit/preset-small-lib": "^13.0.2",
     "tsdown": "^0.22.14",
     "typescript": "5.9.3",
     "vitest": "^4.1.10",
     "vitest-browser-react": "^2.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx}": [
+      "oxfmt --write"
+    ]
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

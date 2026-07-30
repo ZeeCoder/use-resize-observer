@@ -6,6 +6,6 @@
     "emitDeclarationOnly": false,
     "types": ["node"]
   },
-  "include": ["../src", "node", "browser", "utils", "setup.ts"],
+  "include": ["../src", "node", "browser", "utils", "setup.ts", "react-dom-server.d.ts"],
   "exclude": ["../src/**/*.test.tsx"]
 }
