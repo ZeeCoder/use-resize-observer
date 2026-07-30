@@ -416,3 +416,421 @@ New Test Reporting and Analytics Dashboard visibilty is OFF for this build.
 Set testReporting: true in your browserstack.yml to dashboard-level build visibility
 ──────────────────────────────────────────
 2026-07-30T13:30:00.274Z CLI info [main]  [56tu516bfhqpw9uvd4txvuhmhhbma4v5xrzkktyz]  [b047dad4-06fd-4d32-9818-7b34292e4c6f]  Received graceful signal termination (SIGTERM), performing cleanup
+2026-07-30T13:39:24.758Z CLI info    Config : {"userName":"[REDACTED]","accessKey":"[REDACTED]","platforms":[{"browserName":"Chrome","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"os":"Windows","osVersion":"11","browserVersion":"latest","wdioService":"9.33.0"},{"browserName":"Firefox","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"os":"Windows","osVersion":"11","browserVersion":"latest","wdioService":"9.33.0"},{"browserName":"Edge","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"os":"Windows","osVersion":"11","browserVersion":"latest","wdioService":"9.33.0"},{"browserName":"Safari","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"os":"OS X","osVersion":"Sequoia","browserVersion":"latest","wdioService":"9.33.0"},{"browserName":"Safari","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"os":"OS X","osVersion":"Catalina","browserVersion":"13.0","wdioService":"9.33.0"},{"browserName":"safari","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"deviceName":"iPhone 15","osVersion":"17","realMobile":true,"wdioService":"9.33.0"},{"browserName":"chrome","local":true,"projectName":"use-resize-observer","buildName":"local 2026-07-30T13:39:21.998Z","seleniumVersion":"4.20.0","accessibility":false,"deviceName":"Samsung Galaxy S23","osVersion":"13.0","realMobile":true,"wdioService":"9.33.0"}],"isNonBstackA11yWDIO":false,"browserstackLocal":true,"testObservability":false,"accessibility":false,"percy":false,"testContextOptions":{"skipSessionName":false,"skipSessionStatus":false,"sessionNameOmitTestTitle":false,"sessionNamePrependTopLevelSuiteTitle":false,"sessionNameFormat":""},"buildTag":[]}
+2026-07-30T13:39:24.799Z CLI info    Should start debug utility: undefined
+2026-07-30T13:39:24.801Z CLI info [testhub:module]   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Starting testhub from 121888:0
+2026-07-30T13:39:24.803Z CLI info   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making POST request to https://sdk.browserstack.com
+2026-07-30T13:39:24.804Z CLI info   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making GET request to https://hub.browserstack.com
+2026-07-30T13:39:25.194Z CLI info   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making GET request to https://hub-euw.browserstack.com
+2026-07-30T13:39:25.194Z CLI info   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making GET request to https://hub-use.browserstack.com
+2026-07-30T13:39:25.195Z CLI info   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making GET request to https://hub-aps.browserstack.com
+2026-07-30T13:39:25.885Z CLI info [testhub:module]   [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  startBuild: response=au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa
+2026-07-30T13:39:25.886Z CLI info  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making POST request to https://api.browserstack.com
+2026-07-30T13:39:31.719Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=2
+2026-07-30T13:39:31.814Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=1
+2026-07-30T13:39:31.881Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=4
+2026-07-30T13:39:31.948Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=3
+2026-07-30T13:39:31.995Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=0
+2026-07-30T13:39:38.360Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:38.502Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:39.337Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.343Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.719Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.728Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.729Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.827Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.829Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:40.829Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.304Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.310Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.310Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.404Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.407Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.408Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.838Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.840Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:41.841Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.044Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.050Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.050Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.142Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.144Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.145Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.205Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.207Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.207Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.618Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.866Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.873Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.875Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:42.876Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:43.218Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:45.274Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=5
+2026-07-30T13:39:45.458Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Driver initialized as primary driver: platformIndex=6
+2026-07-30T13:39:48.154Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.331Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.336Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.337Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.450Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.453Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:51.453Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:52.688Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:52.690Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:52.690Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:53.336Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.155Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.162Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.162Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.263Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.266Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:55.266Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:56.510Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:56.512Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:56.512Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:39:57.173Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:06.545Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:07.450Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.434Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.440Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.441Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.486Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.492Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.493Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.554Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.557Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.557Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.617Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.620Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:10.620Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.057Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.059Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.059Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.792Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.976Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.978Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestSessionEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:12.978Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:14.558Z CLI error [TEST REPORTING AND ANALYTICS:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Error: unsupported language: ECMAScript
+    at ObservabilityModule.forwardRequest (/snapshot/browserstack-binary/cli/dist/index.js)
+    at ObservabilityModule.onTestFrameworkEvent (/snapshot/browserstack-binary/cli/dist/index.js)
+    at /snapshot/browserstack-binary/cli/dist/index.js
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:16.301Z CLI info  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making GET request to https://api.browserstack.com
+2026-07-30T13:40:16.304Z CLI info  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making PUT request to https://collector-observability.browserstack.com
+2026-07-30T13:40:16.872Z CLI error [testhub:module]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  stopBuild: request={"finished_at":"2026-07-30T13:40:16.301Z","finished_metadata":[],"custom_metadata":null} error=HTTPError: Response code 401 (Unauthorized)
+    at _0x518cbe.<anonymous> (/snapshot/browserstack-binary/cli/dist/index.js)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:16.873Z CLI error  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  error invoking callback for eventName onStop: Response code 401 (Unauthorized)
+2026-07-30T13:40:16.873Z CLI error  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  HTTPError: Response code 401 (Unauthorized)
+    at _0x518cbe.<anonymous> (/snapshot/browserstack-binary/cli/dist/index.js)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-30T13:40:16.874Z CLI info  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  [PRODUCTION] Making POST request to https://api.browserstack.com
+2026-07-30T13:40:17.602Z CLI info [TEST REPORTING AND ANALYTICS:module]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Visit https://automation.browserstack.com/builds/au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa to view build report, insights, and many more debugging information all at one place!
+2026-07-30T13:40:17.621Z CLI info [sdk:service]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  ────── Test Reporting & Analytics Disabled ──────
+New Test Reporting and Analytics Dashboard visibilty is OFF for this build.
+Set testReporting: true in your browserstack.yml to dashboard-level build visibility
+──────────────────────────────────────────
+2026-07-30T13:40:17.625Z CLI info [main]  [au9srl44ovxtxwrb2szggacpigo1d8nlknkfttfa]  [ed4f9f35-9458-47e9-b179-b53f6b4cd0f6]  Received graceful signal termination (SIGTERM), performing cleanup

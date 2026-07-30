@@ -169,6 +169,11 @@ export const config: WebdriverIO.Config = {
   mochaOpts: { ui: "bdd", timeout: 60000 },
 
   logLevel: "warn",
+  // Silence the browserstack-service's own warnings — on this account they're all
+  // non-fatal noise (the server-side accessibility notice and the disabled-TestHub
+  // "Invalid auth token" bootstrap line), and the client-side options don't
+  // suppress them. Errors are still shown. Everything else stays at "warn".
+  logLevels: { "@wdio/browserstack-service": "error" },
   waitforTimeout: 15000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 3,
