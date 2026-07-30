@@ -14,8 +14,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![build](https://github.com/ZeeCoder/use-resize-observer/workflows/Testing/badge.svg)](https://github.com/ZeeCoder/use-resize-observer/actions/workflows/testing.yml)
 [![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)](https://automate.browserstack.com/public-build/aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)
 
-> **Upgrading from v9?** v10 has several breaking changes (named export, no
-> `/polyfilled` entrypoint, React 18.2+ only). See [MIGRATION.md](./MIGRATION.md).
+> **Upgrading from v9?** v10 has several breaking changes, see [MIGRATION.md](./MIGRATION.md).
 
 ## Highlights
 
