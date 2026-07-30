@@ -60,9 +60,3 @@ You now need React 18.2 or newer (18.2+ or 19). Anything older is no longer supp
 
 The build no longer transpiles down to ES5 / IE 11. If you must support very old
 browsers, transpile `node_modules/use-resize-observer` as part of your own build.
-
-## Not changing
-
-- The runtime API (`useResizeObserver(options)` and its `{ ref, width, height }`
-  response) is unchanged apart from the import.
-- All options (`ref`, `box`, `onResize`, `round`) behave the same.
