@@ -50,6 +50,12 @@ const buildName = process.env.GITHUB_RUN_ID
   ? `ci-${process.env.GITHUB_RUN_ID}`
   : `local ${new Date().toISOString()}`;
 
+// With Test Observability disabled, the service doesn't mark sessions
+// passed/failed, so the dashboard leaves them "unmarked" and the build lingers
+// "running". Mark status explicitly via BrowserStack's JS executor (independent
+// of observability). Track the first failure for a useful reason.
+let firstFailureReason = "";
+
 const commonBstackOptions = {
   local: true,
   projectName: "use-resize-observer",
@@ -166,4 +172,31 @@ export const config: WebdriverIO.Config = {
   waitforTimeout: 15000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 3,
+
+  // Capture the first failure so we can report a useful reason on the session.
+  afterTest: (_test, _context, result) => {
+    if (!result.passed && !firstFailureReason) {
+      firstFailureReason = result.error?.message ?? "Test failed";
+    }
+  },
+  // Mark the session passed/failed via BrowserStack's JS executor, so the
+  // dashboard shows a status instead of "unmarked". Best-effort — a marking
+  // failure must never fail the run.
+  after: async (exitCode) => {
+    const passed = exitCode === 0;
+    try {
+      await browser.executeScript(
+        `browserstack_executor: ${JSON.stringify({
+          action: "setSessionStatus",
+          arguments: {
+            status: passed ? "passed" : "failed",
+            reason: passed ? "All specs passed" : firstFailureReason || "One or more specs failed",
+          },
+        })}`,
+        [],
+      );
+    } catch {
+      // ignore
+    }
+  },
 };
