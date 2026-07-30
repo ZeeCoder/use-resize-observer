@@ -27,7 +27,7 @@
     "README.md",
     "MIGRATION.md",
     "LICENSE",
-    "CHANGELOG*",
+    "CHANGELOG.md",
     "CONTRIBUTING.md"
   ],
   "type": "module",
