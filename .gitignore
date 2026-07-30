@@ -12,7 +12,7 @@ coverage
 browsers.json
 tests/e2e/app/bundle.js
 tests/e2e/app/node_modules
-tests/e2e/app/package-lock.json
+tests/e2e/app/pnpm-lock.yaml
 
 # BrowserStack SDK / WebdriverIO run artifacts (E2E)
 *.log

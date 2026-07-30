@@ -5,6 +5,7 @@
   "description": "Static page that consumes the packed use-resize-observer tarball for the BrowserStack E2E suite.",
   "dependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "use-resize-observer": "file:../../../use-resize-observer.tgz"
   }
 }

@@ -20,7 +20,6 @@ const run = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { stdio: "inherit", cwd: root, shell: false, ...opts });
 
 const pnpm = "pnpm";
-const npm = "npm";
 
 console.log("→ Building");
 run(pnpm, ["build"]);
@@ -41,7 +40,8 @@ if (!tgz) throw new Error("FAIL: no tarball produced by `pnpm pack`");
 const dir = mkdtempSync(join(tmpdir(), "urs-smoke-"));
 console.log(`\n→ smoke-testing packed tarball in ${dir}`);
 writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "smoke", private: true }));
-run(npm, ["install", "--no-audit", "--no-fund", join(root, tgz), "react"], { cwd: dir });
+// Standalone temp project (outside the repo); --ignore-workspace keeps it isolated.
+run(pnpm, ["add", "--ignore-workspace", join(root, tgz), "react"], { cwd: dir });
 copyFileSync(join(root, "scripts", "smoke.cjs"), join(dir, "smoke.cjs"));
 copyFileSync(join(root, "scripts", "smoke.mjs"), join(dir, "smoke.mjs"));
 run("node", ["smoke.cjs"], { cwd: dir });
