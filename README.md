@@ -100,30 +100,6 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>({
 
 Note that if the browser does not support the given box type, then the hook won't report any sizes either.
 
-### Next.js App Router / React Server Components
-
-This is a hooks-only library, so it can only run in Client Components. In the
-Next.js App Router (or any React Server Components setup), the component that
-calls `useResizeObserver` must be a Client Component — add the `"use client"`
-directive at the top of your own file:
-
-```tsx
-"use client";
-
-import { useResizeObserver } from "use-resize-observer";
-
-export function Measured() {
-  const { ref, width, height } = useResizeObserver<HTMLDivElement>();
-  return <div ref={ref}>{width}x{height}</div>;
-}
-```
-
-The library deliberately does **not** ship its own `"use client"` directive: for
-a hooks-only package that would be a no-op (a Server Component still cannot call a
-hook), and it would force the directive on every consumer. Without a client
-boundary you'll see an opaque `TypeError: (0 , ...useRef) is not a function` at
-prerender time — the fix is the `"use client"` on your calling component above.
-
 ### Box Options
 
 Note that box options are experimental, and as such are not supported by all browsers that implemented ResizeObservers. (See [here](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry).)
