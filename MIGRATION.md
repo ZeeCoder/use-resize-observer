@@ -48,9 +48,9 @@ entrypoint. The package now has **no runtime dependencies**.
 
 ### 4. `react-dom` is no longer a peer dependency
 
-The library never imported `react-dom`; it was only ever a stray peer
-dependency. If your package manager warned about it before, that warning is gone.
-`react` remains the only peer dependency.
+`react-dom` is no longer listed as a peer dependency; `react` remains the only
+one. If your package manager warned about a missing `react-dom` peer before, that
+warning is now gone.
 
 ### 5. Supported React versions
 
