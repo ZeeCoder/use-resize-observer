@@ -12,10 +12,15 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      # Required for npm Trusted Publishing (OIDC): npm mints a short-lived token
+      # from this GitHub OIDC token at publish time — no NPM_TOKEN needed, and
+      # provenance is attached automatically.
       id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
+      # node >= 22.14 satisfies @semantic-release/npm@13's engines; the plugin
+      # bundles npm 11.6.2 (OIDC-capable), so the runner's own npm doesn't matter.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -28,6 +33,3 @@ jobs:
         run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # Publish with npm provenance (requires the id-token: write permission above).
-          NPM_CONFIG_PROVENANCE: true
