@@ -436,14 +436,14 @@ const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
 
 ## "ResizeObserver loop limit exceeded"
 
-Sooner or later you'll see this reported as an error — as
-`ResizeObserver loop limit exceeded` in Chrome, or
-`ResizeObserver loop completed with undelivered notifications` in Firefox.
+If you come across this — `ResizeObserver loop limit exceeded` in Chrome, or
+`ResizeObserver loop completed with undelivered notifications` in Firefox — it is
+**harmless**, despite surfacing as an error.
 
-It's **harmless**. It means observing caused a resize, which caused another
-observation, and the browser cut the loop short instead of hanging. It's a guard
-against infinite loops during a layout pass, not a crash — the pending
-notifications are simply delivered on the next frame.
+It means observing caused a resize, which caused another observation, and the
+browser cut the loop short instead of hanging. It's a guard against infinite loops
+during a layout pass, not a crash — the pending notifications are simply delivered
+on the next frame.
 
 Worth addressing all the same, in this order:
 
