@@ -277,9 +277,8 @@ as `entry`. This gives you everything the hook itself doesn't surface:
   (where supported), so you can read a different box than the one being observed.
 - **The observed element**, as `entry.target`. This is handy when you use the
   returned ref callback, where the element isn't otherwise at hand in the callback.
-  It also lets you reach for `entry.target.getBoundingClientRect()` if you need
-  something the observer doesn't provide, like the element's coordinates. (Note
-  that this forces a layout; the ResizeObserver values above do not.)
+  It also lets you reach for things the observer doesn't provide at all, like the
+  element's [coordinates](#element-coordinates).
 
 ```tsx
 const { ref } = useResizeObserver<HTMLDivElement>({
@@ -312,6 +311,30 @@ You might want to receive values less frequently than changes actually occur.
 Another popular concept are breakpoints. Here is an example for a simple hook accomplishing that.
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-breakpoints-3hiv8)
+
+### Element Coordinates
+
+The hook reports sizes only. If you need the element's `x` / `y` / `top` / `left`
+too, read them off the element with
+[getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect),
+which the [raw `entry`](#the-raw-entry) puts within easy reach:
+
+```ts
+const { ref } = useResizeObserver({
+  onResize: ({ entry }) => {
+    requestAnimationFrame(() => {
+      const rect = entry.target.getBoundingClientRect();
+      // ... do something with the result ...
+    });
+  },
+});
+```
+
+`getBoundingClientRect()` forces a layout, so it is wrapped in a
+`requestAnimationFrame` here to avoid
+[layout thrashing](https://github.com/ZeeCoder/use-resize-observer/discussions/102#discussioncomment-5020345).
+Only reach for this if you actually need the coordinates — if width / height is
+all you're after, use the hook as normal and leave `entry` alone.
 
 ## Defaults (SSR)
 
