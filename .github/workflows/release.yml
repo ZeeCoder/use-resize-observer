@@ -23,16 +23,14 @@ jobs:
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v4
-      # node >= 22.14 satisfies @semantic-release/npm@13's engines.
+      # Node 24 (current LTS). Keep this at 24+: @semantic-release/npm runs
+      # `npm publish` from the runner's npm (its bundled copy isn't on PATH under
+      # pnpm), and npm Trusted Publishing (OIDC) needs npm >= 11.5.1 — which Node
+      # 24 bundles, but Node 22 does not.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-      # @semantic-release/npm runs `npm publish` from the runner's npm (its bundled
-      # copy isn't on PATH under pnpm), and npm Trusted Publishing (OIDC) needs
-      # npm >= 11.5.1 — newer than the npm bundled with Node 22.
-      - name: Upgrade npm for OIDC trusted publishing
-        run: npm install --global npm@latest
       - name: Installing Dependencies
         run: pnpm install --frozen-lockfile
       - name: Building
