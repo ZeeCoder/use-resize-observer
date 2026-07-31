@@ -450,8 +450,8 @@ Worth addressing all the same, in this order:
 1. **Find the root cause.** Usually something in your resize handling changes
    layout in a way that feeds back into the observed element. That feedback loop
    is the actual bug, and fixing it makes the message go away for good.
-2. **Filter it in your error reporting.** If you can't pin it down, drop it in
-   Sentry (or whatever you use). It's noise rather than a failure, and left alone
+2. **Filter it out in your bug tracker** (Sentry, Datadog, etc). If you can't pin
+   it down, stop collecting it. It's noise rather than a failure, and left alone
    it can bury real errors.
 3. **Defer reporting by a frame.** A last resort — compose a hook that pushes the
    size out through `requestAnimationFrame`:
