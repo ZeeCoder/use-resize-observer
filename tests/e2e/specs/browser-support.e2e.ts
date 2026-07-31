@@ -3,7 +3,14 @@ import { browser, $ } from "@wdio/globals";
 describe("use-resize-observer (packed tarball, real browsers)", () => {
   before(async () => {
     await browser.url("/");
-    await $('[data-testid="measured"]').waitForExist();
+    // The initial load is by far the slowest step on a cold remote session —
+    // older engines (Safari 13 especially) can take well over the default
+    // `waitforTimeout` to fetch through the tunnel and render. Interactions once
+    // loaded are quick, so only this wait needs the generous timeout.
+    await $('[data-testid="measured"]').waitForExist({
+      timeout: 60000,
+      timeoutMsg: "the E2E page never rendered",
+    });
   });
 
   it("exposes the v10 export surface (named export, no default)", async () => {

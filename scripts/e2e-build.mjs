@@ -50,6 +50,11 @@ run("pnpm", [
   "--bundle",
   "--format=iife",
   "--jsx=automatic",
+  // Target the oldest engine in the capability matrix, so the harness page is
+  // guaranteed to parse everywhere we test. Without this, esbuild passes modern
+  // syntax straight through (ours and React's) and an old Safari fails to render
+  // the page at all — a failure about the bundle, not about the library.
+  "--target=es2017",
   '--define:process.env.NODE_ENV="production"',
   `--outfile=${join(appDir, "bundle.js")}`,
 ]);
