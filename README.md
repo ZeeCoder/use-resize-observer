@@ -434,6 +434,48 @@ const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
 });
 ```
 
+## "ResizeObserver loop limit exceeded"
+
+Sooner or later you'll see this reported as an error — as
+`ResizeObserver loop limit exceeded` in Chrome, or
+`ResizeObserver loop completed with undelivered notifications` in Firefox.
+
+It's **harmless**. It means observing caused a resize, which caused another
+observation, and the browser cut the loop short instead of hanging. It's a guard
+against infinite loops during a layout pass, not a crash — the pending
+notifications are simply delivered on the next frame.
+
+Worth addressing all the same, in this order:
+
+1. **Find the root cause.** Usually something in your resize handling changes
+   layout in a way that feeds back into the observed element. That feedback loop
+   is the actual bug, and fixing it makes the message go away for good.
+2. **Filter it in your error reporting.** If you can't pin it down, drop it in
+   Sentry (or whatever you use). It's noise rather than a failure, and left alone
+   it can bury real errors.
+3. **Defer reporting by a frame.** A last resort — compose a hook that pushes the
+   size out through `requestAnimationFrame`:
+
+```ts
+const useResizeObserverWithRAF = (opts) => {
+  const [size, setSize] = useState({ width: undefined, height: undefined });
+
+  const { ref } = useResizeObserver({
+    ...opts,
+    onResize: ({ width, height }) => {
+      requestAnimationFrame(() => setSize({ width, height }));
+    },
+  });
+
+  return { ref, ...size };
+};
+```
+
+This works because it moves the reporting out of the layout pass where the limit
+is enforced. The catch is that sizes now arrive a frame late (~16ms at 60fps),
+which gives up much of the point of using a `ResizeObserver` — so reach for it
+only once the first two options are exhausted.
+
 ## Related
 
 - [@zeecoder/container-query](https://github.com/ZeeCoder/container-query)
