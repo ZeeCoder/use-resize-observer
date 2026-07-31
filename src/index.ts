@@ -107,6 +107,13 @@ function useResizeObserver<T extends Element>(
             box: opts.box,
             round,
             instance: new RO((entries) => {
+              // A ResizeObserver notification can still arrive right after the
+              // component unmounted. Bail out before reporting, so we neither
+              // invoke the user's onResize nor setState on an unmounted component.
+              if (didUnmount.current) {
+                return;
+              }
+
               const entry = entries[0];
 
               const boxProp =
@@ -135,9 +142,7 @@ function useResizeObserver<T extends Element>(
                   // through `entry.target`, the element) across renders.
                   onResizeRef.current({ ...newSize, entry });
                 } else {
-                  if (!didUnmount.current) {
-                    setSize(newSize);
-                  }
+                  setSize(newSize);
                 }
               }
             }),
