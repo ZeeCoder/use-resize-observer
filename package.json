@@ -110,8 +110,5 @@
     "*.{js,mjs,cjs,ts,tsx}": [
       "oxfmt --write"
     ]
-  },
-  "engines": {
-    "node": ">=24"
   }
 }
