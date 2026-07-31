@@ -8,7 +8,15 @@ export type ObservedSize = {
   height: number | undefined;
 };
 
-export type ResizeHandler = (size: ObservedSize) => void;
+export type ResizeHandlerPayload = ObservedSize & {
+  // The raw ResizeObserverEntry, exposed so that anything the hook doesn't
+  // (or doesn't yet) surface itself stays reachable: all box sizes are reported
+  // regardless of the `box` option, and `entry.target` is the observed element,
+  // which is otherwise awkward to get hold of when using the returned ref callback.
+  entry: ResizeObserverEntry;
+};
+
+export type ResizeHandler = (payload: ResizeHandlerPayload) => void;
 
 type HookResponse<T extends Element> = {
   ref: RefCallback<T>;
@@ -122,7 +130,10 @@ function useResizeObserver<T extends Element>(
                 previous.current.width = newWidth;
                 previous.current.height = newHeight;
                 if (onResizeRef.current) {
-                  onResizeRef.current(newSize);
+                  // The entry is only passed to the callback, deliberately not
+                  // into state: keeping it in state would retain the entry (and
+                  // through `entry.target`, the element) across renders.
+                  onResizeRef.current({ ...newSize, entry });
                 } else {
                   if (!didUnmount.current) {
                     setSize(newSize);

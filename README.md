@@ -22,7 +22,8 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - **Zero runtime dependencies.**
 - **Tiny**: under 1kB (minified, gzipped), monitored by [size-limit](https://github.com/ai/size-limit) ([budget](.size-limit.json)).
 - Ships **ESM and CJS** builds.
-- Exposes an **onResize callback** if you need more control.
+- Exposes an **onResize callback** if you need more control, receiving the raw
+  `ResizeObserverEntry` along with the measured size.
 - `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
@@ -61,7 +62,7 @@ yarn add use-resize-observer
 | -------- |--------------------------------------------------------------------------------------| ----------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | ref      | undefined &#124; RefCallback &#124; RefObject &#124; HTMLElement                     | A ref or element to observe.                                                                                                  | undefined      |
 | box      | undefined &#124; "border-box" &#124; "content-box" &#124; "device-pixel-content-box" | The [box model](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax) to use for observation.       | "content-box"  |
-| onResize | undefined &#124; ({ width?: number, height?: number }) => void                       | A callback receiving the element size. If given, then the hook will not return the size, and instead will call this callback. | undefined      |
+| onResize | undefined &#124; ({ width?: number, height?: number, entry: ResizeObserverEntry }) => void | A callback receiving the element size, along with the [raw entry](#the-raw-entry). If given, then the hook will not return the size, and instead will call this callback. | undefined      |
 | round    | undefined &#124; (n: number) => number                                               | A function to use for rounding values instead of the default.                                                                 | `Math.round()` |
 
 ## Response
@@ -263,6 +264,30 @@ const App = () => {
 
   return <div ref={ref} />;
 };
+```
+
+### The raw `entry`
+
+Along with the resolved `width` / `height`, the callback receives the raw
+[ResizeObserverEntry](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
+as `entry`. This gives you everything the hook itself doesn't surface:
+
+- **All box sizes**, regardless of the `box` option in use. Browsers report
+  `contentBoxSize`, `borderBoxSize` and `devicePixelContentBoxSize` on every entry
+  (where supported), so you can read a different box than the one being observed.
+- **The observed element**, as `entry.target`. This is handy when you use the
+  returned ref callback, where the element isn't otherwise at hand in the callback.
+  It also lets you reach for `entry.target.getBoundingClientRect()` if you need
+  something the observer doesn't provide, like the element's coordinates. (Note
+  that this forces a layout; the ResizeObserver values above do not.)
+
+```tsx
+const { ref } = useResizeObserver<HTMLDivElement>({
+  onResize: ({ width, height, entry }) => {
+    // e.g. the element itself, and the border box while observing the content box:
+    console.log(entry.target, entry.borderBoxSize);
+  },
+});
 ```
 
 This callback also makes it possible to implement your own hooks that report only

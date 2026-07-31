@@ -5,6 +5,7 @@ import { useResizeObserver } from "../../src";
 import type {
   ObservedSize,
   ResizeHandler,
+  ResizeHandlerPayload,
   ResizeObserverBoxOptions,
   RoundingFunction,
 } from "../../src";
@@ -795,8 +796,8 @@ describe("onResize callback", () => {
     controller.assertMeasuredSize({ width: undefined, height: undefined });
 
     expect(observations.length).toBe(2);
-    expect(observations[0]).toEqual({ width: 100, height: 200 });
-    expect(observations[1]).toEqual({ width: 101, height: 201 });
+    expect(observations[0]).toMatchObject({ width: 100, height: 200 });
+    expect(observations[1]).toMatchObject({ width: 101, height: 201 });
 
     // Should render once on mount only
     controller.assertRenderCount(1);
@@ -879,11 +880,75 @@ describe("onResize callback", () => {
     controller.assertRenderCount(3);
 
     expect(observations1.length).toBe(2);
-    expect(observations1[0]).toEqual({ width: 1, height: 2 });
-    expect(observations1[1]).toEqual({ width: 3, height: 4 });
+    expect(observations1[0]).toMatchObject({ width: 1, height: 2 });
+    expect(observations1[1]).toMatchObject({ width: 3, height: 4 });
 
     expect(observations2.length).toBe(2);
-    expect(observations2[0]).toEqual({ width: 5, height: 6 });
-    expect(observations2[1]).toEqual({ width: 7, height: 8 });
+    expect(observations2[0]).toMatchObject({ width: 5, height: 6 });
+    expect(observations2[1]).toMatchObject({ width: 7, height: 8 });
+  });
+
+  it("passes the raw ResizeObserverEntry alongside the measured size", async () => {
+    const payloads: ResizeHandlerPayload[] = [];
+    let observedElement: HTMLDivElement | null = null;
+    const c = createController();
+    const Test = () => {
+      const { ref } = useResizeObserver<HTMLDivElement>({
+        onResize: (payload) => payloads.push(payload),
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(ref, (element: HTMLDivElement) => {
+        observedElement = element;
+        c.provideSetSizeFunction(element);
+      });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    await render(<Test />);
+    await c.setSize({ width: 100, height: 200 });
+
+    expect(payloads.length).toBeGreaterThan(0);
+    const payload = payloads[payloads.length - 1];
+
+    // The resolved size is still reported...
+    expect(payload).toMatchObject({ width: 100, height: 200 });
+    // ...now alongside the raw entry.
+    expect(payload.entry).toBeInstanceOf(ResizeObserverEntry);
+    expect(payload.entry.contentRect.width).toBe(100);
+    expect(payload.entry.contentRect.height).toBe(200);
+    // `entry.target` is the observed element, which is otherwise awkward to get
+    // hold of in the callback when the returned ref callback is used.
+    expect(payload.entry.target).toBe(observedElement);
+  });
+
+  it("exposes every box size on the entry, regardless of the box option", async ({ skip }) => {
+    skip(!supports.borderBox, "borderBoxSize unsupported");
+
+    const payloads: ResizeHandlerPayload[] = [];
+    const c = createController();
+    const Test = () => {
+      const { ref } = useResizeObserver<HTMLDivElement>({
+        box: "border-box",
+        onResize: (payload) => payloads.push(payload),
+      });
+
+      const mergedCallbackRef = useMergedCallbackRef(ref, (element: HTMLDivElement) => {
+        c.provideSetSizeFunction(element);
+      });
+
+      return <div ref={mergedCallbackRef} />;
+    };
+
+    await render(<Test />);
+    await c.setSize({ width: 100, height: 200 });
+
+    expect(payloads.length).toBeGreaterThan(0);
+    const { entry } = payloads[payloads.length - 1];
+
+    // Observing the border box, yet the content box is reported on the entry too.
+    expect(entry.borderBoxSize).toBeTruthy();
+    expect(entry.contentBoxSize).toBeTruthy();
+    expect(entry.contentRect).toBeTruthy();
   });
 });
