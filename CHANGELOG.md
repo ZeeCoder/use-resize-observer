@@ -1,3 +1,30 @@
+# [10.0.0](https://github.com/ZeeCoder/use-resize-observer/compare/v9.1.0...v10.0.0) (2026-07-31)
+
+
+* feat!: v10 — modernised toolchain, React 19 support, long-standing fixes ([5647fab](https://github.com/ZeeCoder/use-resize-observer/commit/5647fab4b1321a384f76fb49da9a68138ba1e7bc))
+
+
+### BREAKING CHANGES
+
+* named export only (no default), `/polyfilled` entrypoint
+removed, zero runtime dependencies (@juggle/resize-observer dropped), react-dom
+no longer a peer, React >=18.2, ES2020 output (no IE11), and only the package
+root is importable. Full list with rationale in MIGRATION.md.
+
+Toolchain (rebuilt end to end)
+- Build: rollup + babel → tsdown (ESM + CJS + type declarations).
+- Tests: jest + karma → Vitest in real browsers (Playwright), plus a
+  WebdriverIO / BrowserStack suite on real desktop & mobile devices.
+- Lint / format: eslint + prettier → oxlint + oxfmt.
+- Package manager: yarn → pnpm; CI on Node 24 with OIDC trusted publishing.
+
+Library
+- React 19 support (18 kept); open-ended peer range so future majors work
+  without a release here.
+- onResize payload now carries the raw ResizeObserverEntry (every box size,
+  entry.target), cross-window / iframe observation, and a measured 0 reports
+  as 0 rather than undefined.
+
 # [10.0.0-alpha.3](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.2...v10.0.0-alpha.3) (2026-07-31)
 
 
