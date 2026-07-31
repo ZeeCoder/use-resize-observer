@@ -38,9 +38,9 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 - **React** `^18.2` or `^19`.
 - A **`ResizeObserver`** implementation. It is available in all
-  [modern browsers](https://caniuse.com/resizeobserver). If you need to support an
-  environment without it, polyfill it yourself in your app's entry point (see
-  [Polyfilling](#polyfilling)).
+  [modern browsers](https://caniuse.com/resizeobserver). To support an environment
+  without it, either [polyfill it](#polyfilling) yourself, or
+  [skip observation entirely](#environments-without-resizeobserver).
 
 ## In Action
 
@@ -392,6 +392,45 @@ import { ResizeObserver } from "@juggle/resize-observer";
 if (!window.ResizeObserver) {
   window.ResizeObserver = ResizeObserver;
 }
+```
+
+## Environments Without `ResizeObserver`
+
+Polyfilling is one option. The other is to let the hook sit idle where
+`ResizeObserver` is missing, and fall back to default sizes.
+
+This works because the hook creates its `ResizeObserver` **lazily** — not on
+render, but the first time it actually has an element to observe. (That is what
+makes it SSR-safe too.) Give it nothing to observe and it never touches the
+global, so nothing throws. Hooks can't be called conditionally, but this way you
+don't need to.
+
+Detect the global once, then only hand over the ref when it's there:
+
+```ts
+const isRoAvailable = typeof window !== "undefined" && "ResizeObserver" in window;
+
+const ref = useRef<HTMLDivElement>(null);
+// Stays at 100x50 where there's no ResizeObserver to measure with.
+const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
+  ref: isRoAvailable ? ref : null,
+});
+```
+
+The same works with the returned ref callback — wrap it, and only pass the element
+through when the global is available:
+
+```ts
+const { ref: observe, width = 100, height = 50 } = useResizeObserver<HTMLDivElement>();
+
+const ref = useCallback(
+  (element: HTMLDivElement | null) => {
+    if (isRoAvailable) {
+      observe(element);
+    }
+  },
+  [observe],
+);
 ```
 
 ## Related
