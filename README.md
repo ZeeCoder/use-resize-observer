@@ -62,7 +62,7 @@ yarn add use-resize-observer
 | -------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | ref      | undefined &#124; RefObject &#124; Element                                             | A ref or element to observe. If omitted, use the [ref callback](#response) the hook returns instead (preferred).             | undefined      |
 | box      | undefined &#124; "border-box" &#124; "content-box" &#124; "device-pixel-content-box" | The [box model](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax) to use for observation.       | "content-box"  |
-| onResize | undefined &#124; ({ width, height, entry }: [ResizeHandlerPayload](#the-raw-entry)) => void | A callback receiving the element size, along with the [raw entry](#the-raw-entry). If given, then the hook will not return the size, and instead will call this callback. | undefined      |
+| onResize | undefined &#124; ({ width, height, entry }: [ResizeHandlerPayload](#the-raw-entry)) => void | A callback receiving the element size and the [raw entry](#the-raw-entry). Providing it opts into **callback-only mode**: the hook stops returning/updating `width` & `height` and no longer re-renders — you own updates (and the render optimisation) instead. | undefined      |
 | round    | undefined &#124; (n: number) => number                                               | A function to use for rounding values instead of the default.                                                                 | `Math.round()` |
 
 ## Response
