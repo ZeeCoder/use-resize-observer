@@ -1,3 +1,10 @@
+# [10.0.0-alpha.3](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.2...v10.0.0-alpha.3) (2026-07-31)
+
+
+### Bug Fixes
+
+* don't call onResize after the component unmounts ([cffac3a](https://github.com/ZeeCoder/use-resize-observer/commit/cffac3a9996cfe01d8a730c810a0e38e2249c6ff))
+
 # [10.0.0-alpha.2](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.1...v10.0.0-alpha.2) (2026-07-31)
 
 
