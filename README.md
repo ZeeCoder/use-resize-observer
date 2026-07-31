@@ -405,22 +405,13 @@ makes it SSR-safe too.) Give it nothing to observe and it never touches the
 global, so nothing throws. Hooks can't be called conditionally, but this way you
 don't need to.
 
-Detect the global once, then only hand over the ref when it's there:
+Detect the global once, then wrap the returned ref callback so the element is only
+passed through when it's there:
 
 ```ts
 const isRoAvailable = typeof window !== "undefined" && "ResizeObserver" in window;
 
-const ref = useRef<HTMLDivElement>(null);
 // Stays at 100x50 where there's no ResizeObserver to measure with.
-const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
-  ref: isRoAvailable ? ref : null,
-});
-```
-
-The same works with the returned ref callback — wrap it, and only pass the element
-through when the global is available:
-
-```ts
 const { ref: observe, width = 100, height = 50 } = useResizeObserver<HTMLDivElement>();
 
 const ref = useCallback(
@@ -431,6 +422,16 @@ const ref = useCallback(
   },
   [observe],
 );
+```
+
+The same works with a ref object, if you have one already — hand it to the hook
+only when the global is available:
+
+```ts
+const ref = useRef<HTMLDivElement>(null);
+const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
+  ref: isRoAvailable ? ref : null,
+});
 ```
 
 ## Related
