@@ -1,6 +1,6 @@
 {
   "name": "use-resize-observer",
-  "version": "10.0.0-alpha.1",
+  "version": "10.0.0-alpha.2",
   "packageManager": "pnpm@10.34.1",
   "description": "A React hook that allows you to use a ResizeObserver to measure an element's size.",
   "keywords": [

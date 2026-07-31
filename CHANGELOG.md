@@ -1,3 +1,10 @@
+# [10.0.0-alpha.2](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.1...v10.0.0-alpha.2) (2026-07-31)
+
+
+### Features
+
+* expose the raw ResizeObserverEntry in the onResize callback ([148a985](https://github.com/ZeeCoder/use-resize-observer/commit/148a9859f065f7f47d928345dce02e155c000b4d)), closes [#102](https://github.com/ZeeCoder/use-resize-observer/issues/102)
+
 # [10.0.0-alpha.1](https://github.com/ZeeCoder/use-resize-observer/compare/v9.1.0...v10.0.0-alpha.1) (2026-07-30)
 
 
