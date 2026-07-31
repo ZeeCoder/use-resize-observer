@@ -54,7 +54,9 @@ warning is now gone.
 
 ### 5. Supported React versions
 
-You now need React 18.2 or newer (18.2+ or 19). Anything older is no longer supported.
+You now need React 18.2 or newer; anything older is no longer supported. The peer
+range has no upper bound (`>=18.2`), so future React majors are accepted without
+needing a release here.
 
 ### 6. Output targets ES2020; IE 11 is no longer supported
 

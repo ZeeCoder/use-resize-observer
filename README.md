@@ -36,7 +36,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 
 ## Requirements
 
-- **React** `^18.2` or `^19`.
+- **React** 18.2 or newer (the peer range is open-ended, so future majors work too).
 - A **`ResizeObserver`** implementation. It is available in all
   [modern browsers](https://caniuse.com/resizeobserver). To support an environment
   without it, either [polyfill it](#polyfilling) yourself, or
