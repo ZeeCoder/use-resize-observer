@@ -26,7 +26,7 @@
 export default function extractSize(
   entry: ResizeObserverEntry,
   boxProp: "borderBoxSize" | "contentBoxSize" | "devicePixelContentBoxSize",
-  sizeType: keyof ResizeObserverSize
+  sizeType: keyof ResizeObserverSize,
 ): number | undefined {
   if (!entry[boxProp]) {
     if (boxProp === "contentBoxSize") {

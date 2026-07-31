@@ -14,21 +14,33 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 [![build](https://github.com/ZeeCoder/use-resize-observer/workflows/Testing/badge.svg)](https://github.com/ZeeCoder/use-resize-observer/actions/workflows/testing.yml)
 [![BrowserStack Status](https://automate.browserstack.com/badge.svg?badge_key=aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)](https://automate.browserstack.com/public-build/aVpjV2RZbThnWnh2S0FvREh0cGRtRHRCNzYwUmw4N0Z4WUxybHM0WkpqST0tLW9RT0tDeGk3OVU2WkNtalpON29xWFE9PQ==--ec6a97c52cd7ad30417612ca3f5df511eef5d631)
 
+> **Upgrading from v9?** v10 has several breaking changes, see [MIGRATION.md](./MIGRATION.md).
+
 ## Highlights
 
 - Written in **TypeScript**.
-- **Tiny**: [648B](.size-limit.json) (minified, gzipped) Monitored by [size-limit](https://github.com/ai/size-limit).
-- Exposes an **onResize callback** if you need more control.
+- **Zero runtime dependencies.**
+- **Tiny**: under 1kB (minified, gzipped), monitored by [size-limit](https://github.com/ai/size-limit) ([budget](.size-limit.json)).
+- Ships **ESM and CJS** builds.
+- Exposes an **onResize callback** if you need more control, receiving the raw
+  `ResizeObserverEntry` along with the measured size.
 - `box` [option](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax).
 - Works with **SSR**.
 - Works with **CSS-in-JS**.
 - **Supports custom refs** in case you [had one already](#passing-in-your-own-ref).
-- **Uses RefCallback by default** To address delayed mounts and changing ref elements.
-- **Ships a polyfilled version**
+- **Uses RefCallback by default** to address delayed mounts and changing ref elements.
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
-- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints))
-- **Tested in real browsers** (Currently latest Chrome, Firefox, Edge, Safari, Opera, IE 11, iOS and Android, sponsored by BrowserStack)
+- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints), [Element Coordinates](#element-coordinates))
+- **Tested in real browsers** (latest Chrome, Firefox, Edge and Safari, plus real iOS and Android devices, sponsored by BrowserStack)
+
+## Requirements
+
+- **React** 18.2 or newer (the peer range is open-ended, so future majors work too).
+- A **`ResizeObserver`** implementation. It is available in all
+  [modern browsers](https://caniuse.com/resizeobserver). To support an environment
+  without it, either [polyfill it](#polyfilling) yourself, or
+  [skip observation entirely](#environments-without-resizeobserver).
 
 ## In Action
 
@@ -37,18 +49,20 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 ## Install
 
 ```sh
-yarn add use-resize-observer --dev
+pnpm add use-resize-observer
 # or
-npm install use-resize-observer --save-dev
+npm install use-resize-observer
+# or
+yarn add use-resize-observer
 ```
 
 ## Options
 
 | Option   | Type                                                                                 | Description                                                                                                                   | Default        |
-| -------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| ref      | undefined &#124; RefObject &#124; HTMLElement                                        | A ref or element to observe.                                                                                                  | undefined      |
+| -------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| ref      | undefined &#124; RefObject &#124; Element                                             | A ref or element to observe. If omitted, use the [ref callback](#response) the hook returns instead (preferred).             | undefined      |
 | box      | undefined &#124; "border-box" &#124; "content-box" &#124; "device-pixel-content-box" | The [box model](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax) to use for observation.       | "content-box"  |
-| onResize | undefined &#124; ({ width?: number, height?: number }) => void                       | A callback receiving the element size. If given, then the hook will not return the size, and instead will call this callback. | undefined      |
+| onResize | undefined &#124; ({ width, height, entry }: [ResizeHandlerPayload](#the-raw-entry)) => void | A callback receiving the element size and the [raw entry](#the-raw-entry). Providing it opts into **callback-only mode**: the hook stops returning/updating `width` & `height` and no longer re-renders — you own updates (and the render optimisation) instead. | undefined      |
 | round    | undefined &#124; (n: number) => number                                               | A function to use for rounding values instead of the default.                                                                 | `Math.round()` |
 
 ## Response
@@ -61,12 +75,10 @@ npm install use-resize-observer --save-dev
 
 ## Basic Usage
 
-Note that the default builds are not polyfilled! For instructions and alternatives,
-see the [Transpilation / Polyfilling](#transpilation--polyfilling) section.
+`useResizeObserver` is a **named** export:
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
@@ -101,13 +113,13 @@ the old spec in case `contentBoxSize` is not available.
 `border-box`
 
 Supported well for the most part by evergreen browsers. If you need to support older versions of these browsers however,
-then you may want to feature-detect for support, and optionally include a polyfill instead of the native implementation.
+then you may want to feature-detect for support.
 
 `device-pixel-content-box`
 
 Surma has a [very good article](https://web.dev/device-pixel-content-box/) on how this allows us to do pixel perfect
-rendering. At the time of writing, however this has very limited support.
-The advices on feature detection for `border-box` apply here too.
+rendering. At the time of writing, however, this has limited support (notably, it is unsupported in Safari).
+Feature-detect before relying on it.
 
 ### Custom Rounding
 
@@ -126,11 +138,10 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>({
 **Skipping Rounding**
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 // Outside the hook to ensure this instance does not change unnecessarily.
-const noop = (n) => n;
+const noop = (n: number) => n;
 
 const App = () => {
   const {
@@ -160,9 +171,8 @@ To get the raw element, either you use your own RefObject (see later in this doc
 or you can merge the returned ref with one of your own:
 
 ```tsx
-import React, { useCallback, useEffect, useRef } from "react";
-import useResizeObserver from "use-resize-observer";
-import mergeRefs from "react-merge-refs";
+import { useResizeObserver } from "use-resize-observer";
+import { mergeRefs } from "react-merge-refs";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
@@ -184,8 +194,9 @@ const App = () => {
 
 ## Passing in Your Own `ref`
 
-You can pass in your own ref instead of using the one provided.
-This can be useful if you already have a ref you want to measure.
+Where you can, prefer the `RefCallback` the hook returns (the default usage shown
+above) — it handles delayed mounts and elements that change over time. Passing
+your own ref is for when you already have one you need to measure.
 
 ```ts
 const ref = useRef<HTMLDivElement>(null);
@@ -199,13 +210,15 @@ You can even reuse the same hook instance to measure different elements:
 ## Measuring a raw element
 
 There might be situations where you have an element already that you need to measure.
-`ref` now accepts elements as well, not just refs, which means that you can do this:
+The `ref` option accepts a raw element too, not just a ref, so you can do this:
 
 ```ts
 const { width, height } = useResizeObserver<HTMLDivElement>({
   ref: divElement,
 });
 ```
+
+Elements from another window (for example a cross-document iframe) are supported too.
 
 ## Using a Single Hook to Measure Multiple Refs
 
@@ -226,14 +239,9 @@ you run some tests, where the environment does not provide the `ResizeObserver`.
 
 ([See discussions](https://github.com/ZeeCoder/use-resize-observer/issues/40))
 
-You can do one of the following depending on your needs:
-
-- Use the default `ref` RefCallback, or provide a custom ref conditionally,
-  only when needed. The hook will not create a ResizeObserver instance up until
-  there's something there to actually observe.
-- Patch the test environment, and make a polyfill available as the ResizeObserver.
-  (This assumes you don't already use the polyfilled version, which would switch
-  to the polyfill when no native implementation was available.)
+Use the default `ref` RefCallback, or provide a custom ref conditionally, only
+when needed. The hook will not create a ResizeObserver instance until there's
+something there to actually observe.
 
 ## The "onResize" Callback
 
@@ -245,8 +253,7 @@ which'll simply receive the width and height of the element when it changes, so
 that you can decide what to do with it:
 
 ```tsx
-import React from "react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 const App = () => {
   // width / height will not be returned here when the onResize callback is present
@@ -258,6 +265,29 @@ const App = () => {
 
   return <div ref={ref} />;
 };
+```
+
+### The raw `entry`
+
+Along with the resolved `width` / `height`, the callback receives the raw
+[ResizeObserverEntry](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
+as `entry`. This gives you everything the hook itself doesn't surface:
+
+- **All box sizes**, regardless of the `box` option in use. Browsers report
+  `contentBoxSize`, `borderBoxSize` and `devicePixelContentBoxSize` on every entry
+  (where supported), so you can read a different box than the one being observed.
+- **The observed element**, as `entry.target`. This is handy when you use the
+  returned ref callback, where the element isn't otherwise at hand in the callback.
+  It also lets you reach for things the observer doesn't provide at all, like the
+  element's [coordinates](#element-coordinates).
+
+```tsx
+const { ref } = useResizeObserver<HTMLDivElement>({
+  onResize: ({ width, height, entry }) => {
+    // e.g. the element itself, and the border box while observing the content box:
+    console.log(entry.target, entry.borderBoxSize);
+  },
+});
 ```
 
 This callback also makes it possible to implement your own hooks that report only
@@ -282,6 +312,30 @@ You might want to receive values less frequently than changes actually occur.
 Another popular concept are breakpoints. Here is an example for a simple hook accomplishing that.
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-breakpoints-3hiv8)
+
+### Element Coordinates
+
+The hook reports sizes only. If you need the element's `x` / `y` / `top` / `left`
+too, read them off the element with
+[getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect),
+which the [raw `entry`](#the-raw-entry) puts within easy reach:
+
+```ts
+const { ref } = useResizeObserver({
+  onResize: ({ entry }) => {
+    requestAnimationFrame(() => {
+      const rect = entry.target.getBoundingClientRect();
+      // ... do something with the result ...
+    });
+  },
+});
+```
+
+`getBoundingClientRect()` forces a layout, so it is wrapped in a
+`requestAnimationFrame` here to avoid
+[layout thrashing](https://github.com/ZeeCoder/use-resize-observer/discussions/102#discussioncomment-5020345).
+Only reach for this if you actually need the coordinates — if width / height is
+all you're after, use the hook as normal and leave `entry` alone.
 
 ## Defaults (SSR)
 
@@ -310,7 +364,9 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 ```
 
 Here "width" and "height" will be undefined until the ResizeObserver takes its
-first measurement.
+first measurement. A measured dimension of `0` is reported as `0` (not
+`undefined`), so you can distinguish a genuinely zero-sized element from one that
+has not been measured yet.
 
 ## Container/Element Query with CSS-in-JS
 
@@ -320,38 +376,106 @@ container/element queries:
 
 [CodeSandbox Demo](https://codesandbox.io/s/use-resize-observer-container-query-with-css-in-js-iitxl)
 
-## Transpilation / Polyfilling
+## Polyfilling
 
-By default the library provides transpiled ES5 modules in CJS / ESM module formats.
+The library targets modern (ES2020) browsers and ships **no** ResizeObserver
+polyfill. It has zero runtime dependencies.
 
-Polyfilling is recommended to be done in the host app, and not within imported
-libraries, as that way consumers have control over the exact polyfills being used.
-
-That said, there's a [polyfilled](https://github.com/juggle/resize-observer)
-CJS module that can be used for convenience:
-
-```ts
-import useResizeObserver from "use-resize-observer/polyfilled";
-```
-
-Note that using the above will use the polyfill, [even if the native ResizeObserver is available](https://github.com/juggle/resize-observer#basic-usage).
-
-To use the polyfill as a fallback only when the native RO is unavailable, you can polyfill yourself instead,
-either in your app's entry file, or you could create a local `useResizeObserver` module, like so:
+Polyfilling is best done in the host app, and not within imported libraries, as
+that way consumers control the exact polyfills being used. If you need to support
+an environment without a native `ResizeObserver`, install a polyfill such as
+[@juggle/resize-observer](https://github.com/juggle/resize-observer) and make it
+available before the hook runs — for example in your app's entry point:
 
 ```ts
-// useResizeObserver.ts
 import { ResizeObserver } from "@juggle/resize-observer";
-import useResizeObserver from "use-resize-observer";
 
 if (!window.ResizeObserver) {
   window.ResizeObserver = ResizeObserver;
 }
-
-export default useResizeObserver;
 ```
 
-The same technique can also be used to provide any of your preferred ResizeObserver polyfills out there.
+## Environments Without `ResizeObserver`
+
+Polyfilling is one option. The other is to let the hook sit idle where
+`ResizeObserver` is missing, and fall back to default sizes.
+
+This works because the hook creates its `ResizeObserver` **lazily** — not on
+render, but the first time it actually has an element to observe. (That is what
+makes it SSR-safe too.) Give it nothing to observe and it never touches the
+global, so nothing throws. Hooks can't be called conditionally, but this way you
+don't need to.
+
+Detect the global once, then wrap the returned ref callback so the element is only
+passed through when it's there:
+
+```ts
+const isRoAvailable = typeof window !== "undefined" && "ResizeObserver" in window;
+
+// Stays at 100x50 where there's no ResizeObserver to measure with.
+const { ref: observe, width = 100, height = 50 } = useResizeObserver<HTMLDivElement>();
+
+const ref = useCallback(
+  (element: HTMLDivElement | null) => {
+    if (isRoAvailable) {
+      observe(element);
+    }
+  },
+  [observe],
+);
+```
+
+The same works with a ref object, if you have one already — hand it to the hook
+only when the global is available:
+
+```ts
+const ref = useRef<HTMLDivElement>(null);
+const { width = 100, height = 50 } = useResizeObserver<HTMLDivElement>({
+  ref: isRoAvailable ? ref : null,
+});
+```
+
+## "ResizeObserver loop limit exceeded"
+
+If you come across this — `ResizeObserver loop limit exceeded` in Chrome, or
+`ResizeObserver loop completed with undelivered notifications` in Firefox — it is
+**harmless**, despite surfacing as an error.
+
+It means observing caused a resize, which caused another observation, and the
+browser cut the loop short instead of hanging. It's a guard against infinite loops
+during a layout pass, not a crash — the pending notifications are simply delivered
+on the next frame.
+
+Worth addressing all the same, in this order:
+
+1. **Find the root cause.** Usually something in your resize handling changes
+   layout in a way that feeds back into the observed element. That feedback loop
+   is the actual bug, and fixing it makes the message go away for good.
+2. **Filter it out in your bug tracker** (Sentry, Datadog, etc). If you can't pin
+   it down, stop collecting it. It's noise rather than a failure, and left alone
+   it can bury real errors.
+3. **Defer reporting by a frame.** A last resort — compose a hook that pushes the
+   size out through `requestAnimationFrame`:
+
+```ts
+const useResizeObserverWithRAF = (opts) => {
+  const [size, setSize] = useState({ width: undefined, height: undefined });
+
+  const { ref } = useResizeObserver({
+    ...opts,
+    onResize: ({ width, height }) => {
+      requestAnimationFrame(() => setSize({ width, height }));
+    },
+  });
+
+  return { ref, ...size };
+};
+```
+
+This works because it moves the reporting out of the layout pass where the limit
+is enforced. The catch is that sizes now arrive a frame late (~16ms at 60fps),
+which gives up much of the point of using a `ResizeObserver` — so reach for it
+only once the first two options are exhausted.
 
 ## Related
 

@@ -1,20 +1,15 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "es6",
-    "target": "es5",
-    "moduleResolution": "node",
-    "strict": true,
-    "esModuleInterop": true,
-    "outDir": "dist",
+    "noEmit": true,
     "declaration": false,
     "emitDeclarationOnly": false,
-    "jsx": "react",
-    "noEmit": true,
-    "typeRoots": [
-      "@types/karma", "../node_modules/@types"]
+    // Typecheck-only config covering both ../src and tests/. TS 6+ infers rootDir
+    // from the inherited outDir and would reject ../src as "outside rootDir", so
+    // set it to the repo root explicitly.
+    "rootDir": "..",
+    "types": ["node"]
   },
-  "include": [".", "../src"],
-  "exclude": [
-    "../src/**/*.test.tsx"
-  ]
+  "include": ["../src", "node", "browser", "utils", "setup.ts", "react-dom-server.d.ts"],
+  "exclude": ["../src/**/*.test.tsx"]
 }

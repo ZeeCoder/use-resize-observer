@@ -1,4 +1,5 @@
-import { RefCallback, RefObject, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import type { RefCallback, RefObject } from "react";
 
 type SubscriberCleanupFunction = () => void;
 type SubscriberResponse = SubscriberCleanupFunction | void;
@@ -7,7 +8,7 @@ type SubscriberResponse = SubscriberCleanupFunction | void;
 // refs to such extent, but then composing hooks and components could not opt out of unnecessary renders.
 export default function useResolvedElement<T extends Element>(
   subscriber: (element: T) => SubscriberResponse,
-  refOrElement?: T | RefObject<T> | null
+  refOrElement?: T | RefObject<T | null> | null,
 ): RefCallback<T> {
   const lastReportRef = useRef<{
     element: T | null;
@@ -28,13 +29,19 @@ export default function useResolvedElement<T extends Element>(
     const cbElement = cbElementRef.current;
     const refOrElement = refOrElementRef.current;
     // Ugly ternary. But smaller than an if-else block.
+    // Duck-typing element-ness via `nodeType` instead of `instanceof Element`, so
+    // that elements from another window / cross-document iframe are recognised as
+    // elements rather than mistaken for a ref object and silently never observed.
+    // `nodeType` is present on elements from any window but absent on ref objects
+    // (and on invalid `{}` refs, which then resolve to `undefined` and are
+    // ignored). @see issues #100, #109, #113
     const element: T | null = cbElement
       ? cbElement
       : refOrElement
-      ? refOrElement instanceof Element
-        ? refOrElement
-        : refOrElement.current
-      : null;
+        ? "nodeType" in refOrElement
+          ? refOrElement
+          : refOrElement.current
+        : null;
 
     if (
       lastReportRef.current &&
@@ -71,6 +78,6 @@ export default function useResolvedElement<T extends Element>(
       cbElementRef.current = element;
       evaluateSubscription();
     },
-    [evaluateSubscription]
+    [evaluateSubscription],
   );
 }

@@ -1,3 +1,40 @@
+# [10.0.0-alpha.3](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.2...v10.0.0-alpha.3) (2026-07-31)
+
+
+### Bug Fixes
+
+* don't call onResize after the component unmounts ([cffac3a](https://github.com/ZeeCoder/use-resize-observer/commit/cffac3a9996cfe01d8a730c810a0e38e2249c6ff))
+
+# [10.0.0-alpha.2](https://github.com/ZeeCoder/use-resize-observer/compare/v10.0.0-alpha.1...v10.0.0-alpha.2) (2026-07-31)
+
+
+### Features
+
+* expose the raw ResizeObserverEntry in the onResize callback ([148a985](https://github.com/ZeeCoder/use-resize-observer/commit/148a9859f065f7f47d928345dce02e155c000b4d)), closes [#102](https://github.com/ZeeCoder/use-resize-observer/issues/102)
+
+# [10.0.0-alpha.1](https://github.com/ZeeCoder/use-resize-observer/compare/v9.1.0...v10.0.0-alpha.1) (2026-07-30)
+
+
+* feat!: v10 — docs, npm provenance, Dependabot ([aced5cc](https://github.com/ZeeCoder/use-resize-observer/commit/aced5cc7c215169e8126a9d49e12849a88be211a))
+
+
+### Bug Fixes
+
+* cross-window observation + report measured 0 (not undefined) ([0b3bcb7](https://github.com/ZeeCoder/use-resize-observer/commit/0b3bcb7cb9c79e37b48eac03235613bb271cccd6)), closes [#100](https://github.com/ZeeCoder/use-resize-observer/issues/100) [#109](https://github.com/ZeeCoder/use-resize-observer/issues/109) [#113](https://github.com/ZeeCoder/use-resize-observer/issues/113) [#103](https://github.com/ZeeCoder/use-resize-observer/issues/103)
+
+
+### BREAKING CHANGES
+
+* The default export has been removed. Use the named export instead:
+  import { useResizeObserver } from "use-resize-observer";
+The "use-resize-observer/polyfilled" entrypoint has been removed, along with the
+@juggle/resize-observer dependency. The package now has zero runtime dependencies.
+React 16.8 - 17 are no longer supported; the peer range is now ^18.2 || ^19.
+react-dom is no longer a peer dependency.
+Output now targets ES2020; IE 11 is no longer supported.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+
 # [9.1.0](https://github.com/ZeeCoder/use-resize-observer/compare/v9.0.2...v9.1.0) (2022-11-22)
 
 ### Bug Fixes

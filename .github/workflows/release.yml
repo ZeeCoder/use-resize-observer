@@ -8,15 +8,34 @@ jobs:
   release:
     name: release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      # Required for npm Trusted Publishing (OIDC): npm mints a short-lived token
+      # from this GitHub OIDC token at publish time — no NPM_TOKEN needed, and
+      # provenance is attached automatically.
+      id-token: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      # fetch-depth: 0 so semantic-release sees the full history + tags (it
+      # determines the last release from tags like v9.1.0).
+      - uses: actions/checkout@v4
         with:
-          node-version: 14
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      # Node 24 (current LTS). Keep this at 24+: @semantic-release/npm runs
+      # `npm publish` from the runner's npm (its bundled copy isn't on PATH under
+      # pnpm), and npm Trusted Publishing (OIDC) needs npm >= 11.5.1 — which Node
+      # 24 bundles, but Node 22 does not.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
       - name: Installing Dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Building
+        run: pnpm build
       - name: Releasing
-        run: npx semantic-release
+        run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

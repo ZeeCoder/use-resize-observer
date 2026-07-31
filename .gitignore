@@ -2,8 +2,20 @@
 node_modules
 .idea
 .vscode
-yarn-error.log*
 dist
-/polyfilled.js
-/polyfilled.d.ts
-local.log
+release
+.baseline
+coverage
+*.tgz
+.vitest-attachments
+**/__screenshots__
+browsers.json
+tests/e2e/app/bundle.js
+tests/e2e/app/node_modules
+tests/e2e/app/pnpm-lock.yaml
+
+# BrowserStack SDK / WebdriverIO run artifacts (E2E)
+*.log
+log/
+logs/
+.browserstack/

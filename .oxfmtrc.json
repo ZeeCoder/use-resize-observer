@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    ".baseline",
+    "release",
+    "coverage",
+    "pnpm-lock.yaml",
+    "**/*.md",
+    ".claude",
+    "**/package.json"
+  ]
+}
