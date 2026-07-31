@@ -31,7 +31,7 @@ A React hook that allows you to use a ResizeObserver to measure an element's siz
 - **Uses RefCallback by default** to address delayed mounts and changing ref elements.
 - Handles many edge cases you might not even think of.
   (See this documentation and the test cases.)
-- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints))
+- Easy to compose ([Throttle / Debounce](#throttle--debounce), [Breakpoints](#breakpoints), [Element Coordinates](#element-coordinates))
 - **Tested in real browsers** (latest Chrome, Firefox, Edge and Safari, plus real iOS and Android devices, sponsored by BrowserStack)
 
 ## Requirements
