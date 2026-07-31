@@ -59,10 +59,10 @@ yarn add use-resize-observer
 ## Options
 
 | Option   | Type                                                                                 | Description                                                                                                                   | Default        |
-| -------- |--------------------------------------------------------------------------------------| ----------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| ref      | undefined &#124; RefCallback &#124; RefObject &#124; HTMLElement                     | A ref or element to observe.                                                                                                  | undefined      |
+| -------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| ref      | undefined &#124; RefObject &#124; Element                                             | A ref or element to observe. If omitted, use the [ref callback](#response) the hook returns instead (preferred).             | undefined      |
 | box      | undefined &#124; "border-box" &#124; "content-box" &#124; "device-pixel-content-box" | The [box model](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#syntax) to use for observation.       | "content-box"  |
-| onResize | undefined &#124; ({ width?: number, height?: number, entry: ResizeObserverEntry }) => void | A callback receiving the element size, along with the [raw entry](#the-raw-entry). If given, then the hook will not return the size, and instead will call this callback. | undefined      |
+| onResize | undefined &#124; ({ width, height, entry }: [ResizeHandlerPayload](#the-raw-entry)) => void | A callback receiving the element size, along with the [raw entry](#the-raw-entry). If given, then the hook will not return the size, and instead will call this callback. | undefined      |
 | round    | undefined &#124; (n: number) => number                                               | A function to use for rounding values instead of the default.                                                                 | `Math.round()` |
 
 ## Response
@@ -141,7 +141,7 @@ const { ref, width, height } = useResizeObserver<HTMLDivElement>({
 import { useResizeObserver } from "use-resize-observer";
 
 // Outside the hook to ensure this instance does not change unnecessarily.
-const noop = (n) => n;
+const noop = (n: number) => n;
 
 const App = () => {
   const {
@@ -172,7 +172,7 @@ or you can merge the returned ref with one of your own:
 
 ```tsx
 import { useResizeObserver } from "use-resize-observer";
-import mergeRefs from "react-merge-refs";
+import { mergeRefs } from "react-merge-refs";
 
 const App = () => {
   const { ref, width = 1, height = 1 } = useResizeObserver<HTMLDivElement>();
@@ -194,8 +194,9 @@ const App = () => {
 
 ## Passing in Your Own `ref`
 
-You can pass in your own ref instead of using the one provided.
-This can be useful if you already have a ref you want to measure.
+Where you can, prefer the `RefCallback` the hook returns (the default usage shown
+above) — it handles delayed mounts and elements that change over time. Passing
+your own ref is for when you already have one you need to measure.
 
 ```ts
 const ref = useRef<HTMLDivElement>(null);
@@ -209,7 +210,7 @@ You can even reuse the same hook instance to measure different elements:
 ## Measuring a raw element
 
 There might be situations where you have an element already that you need to measure.
-`ref` now accepts elements as well, not just refs, which means that you can do this:
+The `ref` option accepts a raw element too, not just a ref, so you can do this:
 
 ```ts
 const { width, height } = useResizeObserver<HTMLDivElement>({
